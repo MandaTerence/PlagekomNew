@@ -267,14 +267,24 @@ class PersonnelController extends Controller
     }
 
     public function getPersonnelData(Request $request){
-        $personnel = Personnel::where('Matricule',$request->matricule)
+        $personnel = Personnel::whereRaw("Matricule like ".$request->matricule."")
         ->first();
-        $response = [
-            'success' => false,
-            'message' => 'resultat trouvé '.$request->matricule,
-            'personnel' => $personnel,
-        ];
-        return $response;
+        if($personnel){
+            $response = [
+                'success' => true,
+                'message' => 'resultat trouvé',
+                'personnel' => $personnel,
+            ];
+            return $response;
+        }
+        else{
+            $response = [
+                'success' => false,
+                'message' => 'aucun resultat trouvé',
+                'personnel' => null,
+            ];
+            return $response;
+        }
     }
 
 }

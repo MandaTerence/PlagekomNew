@@ -316,7 +316,7 @@
                             <ul class="nav nav-collapse">
                                 <li>
                                     <a href="components/avatars.html">
-                                        <span class="sub-item">Controle</span>
+                                        <router-link to="/controleTelephonique"><span class="sub-item">Controle</span></router-link>
                                     </a>
                                 </li>
                                 <li>
