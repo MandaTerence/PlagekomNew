@@ -315,9 +315,7 @@
                         <div class="collapse" id="controle">
                             <ul class="nav nav-collapse">
                                 <li>
-                                    <a href="components/avatars.html">
-                                        <router-link to="/controleTelephonique"><span class="sub-item">Controle</span></router-link>
-                                    </a>
+                                    <router-link to="/controleTelephonique"><span class="sub-item">Controle</span></router-link>
                                 </li>
                                 <li>
                                     <a href="components/buttons.html">

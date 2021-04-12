@@ -267,7 +267,7 @@ class PersonnelController extends Controller
     }
 
     public function getPersonnelData(Request $request){
-        $personnel = Personnel::whereRaw("Matricule like ".$request->matricule."")
+        $personnel = Personnel::whereRaw("Matricule like '".$request->matricule."' ")
         ->first();
         if($personnel){
             $response = [

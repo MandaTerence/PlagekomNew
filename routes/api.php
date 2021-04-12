@@ -8,7 +8,10 @@ use App\Http\Controllers\API\MissionController;
 use App\Http\Controllers\API\PersonnelController;
 use App\Http\Controllers\API\ClassementController;
 use App\Http\Controllers\API\ProduitController;
+use App\Http\Controllers\API\ControleController;
+
 use Illuminate\Support\Facades\Route;
+
 
 Route::post('login', [UtilisateurController::class, 'login']);
 Route::post('register', [UtilisateurController::class, 'register']);
@@ -48,6 +51,10 @@ Route::group(['prefix' => 'equipe', 'middleware' => 'auth:sanctum'], function ()
 Route::group(['prefix' => 'classements', 'middleware' => 'auth:sanctum'], function () {
     Route::post('/', [ClassementController::class, 'create']);
     Route::get('/planning', [ClassementController::class, 'getPlanning']);
+});
+
+Route::group(['prefix' => 'controle', 'middleware' => 'auth:sanctum'], function () {
+    Route::post('/', [ControleController::class, 'create']);
 });
 
 Route::group(['prefix' => 'produits', 'middleware' => 'auth:sanctum'], function () {

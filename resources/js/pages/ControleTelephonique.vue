@@ -1,4 +1,18 @@
 <template>
+    <div v-if="!exist">
+        <div class="card" >
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="matricule">Matricule</label>
+                    <input type="text" class="form-control" id="matricule"  placeholder="Matricule" v-model="nouveauMatricule">
+                    
+                </div>
+                <div class="form-group">
+                    <button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-secondary" v-on:click="changeCommerciaux">controler</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div v-if="exist">
         <div class="card" >
             <div class="card-body">
@@ -52,24 +66,70 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-3">
+
+                    <div class="form-group">
                         <select class="form-control" v-model="sim">
                             <option value="Telma">Telma</option>
                             <option value="Orange">Orange</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
+
+                    <div class="form-group">
                         {{ tempsMinute }}
                     </div>
-                    <div class="col-md-3">
+
+                    <div v-if="!timerIsCounting" class="form-group">
                         <button type="button" class="btn btn-success" v-on:click="startTimer">Demarrer</button>
                     </div>
-                    <div class="col-md-3">
-                        <button type="button" class="btn btn-danger" v-on:click="stopTimer">Arreter</button>
+                    <div v-if="timerIsCounting" class="form-group">
+                        <button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-danger" v-on:click="stopTimer">Arreter</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel" >Valider Controle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table>
+                            <tr>
+                                <td><strong>Commerciaux: </strong></td>
+                                <td>{{ matricule }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>sim: </strong></td>
+                                <td>{{ sim }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>debut: </strong></td>
+                                <td>{{ tempsDebut }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>fin: </strong></td>
+                                <td>{{ tempsFin }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>durée: </strong></td>
+                                <td>{{ dureeMinute }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="validateControle">valider</button>   
                     </div>
                 </div>
             </div>
         </div>
+        <!-- Modal end -->
     </div>
 </template>
 
@@ -79,11 +139,15 @@ export default {
     data() {
         return {
             matricule: '',
+            nouveauMatricule: '',
             personnelData: [],
             exist: false,
             sim: "Telma",
             timerIsCounting: false,
             temps: 0,
+            duree: 0,
+            tempsDebut: null,
+            tempsFin: null,
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -95,13 +159,30 @@ export default {
     created() {
         this.loadURLdata();
         this.countDownTimer();
+        this.tempsDebut = this.getCurrentDateTime();
+        this.tempsFin = this.getCurrentDateTime();
     },
     computed:{
         tempsMinute: function(){
             return new Date(this.temps*1000).toISOString().substr(11, 8);
+        },
+        dureeMinute: function(){
+            return new Date(this.duree*1000).toISOString().substr(11, 8);
         }
     },
     methods: {
+        changeCommerciaux(){
+            this.matricule = this.nouveauMatricule;
+            this.nouveauMatricule = "";
+            this.getPersonnel();
+        },
+        getCurrentDateTime(){
+            let today = new Date();
+            let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+            let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            let dateTime = date+' '+time;
+            return dateTime;
+        },
         countDownTimer(){
             if(this.temps >= 0) {
                 setTimeout(() => {
@@ -113,12 +194,26 @@ export default {
             }
         },
         startTimer(){
+            this.tempsDebut = this.getCurrentDateTime();
+            this.tempsFin = this.getCurrentDateTime();
             this.timerIsCounting = true;
         },
+        getTemps(){ 
+            var today = new Date();
+            var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            var dateTime = date+' '+time;
+        },
         stopTimer(){
-            this.timerIsCounting = false;
-            alert(this.tempsMinute);
-            this.temps = 0;
+            if(this.timerIsCounting){
+                this.tempsFin = this.getCurrentDateTime();
+                this.timerIsCounting = false;
+                this.duree = this.temps;
+                this.temps = 0;
+            }
+            else{
+                alert("demarrer dabord le timer");
+            }
         },
         loadURLdata(){
             let urlParams = new URLSearchParams(window.location.search);
@@ -127,11 +222,23 @@ export default {
                 this.getPersonnel();
             }
         },
+        validateControle(){
+            axios.post('/api/controle/',{sim: this.sim,debut: this.tempsDebut,fin: this.tempsFin,commercial: this.matricule,controlleur:window.Laravel.user.Matricule.trim()}).then(response => {
+                this.nouveauMatricule = '';
+                this.exist = false;
+                alert("controle reusssit");
+            });
+        },
         getPersonnel(){
             this.$axios.get('/api/personnels/getPersonnelData',{params: {matricule: this.matricule }}) 
             .then(response => {
                 this.exist=response.data.success;
-                this.personnelData = response.data.personnel;
+                if(this.exist){
+                    this.personnelData = response.data.personnel;
+                }
+                else{
+                    alert(this.matricule+" n'existe pas ");
+                }
             });
         }
     }

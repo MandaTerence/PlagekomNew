@@ -1,23 +1,34 @@
 <template>
     <div class="row">
-        <div class="form-row">
-            <div class="form-group">
-                <label for="inputMission">Mission</label>
-                <select class="form-control" id="inputMission" v-model="idMission" v-on:change="reloadPlannig();">
-                    <option v-bind:key="mission.Id_de_la_mission" v-bind:value="mission.Id_de_la_mission" v-for="mission in missions">{{ mission.Id_de_la_mission }}</option>
-                </select> 
+        <div class="card" >
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="inputMission">Mission</label>
+                    <select class="form-control" id="inputMission" v-model="idMission" v-on:change="reloadPlannig();">
+                        <option v-bind:key="mission.Id_de_la_mission" v-bind:value="mission.Id_de_la_mission" v-for="mission in missions">{{ mission.Id_de_la_mission }}</option>
+                    </select> 
+                </div>
             </div>
-        </div> 
+        </div>
     </div>
     <div>
         <div v-for="planningCoach in plannings" v-bind:key="planningCoach">
-            <h1 v-if="planningCoach.accompagnement.length>0" v-on:click="displayPlanning(planningCoach.coach )">{{ planningCoach.coach.Coach  }}</h1>
+            <h3 v-if="planningCoach.accompagnement.length>0" v-on:click="displayPlanning(planningCoach.coach )">{{ planningCoach.coach.Coach  }}</h3>
             <div v-if="planningCoach.visibility==true">
                 <div>
-                    <h1>Equipe</h1>
-                    <ul>
-                        <li v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">{{ commercial.Commercial }}</li>
-                    </ul>
+                    <h3>Equipe</h3>
+                    <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                        <thead>
+                            <tr>
+                                <th> personnel </th>            
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
+                                <td>{{ commercial.Commercial }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <div style="margin-top:50px" v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
                     <div class="row">
