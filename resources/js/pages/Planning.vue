@@ -16,19 +16,25 @@
             <h3 v-if="planningCoach.accompagnement.length>0" v-on:click="displayPlanning(planningCoach.coach )">{{ planningCoach.coach.Coach  }}</h3>
             <div v-if="planningCoach.visibility==true">
                 <div>
-                    <h3>Equipe</h3>
-                    <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                        <thead>
-                            <tr>
-                                <th> personnel </th>            
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
-                                <td>{{ commercial.Commercial }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <h3>
+                    <a v-on:click="toogleDisplayEquipe()">
+                        Equipe
+                    </a>
+                    </h3>
+                    <div v-if="equipeDisplay">
+                        <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                            <thead>
+                                <tr>
+                                    <th> personnel </th>            
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
+                                    <td>{{ commercial.Commercial }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div style="margin-top:50px" v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
                     <div class="row">
@@ -92,6 +98,8 @@ export default {
     name: "Planning",
     data() {
         return {
+            equipeDisplay: false,
+            Display: [],
             missions: [],
             idMission: '',
             plannings: [],
@@ -112,6 +120,9 @@ export default {
         this.loadURLdata();
     },
     methods: {
+        toogleDisplayEquipe(){
+            (this.equipeDisplay==true)?this.equipeDisplay = false:this.equipeDisplay = true;
+        },
         loadURLdata(){
             let urlParams = new URLSearchParams(window.location.search);
             if(urlParams.get('idMission')){

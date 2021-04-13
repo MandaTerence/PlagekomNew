@@ -1,13 +1,12 @@
 <template>
     <div v-if="!exist">
         <div class="card" >
-            <div class="card-body">
+            <div class="card-body ">
                 <div class="form-group">
                     <label for="matricule">Matricule</label>
                     <input type="text" class="form-control" id="matricule"  placeholder="Matricule" v-model="nouveauMatricule">
-                    
                 </div>
-                <div class="form-group">
+                <div class="form-group text-center">
                     <button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-secondary" v-on:click="changeCommerciaux">controler</button>
                 </div>
             </div>
@@ -88,6 +87,25 @@
                 </div>
             </div>
         </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="form-group">
+                        <select class="form-control" v-model="typePersonnel">
+                            <option value="Commerciaux" selected>Commerciaux</option>
+                            <option value="Coach">Coach</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" v-model="codeSanction">
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-secondary form-control" v-on:click="AddSanction">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
 
         <!-- Modal -->
         <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -107,7 +125,12 @@
                             </tr>
                             <tr>
                                 <td><strong>sim: </strong></td>
-                                <td>{{ sim }}</td>
+                                <td>
+                                    <select class="form-control" v-model="sim">
+                                        <option value="Telma">Telma</option>
+                                        <option value="Orange">Orange</option>
+                                    </select>
+                                </td>
                             </tr>
                             <tr>
                                 <td><strong>debut: </strong></td>
@@ -138,6 +161,8 @@ export default {
     name: "ControleTelephonique",
     data() {
         return {
+            codeSanction: '',
+            typePersonnel: 'Commerciaux',
             matricule: '',
             nouveauMatricule: '',
             personnelData: [],
@@ -171,6 +196,10 @@ export default {
         }
     },
     methods: {
+        AddSanction(){
+            // TO-DO
+            alert(this.codeSanction);
+        },
         changeCommerciaux(){
             this.matricule = this.nouveauMatricule;
             this.nouveauMatricule = "";
