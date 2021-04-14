@@ -261,7 +261,7 @@
     </div>
 
     <!-- Sidebar -->
-    <div class="sidebar">			
+    <div class="sidebar" v-if="isLoggedIn">			
         <div class="sidebar-wrapper scrollbar scrollbar-inner">
             <div class="sidebar-content">
                 <div class="user">

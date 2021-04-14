@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <div class="card" >
+        <div class="card col-md-4" >
             <div class="card-body">
                 <div class="form-group">
                     <label for="inputMission">Mission</label>
@@ -14,81 +14,95 @@
     <div>
         <div v-for="planningCoach in plannings" v-bind:key="planningCoach">
             <h3 v-if="planningCoach.accompagnement.length>0" v-on:click="displayPlanning(planningCoach.coach )">{{ planningCoach.coach.Coach  }}</h3>
-            <div v-if="planningCoach.visibility==true">
-                <div>
-                    <h3>
-                    <a v-on:click="toogleDisplayEquipe()">
-                        Equipe
-                    </a>
-                    </h3>
-                    <div v-if="equipeDisplay">
-                        <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                            <thead>
-                                <tr>
-                                    <th> personnel </th>            
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
-                                    <td>{{ commercial.Commercial }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div style="margin-top:50px" v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
-                    <div class="row">
-                        <div class="col-3">
-                            <h3>{{ planning['jour'] }}</h3>
+            
+                <div class="row">
+                    <div class="card col-md-4">
+                        <div class="form-group">
+                            <div class="card-body">
+                                <label for="equipeList">
+                                    <a v-on:click="toogleDisplayEquipe()">
+                                        <h3>Equipe</h3>
+                                    </a>
+                                </label>
+                                <div  id="equipeList" v-if="equipeDisplay">
+                                    <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                                        <thead>
+                                            <tr>
+                                                <th> personnel </th>            
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
+                                                <td>{{ commercial.Commercial }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h3>Matin</h3>
-                            <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                <thead>
-                                    <tr>
-                                        <th> HEURE </th>
-                                        <th> MATRICULE </th>            
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td> {{ formatHeure(planning.matin[0].Heure_debut) }} à {{ formatHeure(planning.matin[0].Heure_fin) }}  </td>
-                                        <td> {{ planning.matin[0].Commercial }} </td>                    
-                                    </tr>
-                                    <tr>
-                                        <td> {{ formatHeure(planning.matin[1].Heure_debut) }} à {{ formatHeure(planning.matin[1].Heure_fin) }}  </td>
-                                        <td> {{ planning.matin[1].Commercial }} </td>                    
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <h3>Apres Midi</h3>
-                            <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                <thead>
-                                    <tr>
-                                        <th> HEURE </th>
-                                        <th> MATRICULE </th>            
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td> {{ formatHeure(planning.apresMidi[0].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
-                                        <td> {{ planning.apresMidi[0].Commercial }} </td>                    
-                                    </tr>
-                                    <tr>
-                                        <td> {{ formatHeure(planning.apresMidi[1].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
-                                        <td> {{ planning.apresMidi[1].Commercial }} </td>                    
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>  
-                    <hr style="background-color: #3490dc;">
                 </div>
-            </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="">
+                            <div class="card" style="margin-top:50px" v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div v-on:click="toogleVisibility(planning['jour'])">
+                                            <h3><a >{{ planning['jour'] }}</a></h3>
+                                        </div>
+                                    </div>
+                                    <div class="row" v-if="planning.visibility==true">
+                                        <div class="col-md-6">
+                                            <h3>Matin</h3>
+                                            <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                                                <thead>
+                                                    <tr>
+                                                        <th> HEURE </th>
+                                                        <th> MATRICULE </th>            
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td> {{ formatHeure(planning.matin[0].Heure_debut) }} à {{ formatHeure(planning.matin[0].Heure_fin) }}  </td>
+                                                        <td> {{ planning.matin[0].Commercial }} </td>                    
+                                                    </tr>
+                                                    <tr>
+                                                        <td> {{ formatHeure(planning.matin[1].Heure_debut) }} à {{ formatHeure(planning.matin[1].Heure_fin) }}  </td>
+                                                        <td> {{ planning.matin[1].Commercial }} </td>                    
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h3>Apres Midi</h3>
+                                            <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                                                <thead>
+                                                    <tr>
+                                                        <th> HEURE </th>
+                                                        <th> MATRICULE </th>            
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td> {{ formatHeure(planning.apresMidi[0].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
+                                                        <td> {{ planning.apresMidi[0].Commercial }} </td>                    
+                                                    </tr>
+                                                    <tr>
+                                                        <td> {{ formatHeure(planning.apresMidi[1].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
+                                                        <td> {{ planning.apresMidi[1].Commercial }} </td>                    
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div> 
+                                </div> 
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            
         </div>
     </div>
 </template>
@@ -120,6 +134,19 @@ export default {
         this.loadURLdata();
     },
     methods: {
+        toogleVisibility(jour){
+           
+            for(let i = 0;i<this.plannings[0].accompagnement.length;i++){
+                if(this.plannings[0].accompagnement[i]['jour'] == jour){
+                    if(this.plannings[0].accompagnement[i].visibility == true){
+                        this.plannings[0].accompagnement[i].visibility = false;
+                    }
+                    else{
+                        this.plannings[0].accompagnement[i].visibility = true;
+                    }
+                }
+            }
+        },
         toogleDisplayEquipe(){
             (this.equipeDisplay==true)?this.equipeDisplay = false:this.equipeDisplay = true;
         },
@@ -158,8 +185,9 @@ export default {
                 this.$axios.get('/sanctum/csrf-cookie').then(response => {
                     axios.get('/api/classements/planning',{params: {idMission : this.idMission,coach : this.coach}}).then(response => {
                         this.plannings = response.data.plannings;
-                        for(let i=0;i<this.plannings.length;i++){
-                            this.plannings[i].visibility = true;
+                        for(let i=0;i<this.plannings[0].accompagnement.length;i++){
+                            this.plannings[0].accompagnement[i].visibility = false;
+                            console.log(this.plannings[0].accompagnement[i]);
                         }
                     });  
                 });
