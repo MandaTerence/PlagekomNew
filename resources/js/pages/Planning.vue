@@ -43,63 +43,73 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-8">
-                        <div class="">
-                            <div class="card" style="margin-top:50px" v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div v-on:click="toogleVisibility(planning['jour'])">
-                                            <h3><a >{{ planning['jour'] }}</a></h3>
+                    <div class="card col-md-8">
+                        <div class="card-body">
+                            <div class="row">
+                                    <table class="table table-hover">
+                                        <div v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
+                                            <tbody>
+                                                <tr style="text-align:center" class="col-md-12">
+                                                    <td>
+                                                        <div v-on:click="toogleVisibility(planning['jour'])" >
+                                                            <h3><a >{{ planning['jour'] }}</a></h3>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr v-if="planning.visibility==true">
+                                                    <td >
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <h3>Matin</h3>
+                                                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th> HEURE </th>
+                                                                            <th> MATRICULE </th>            
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td> {{ formatHeure(planning.matin[0].Heure_debut) }} à {{ formatHeure(planning.matin[0].Heure_fin) }}  </td>
+                                                                            <td v-on:click="goToPlanning(planning.matin[0].Commercial)"> {{ planning.matin[0].Commercial }}</td>                    
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> {{ formatHeure(planning.matin[1].Heure_debut) }} à {{ formatHeure(planning.matin[1].Heure_fin) }}  </td>
+                                                                            <td v-on:click="goToPlanning(planning.matin[1].Commercial)"> {{ planning.matin[1].Commercial }} </td>                    
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <h3>Apres Midi</h3>
+                                                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th> HEURE </th>
+                                                                            <th> MATRICULE </th>            
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td> {{ formatHeure(planning.apresMidi[0].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
+                                                                            <td v-on:click="goToPlanning(planning.apresMidi[0].Commercial)"> {{ planning.apresMidi[0].Commercial }} </td>                    
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td> {{ formatHeure(planning.apresMidi[1].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
+                                                                            <td v-on:click="goToPlanning(planning.apresMidi[1].Commercial)"> {{ planning.apresMidi[1].Commercial }} </td>                    
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr> 
+                                            </tbody>
                                         </div>
-                                    </div>
-                                    <div class="row" v-if="planning.visibility==true">
-                                        <div class="col-md-6">
-                                            <h3>Matin</h3>
-                                            <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                                <thead>
-                                                    <tr>
-                                                        <th> HEURE </th>
-                                                        <th> MATRICULE </th>            
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td> {{ formatHeure(planning.matin[0].Heure_debut) }} à {{ formatHeure(planning.matin[0].Heure_fin) }}  </td>
-                                                        <td> {{ planning.matin[0].Commercial }} </td>                    
-                                                    </tr>
-                                                    <tr>
-                                                        <td> {{ formatHeure(planning.matin[1].Heure_debut) }} à {{ formatHeure(planning.matin[1].Heure_fin) }}  </td>
-                                                        <td> {{ planning.matin[1].Commercial }} </td>                    
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h3>Apres Midi</h3>
-                                            <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                                <thead>
-                                                    <tr>
-                                                        <th> HEURE </th>
-                                                        <th> MATRICULE </th>            
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td> {{ formatHeure(planning.apresMidi[0].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
-                                                        <td> {{ planning.apresMidi[0].Commercial }} </td>                    
-                                                    </tr>
-                                                    <tr>
-                                                        <td> {{ formatHeure(planning.apresMidi[1].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
-                                                        <td> {{ planning.apresMidi[1].Commercial }} </td>                    
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div> 
-                                </div> 
+                                    </table>
+                                
                             </div>
                         </div>
-                        
                     </div>
                 </div>
             
@@ -134,6 +144,9 @@ export default {
         this.loadURLdata();
     },
     methods: {
+        goToPlanning(matricule){
+            this.$router.push({ path: 'controleTelephonique', query: { matricule: matricule } });
+        },
         toogleVisibility(jour){
            
             for(let i = 0;i<this.plannings[0].accompagnement.length;i++){
@@ -187,7 +200,6 @@ export default {
                         this.plannings = response.data.plannings;
                         for(let i=0;i<this.plannings[0].accompagnement.length;i++){
                             this.plannings[0].accompagnement[i].visibility = false;
-                            console.log(this.plannings[0].accompagnement[i]);
                         }
                     });  
                 });

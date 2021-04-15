@@ -306,13 +306,13 @@
                             <p>Acceuil</p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a data-toggle="collapse" href="#controle">
+                    <li v-bind:class="displaySideBar[0]['navClass']">
+                        <a  v-on:click="toogleDisplaySideBar('controle')">
                             <i class="fas fa-phone-volume"></i>
                             <p>Controle telephonique</p>
                             <span class="caret"></span>
                         </a>
-                        <div class="collapse" id="controle">
+                        <div v-if="displaySideBar[0]['display']==true">
                             <ul class="nav nav-collapse">
                                 <li>
                                     <router-link to="/controleTelephonique"><span class="sub-item">Controle</span></router-link>
@@ -333,13 +333,13 @@
                             </ul>
                         </div>
                     </li>
-                    <li class="nav-item active submenu">
-                        <a data-toggle="collapse" href="#planning">
+                    <li v-bind:class="displaySideBar[1]['navClass']">
+                        <a v-on:click="toogleDisplaySideBar('planning')">
                             <i class="fas fa-users"></i>
                             <p>Planning et Accompagnement</p>
                             <span class="caret"></span>
                         </a>
-                        <div class="collapse show" id="planning">
+                        <div v-if="displaySideBar[1]['display']==true">
                             <ul class="nav nav-collapse">
                                 <li class="active">
                                     <router-link to="/creationEquipe" class="nav-item nav-link sub-category">
@@ -354,13 +354,13 @@
                             </ul>
                         </div>
                     </li>
-                    <li class="nav-item">
-                        <a data-toggle="collapse" href="#salaire">
+                    <li v-bind:class="displaySideBar[2]['navClass']">
+                        <a v-on:click="toogleDisplaySideBar('salaire')">
                             <i class="fas fa-money-check-alt"></i>
                             <p>Salaire</p>
                             <span class="caret"></span>
                         </a>
-                        <div class="collapse" id="salaire">
+                        <div v-if="displaySideBar[2]['display']==true">
                             <ul class="nav nav-collapse">
                                 <li>
                                     <a href="forms/forms.html">
@@ -422,7 +422,24 @@ export default {
             isLoggedIn: false,
             displayMenu: true,
             sideBarWidth: 0,
-            dropdownListDisplay: ["none","none","none"]
+            dropdownListDisplay: ["none","none","none"],
+            displaySideBar: [
+                {
+                    nom:"controle",
+                    navClass:"nav-item submenu",
+                    display:false
+                },
+                {
+                    nom:"planning",
+                    navClass:"nav-item submenu",
+                    display:false
+                },
+                {
+                    nom:"salaire",
+                    navClass:"nav-item submenu",
+                    display:false
+                }
+            ]
         }
     },
     created() {
@@ -434,6 +451,21 @@ export default {
         }
     },
     methods: {
+        toogleDisplaySideBar(sideItemName){
+            for(let i=0;i<this.displaySideBar.length;i++){
+                if(sideItemName == this.displaySideBar[i]["nom"]){
+                    if(this.displaySideBar[i]["display"]==true){
+                        this.displaySideBar[i]["display"]=false;
+                        this.displaySideBar[i]["navClass"]="nav-item submenu";
+                    }
+                    else{
+                        this.displaySideBar[i]["display"]=true;
+                        this.displaySideBar[i]["navClass"]="nav-item active submenu";
+                    } 
+                    break;
+                }
+            }
+        },
         logout(e) {
             console.log('ss')
             e.preventDefault()

@@ -65,7 +65,7 @@ export const routes = [
         name: 'controleTelephonique',
         path: '/controleTelephonique',
         component: ControleTelephonique
-    },
+    }
 ];
 
 const router = createRouter({
