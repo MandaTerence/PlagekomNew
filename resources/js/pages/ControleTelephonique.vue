@@ -32,15 +32,15 @@
                             </tr>
                             <tr>
                                 <td><strong>Mission Actuel:</strong></td>
-                                <td></td>
+                                <td>{{ personnelData.Id_de_la_mission }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Coach Commerciale:</strong></td>
-                                <td></td>
+                                <td>{{ personnelData.Coach }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Contact Coach:</strong></td>
-                                <td></td>
+                                <td>{{ personnelData.ContactCoach }}</td>
                             </tr>
                         </table>
                     </div>
@@ -55,9 +55,6 @@
                                 <td>{{ personnelData.Contact_du_tuteur }}</td>
                             </tr>
                         </table>
-                    </div>
-                    <div class="col-md-4">
-                        of {{ matricule }} !
                     </div>
                 </div>
             </div>

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\Facture;
 use App\Models\Produit;
+use App\Models\Accompagnement;
 
 class Personnel extends Model
 {
@@ -57,6 +58,19 @@ class Personnel extends Model
         "local"=>"LOCAL",
         "mission"=>"MISSION"
     ];
+
+    public function getDetailPersonnel(){
+        $detail = Accompagnement::select('Id_de_la_mission','Coach')
+        ->where('Commercial',$this->Matricule)
+        ->orderBy('Date','asc')
+        ->first();
+        $this->Id_de_la_mission = $detail->Id_de_la_mission;
+        $this->Coach = $detail->Coach;
+        $this->ContactCoach = self::select('Contact_du_personnel')
+        ->where('Matricule',$detail->Coach)
+        ->first()->Contact_du_personnel;
+        return $detail;
+    }
 
     public function getNomFromMAtricule(){
         $result = self::select('Nom','Prenom')

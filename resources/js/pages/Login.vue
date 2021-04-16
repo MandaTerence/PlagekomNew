@@ -29,7 +29,7 @@
 
                             <div class="form-group row">
                                 <div class="col-md-12 text-center">
-                                    <button type="submit" class="btn btn-primary" @click="handleSubmit">
+                                    <button type="submit" class="btn btn-secondary" @click="handleSubmit">
                                         se connecter
                                     </button>
                                 </div>
@@ -68,9 +68,9 @@ export default {
                                 this.error = response.data.message
                             }
                         })
-                        .catch(function (error) {
-                            console.error(error);
-                        });
+                        .catch(
+                            this.error = "probleme de connection au serveur"
+                        );
                 })
             }
         }
