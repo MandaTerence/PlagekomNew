@@ -9,6 +9,7 @@ use App\Http\Controllers\API\PersonnelController;
 use App\Http\Controllers\API\ClassementController;
 use App\Http\Controllers\API\ProduitController;
 use App\Http\Controllers\API\ControleController;
+use App\Http\Controllers\API\SanctionController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -61,4 +62,8 @@ Route::group(['prefix' => 'produits', 'middleware' => 'auth:sanctum'], function 
     Route::get('/', [ProduitController::class, 'index']);
     Route::get('/getProduitByDesignation', [ProduitController::class, 'getProduitByDesignation']);
     Route::get('/getFirst', [ProduitController::class, 'getFirst']);
+});
+
+Route::group(['prefix' => 'Sanction', 'middleware' => 'auth:sanctum'], function () {
+    Route::get('/', [SanctionController::class, 'getAll']);
 });

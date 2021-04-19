@@ -8,11 +8,15 @@ import Login from '../pages/Login';
 import Dashboard from '../pages/Dashboard';
 import Planning from '../pages/Planning';
 import ControleTelephonique from '../pages/ControleTelephonique';
+import TimeLine from '../pages/TimeLine';
 
 
 import Books from '../components/Books';
 import AddBook from '../components/AddBook';
 import EditBook from '../components/EditBook';
+
+
+
 
 
 export const routes = [
@@ -65,7 +69,13 @@ export const routes = [
         name: 'controleTelephonique',
         path: '/controleTelephonique',
         component: ControleTelephonique
+    },
+    {
+        name: 'TimeLine',
+        path: '/TimeLine',
+        component: TimeLine
     }
+    
 ];
 
 const router = createRouter({

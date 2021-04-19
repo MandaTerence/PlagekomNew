@@ -1,3 +1,6 @@
+Select * from malus join malus_detail on malus_detail.Id_malus = malus.Id;
+
+
 select COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA 
 from `facture` 
     inner join `detailvente` on `detailvente`.`Facture` = `facture`.`id` 

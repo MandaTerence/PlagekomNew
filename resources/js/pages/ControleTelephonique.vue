@@ -94,7 +94,9 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <input type="text" class="form-control" v-model="codeSanction">
+                        <select class="form-control" v-model="codeSanction">
+                            <option v-for="sanction in sanctions" v-bind:value="sanction.nom" v-bind:key="sanction">{{ sanction.nom }}</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <button type="button" class="btn btn-secondary form-control" v-on:click="AddSanction">Ajouter</button>
@@ -102,8 +104,31 @@
                 </div>
             </div>
         </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <table class="table table-hover table-bordered" style="font-size:10px">
+                        <thead >
+                            <tr class="bg-secondary" style="color:white">
+                                <th scope="col-md-2">Code Sanction</th>
+                                <th scope="col-md-2">Designation</th>
+                                <th scope="col-md-2">Autres</th>
+                                <th scope="col-md-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr >
+                                <td scope="col-md-2"> </td>
+                                <td scope="col-md-2"> </td>
+                                <td scope="col-md-2"> </td>
+                                <td scope="col-md-2"> </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
         
-
         <!-- Modal -->
         <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -170,6 +195,8 @@ export default {
             duree: 0,
             tempsDebut: null,
             tempsFin: null,
+            sanctions: [],
+            sanctionsPersonnel: []
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -181,6 +208,7 @@ export default {
     created() {
         this.loadURLdata();
         this.countDownTimer();
+        this.loadSanctions();
         this.tempsDebut = this.getCurrentDateTime();
         this.tempsFin = this.getCurrentDateTime();
     },
@@ -193,6 +221,12 @@ export default {
         }
     },
     methods: {
+        loadSanctions(){
+            this.$axios.get('/api/Sanction/') 
+            .then(response => {
+                this.sanctions = response.data.mallus;
+            });
+        },
         AddSanction(){
             // TO-DO
             alert(this.codeSanction);

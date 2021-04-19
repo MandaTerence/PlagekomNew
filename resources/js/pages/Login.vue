@@ -69,7 +69,6 @@ export default {
                             }
                         })
                         .catch(
-                            this.error = "probleme de connection au serveur"
                         );
                 })
             }
