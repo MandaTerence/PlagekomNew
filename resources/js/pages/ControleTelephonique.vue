@@ -94,9 +94,14 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <select class="form-control" v-model="codeSanction">
-                            <option v-for="sanction in sanctions" v-bind:value="sanction.nom" v-bind:key="sanction">{{ sanction.nom }}</option>
-                        </select>
+                        <input type="text" class="form-control" v-model="codeSanction" v-on:keyup="autoComplete" v-on:click="autoComplete" placeholder="code sanction">
+                        <div v-if="showAutoComplete" class="panel-footer" style="float:top">
+                            <ul class="list-group">
+                                <li class="list-group-item" v-for="sanction in sanctions" v-bind:key="sanction" v-on:click.left="changeSanction(sanction.code_sanction)" >
+                                    <div >{{ sanction.code_sanction }}</div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="form-group">
                         <button type="button" class="btn btn-secondary form-control" v-on:click="AddSanction">Ajouter</button>
@@ -183,6 +188,7 @@ export default {
     name: "ControleTelephonique",
     data() {
         return {
+            showAutoComplete:false,
             codeSanction: '',
             typePersonnel: 'Commerciaux',
             matricule: '',
@@ -196,7 +202,8 @@ export default {
             tempsDebut: null,
             tempsFin: null,
             sanctions: [],
-            sanctionsPersonnel: []
+            sanctionsPersonnel: [],
+            isSearchingAutoComplete:false
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -208,7 +215,6 @@ export default {
     created() {
         this.loadURLdata();
         this.countDownTimer();
-        this.loadSanctions();
         this.tempsDebut = this.getCurrentDateTime();
         this.tempsFin = this.getCurrentDateTime();
     },
@@ -221,10 +227,26 @@ export default {
         }
     },
     methods: {
-        loadSanctions(){
-            this.$axios.get('/api/Sanction/') 
-            .then(response => {
-                this.sanctions = response.data.mallus;
+        changeSanction(mots){
+            this.showAutoComplete = false;
+            this.codeSanction = mots;
+        },
+        autoComplete(){
+            if((this.codeSanction.length > 2)&&(!this.isSearchingAutoComplete)){
+                this.isSearchingAutoComplete = true;
+                if(this.codeSanction != null ){
+                    setTimeout(this.searchAutoComplete, 1000);
+                }
+            }    
+        },
+        searchAutoComplete(){
+            this.resultats = [];
+            axios.get('/api/sanction/',{params: {codeSanction: this.codeSanction}}).then(response => {
+                this.isSearchingAutoComplete = false;
+                if(response.data.success){
+                    this.showAutoComplete = true;
+                    this.sanctions = response.data.sanctions;
+                }
             });
         },
         AddSanction(){

@@ -318,9 +318,7 @@
                                     <router-link to="/controleTelephonique"><span class="sub-item">Controle</span></router-link>
                                 </li>
                                 <li>
-                                    <a href="components/buttons.html">
-                                        <span class="sub-item">Etat Controle du mois</span>
-                                    </a>
+                                    <router-link to="/TimeLine"><span class="sub-item">Etat Controle du mois</span></router-link>
                                 </li>
                                 <li>
                                     <router-link to="/planning"><span class="sub-item">Calendrier du mois</span></router-link>

@@ -64,6 +64,6 @@ Route::group(['prefix' => 'produits', 'middleware' => 'auth:sanctum'], function 
     Route::get('/getFirst', [ProduitController::class, 'getFirst']);
 });
 
-Route::group(['prefix' => 'Sanction', 'middleware' => 'auth:sanctum'], function () {
+Route::group(['prefix' => 'sanction', 'middleware' => 'auth:sanctum'], function () {
     Route::get('/', [SanctionController::class, 'getAll']);
 });

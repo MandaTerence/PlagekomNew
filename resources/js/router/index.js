@@ -10,14 +10,9 @@ import Planning from '../pages/Planning';
 import ControleTelephonique from '../pages/ControleTelephonique';
 import TimeLine from '../pages/TimeLine';
 
-
 import Books from '../components/Books';
 import AddBook from '../components/AddBook';
 import EditBook from '../components/EditBook';
-
-
-
-
 
 export const routes = [
     {

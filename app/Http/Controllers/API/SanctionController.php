@@ -13,10 +13,11 @@ class SanctionController extends Controller
     }
 
     public function getAll(Request $request){
-        $res = SanctionService::getAll();
+        $code=$request->codeSanction;
+        $res = SanctionService::getSanctionFromCode($code);
         $response = [
             'success' => true,
-            'mallus' => $res,
+            'sanctions' => $res,
         ];
         return $response;
     }

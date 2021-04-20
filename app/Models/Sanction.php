@@ -8,18 +8,17 @@ use Illuminate\Support\Facades\DB;
 
 class Sanction extends Model
 {
-    use HasFactory,Notifiable;
-    protected $table = 'malus_detail';
+    use HasFactory;
+    protected $table = 'sanction';
     protected $primaryKey = 'Id';
     public $incrementing = false;
     public $timestamps = false;
 
     protected $fillable = [
-        'Date_d_embauche',			 			 	
-        'Id Primaire',
-        'Id_malus Index',
-        'montant_vente',
-        'valeur_malus',
+        'code_sanction',
+        'titre',
+        'valeur',
+        'unite'
     ];
 
 }
