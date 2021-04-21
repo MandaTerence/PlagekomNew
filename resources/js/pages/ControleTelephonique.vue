@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!exist">
+    <div>
         <div class="card" >
             <div class="card-body ">
                 <div class="form-group">
@@ -7,7 +7,7 @@
                     <input type="text" class="form-control" id="matricule"  placeholder="Matricule" v-model="nouveauMatricule">
                 </div>
                 <div class="form-group text-center">
-                    <button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-secondary" v-on:click="changeCommerciaux">controler</button>
+                    <button type="button" class="btn btn-secondary" v-on:click="changeCommerciaux">controler</button>
                 </div>
             </div>
         </div>
@@ -95,9 +95,9 @@
                     </div>
                     <div class="form-group">
                         <input type="text" class="form-control" v-model="codeSanction" v-on:keyup="autoComplete" v-on:click="autoComplete" placeholder="code sanction">
-                        <div v-if="showAutoComplete" class="panel-footer" style="float:top">
+                        <div v-if="showAutoComplete" class="panel-footer" style="float:top;position: absolute;z-index: 1;">
                             <ul class="list-group">
-                                <li class="list-group-item" v-for="sanction in sanctions" v-bind:key="sanction" v-on:click.left="changeSanction(sanction.code_sanction)" >
+                                <li class="list-group-item" v-on:click.left="changeSanction(sanction.id,sanction.code_sanction,sanction.titre)" v-for="sanction in sanctions" v-bind:key="sanction" >
                                     <div >{{ sanction.code_sanction }}</div>
                                 </li>
                             </ul>
@@ -106,6 +106,9 @@
                     <div class="form-group">
                         <button type="button" class="btn btn-secondary form-control" v-on:click="AddSanction">Ajouter</button>
                     </div>
+                </div>
+                <div class="row">
+                    <textarea rows="3" class="form-control" readonly v-model="titreSanction"></textarea>
                 </div>
             </div>
         </div>
@@ -122,11 +125,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr >
+                            <tr v-for="sanctionP in sanctionsPersonnel" v-bind:key="sanctionP">
+                                <td scope="col-md-2"> {{ sanctionP.code_sanction }} </td>
+                                <td scope="col-md-2"> {{ sanctionP.titre }} </td>
                                 <td scope="col-md-2"> </td>
-                                <td scope="col-md-2"> </td>
-                                <td scope="col-md-2"> </td>
-                                <td scope="col-md-2"> </td>
+                                <td scope="col-md-2"> <button type="button" class="btn btn-danger" v-on:click="removeSanctionPersonnel(sanctionP.id)" >supprimer</button> </td>
                             </tr>
                         </tbody>
                     </table>
@@ -179,7 +182,7 @@
                 </div>
             </div>
         </div>
-        <!-- Modal end -->
+        <!-- Modal  end -->
     </div>
 </template>
 
@@ -188,8 +191,10 @@ export default {
     name: "ControleTelephonique",
     data() {
         return {
+            titreSanction: '',
             showAutoComplete:false,
             codeSanction: '',
+            idSanction: '',
             typePersonnel: 'Commerciaux',
             matricule: '',
             nouveauMatricule: '',
@@ -217,6 +222,7 @@ export default {
         this.countDownTimer();
         this.tempsDebut = this.getCurrentDateTime();
         this.tempsFin = this.getCurrentDateTime();
+        this.loadSanctionsPersonnel();
     },
     computed:{
         tempsMinute: function(){
@@ -227,13 +233,41 @@ export default {
         }
     },
     methods: {
-        changeSanction(mots){
+        removeSanctionPersonnel(id){
+            for(let i=0;i<this.sanctionsPersonnel.length;i++){
+                if(this.sanctionsPersonnel[i].id == id){
+                    this.sanctionsPersonnel.splice(i,1);
+                    break; 
+                }
+            }
+            axios.delete('/api/sanctionPersonnel/delete',{params:{id: id}}).then(response => {
+                if(response.data.success){
+                    this.loadSanctionsPersonnel();
+                }
+            });
+        },
+        loadSanctionsPersonnel(){
+            axios.get('/api/sanctionPersonnel/getFromMatricule',{params: {matricule: this.matricule}}).then(response => {
+                if(response.data.success){
+                    this.sanctionsPersonnel = response.data.sanctionPersonnels;
+                }
+            });
+        },
+        changeCommerciauxNouveau(){
+            this.$router.push('controleTelephonique');
+        },
+        changeSanction(id,code,titre){
+            //alert(window.Laravel.user.Matricule);
             this.showAutoComplete = false;
-            this.codeSanction = mots;
+            this.codeSanction = code;
+            this.titreSanction = titre;
+            this.idSanction = id;
         },
         autoComplete(){
             if((this.codeSanction.length > 2)&&(!this.isSearchingAutoComplete)){
                 this.isSearchingAutoComplete = true;
+                this.titreSanction = "";
+                this.idSanction = "";
                 if(this.codeSanction != null ){
                     setTimeout(this.searchAutoComplete, 1000);
                 }
@@ -250,8 +284,41 @@ export default {
             });
         },
         AddSanction(){
-            // TO-DO
-            alert(this.codeSanction);
+            if(this.idSanction != ""){
+                if(this.typePersonnel == "Commerciaux"){
+                    axios.post('/api/sanctionPersonnel/',{
+                        code_sanction: this.codeSanction,
+                        matricule_personnel: this.matricule,
+                        matricule_coach: this.personnelData.Coach,
+                        matricule_controlleur: window.Laravel.user.Matricule,
+                        id_sanction: this.idSanction,
+                        type_personnel: this.typePersonnel,
+                        }).then(response => {
+                        this.loadSanctionsPersonnel();
+                    });
+                }
+                else if(this.typePersonnel == "Coach"){
+                    axios.post('/api/sanctionPersonnel/',{
+                        code_sanction: this.codeSanction,
+                        matricule_personnel: this.matricule,
+                        matricule_coach: "aucun",
+                        matricule_controlleur: window.Laravel.user.Matricule,
+                        id_sanction: this.idSanction,
+                        type_personnel: this.typePersonnel,
+                        }).then(response => {
+                        this.loadSanctionsPersonnel();
+                    });
+                }
+            }
+            //alert(this.codeSanction);
+            /*axios.post('/api/sanctionPersonnel/',{
+                codeSanction: this.codeSanction
+                //matricule_personnel
+                //matricule_coach
+                //matricule_controlleur
+                //id_sanction
+                }).then(response => {
+            });*/
         },
         changeCommerciaux(){
             this.matricule = this.nouveauMatricule;
@@ -307,7 +374,7 @@ export default {
         validateControle(){
             axios.post('/api/controle/',{sim: this.sim,debut: this.tempsDebut,fin: this.tempsFin,commercial: this.matricule,controlleur:window.Laravel.user.Matricule.trim()}).then(response => {
                 this.nouveauMatricule = '';
-                this.exist = false;
+                //this.exist = false;
                 alert("controle reusssit");
             });
         },
@@ -317,6 +384,10 @@ export default {
                 this.exist=response.data.success;
                 if(this.exist){
                     this.personnelData = response.data.personnel;
+                    if(this.personnelData.Id_de_la_mission == "aucune"){
+                        alert("attention ce commercial n est actuellement sur aucune mission");
+                    }
+                    this.loadSanctionsPersonnel();
                 }
                 else{
                     alert(this.matricule+" n'existe pas ");

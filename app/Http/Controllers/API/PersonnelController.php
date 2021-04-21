@@ -28,7 +28,7 @@ class PersonnelController extends Controller
         $personnels = Personnel::where(ControllerHelper::getConditions($request))
             ->take(self::DEFAULT_MAX_RESULT)
             ->get();
-        return $personnels; 
+        return $personnels;
     }
 
     public function compareCA($pa,$pb){

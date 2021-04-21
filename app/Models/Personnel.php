@@ -64,11 +64,18 @@ class Personnel extends Model
         ->where('Commercial',$this->Matricule)
         ->orderBy('Date','asc')
         ->first();
-        $this->Id_de_la_mission = $detail->Id_de_la_mission;
-        $this->Coach = $detail->Coach;
-        $this->ContactCoach = self::select('Contact_du_personnel')
-        ->where('Matricule',$detail->Coach)
-        ->first()->Contact_du_personnel;
+        if(isset($detail->Id_de_la_mission)){
+            $this->Id_de_la_mission = $detail->Id_de_la_mission;
+            $this->Coach = $detail->Coach;
+            $this->ContactCoach = self::select('Contact_du_personnel')
+            ->where('Matricule',$detail->Coach)
+            ->first()->Contact_du_personnel;
+        }
+        else{
+            $this->Id_de_la_mission = "aucune";
+            $this->Coach = "aucun";
+            $this->ContactCoach = "aucun";
+        }
         return $detail;
     }
 
