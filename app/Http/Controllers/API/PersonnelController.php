@@ -288,5 +288,9 @@ class PersonnelController extends Controller
         }
     }
 
+    public function getAllFromMission(Request $request){
+        
+    }
+
 }
 

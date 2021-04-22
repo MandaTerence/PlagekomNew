@@ -59,6 +59,13 @@ class Personnel extends Model
         "mission"=>"MISSION"
     ];
 
+    public function getDetailControl(){
+        SanctionPersonnel::select()
+        ->where()
+        ->join("sanction","sanction.id","=","sanction_personnel.id_sanction")
+        ->get();
+    }
+
     public function getDetailPersonnel(){
         $detail = Accompagnement::select('Id_de_la_mission','Coach')
         ->where('Commercial',$this->Matricule)

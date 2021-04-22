@@ -24,6 +24,8 @@
         "vue-loader": "^16.1.2"
     },
     "dependencies": {
+        "@fullcalendar/daygrid": "^5.6.0",
+        "@fullcalendar/vue": "^5.6.0",
         "node-gyp": "^7.1.2",
         "vue": "^3.0.5",
         "vue-router": "^4.0.4",

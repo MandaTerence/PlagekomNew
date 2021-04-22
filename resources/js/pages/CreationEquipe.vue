@@ -208,7 +208,7 @@ export default {
                 axios.post('/api/classements/',{matriculeCoach: this.coachs[0].Matricule,matriculeCommerciaux: this.getMatriculeAndPlaceFromArray(this.classementReel),idMission:this.idMission}).then(response => {
                     if(response.data.success){
                         this.showModal = false;
-                        this.$router.push({ name: 'planning', query: { idMission: this.idMission ,coach: this.coach} });
+                        //this.$router.push({ name: 'planning', query: { idMission: this.idMission ,coach: this.coach} });
                     }
                     else if(!response.data.success){
                         alert('insertion echoué');

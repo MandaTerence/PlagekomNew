@@ -1,4 +1,13 @@
 <template>
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label for="dateMission">date</label>
+            <input type="date" class="form-control" id="dateMission" v-model="dateMission">
+            <button class="btn btn-secondary" v-on:click="loadMissionDate()">
+                test
+            </button>
+        </div>
+    </div>
     <div>
         <div class="row"><h3>Controle mission diego</h3></div>
         <div class="row">
@@ -73,11 +82,12 @@
     </div>
 </template>
 <script>
+
 export default {
     name: "TimeLine",
     data() {
         return {
-            
+            dateMission: null
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -90,7 +100,12 @@ export default {
         
     },
     methods: {
+        loadMissionDate(){
+            alert(this.dateMission);
+        }
+    },
+    components: {
         
-    }
+    },
 }
 </script>

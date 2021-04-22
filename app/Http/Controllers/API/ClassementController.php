@@ -8,6 +8,7 @@ use App\Models\Accompagnement;
 use App\Models\DetailMission;
 use Illuminate\Http\Request;
 use App\Services\AccompagnementService;
+use App\Services\PersonnelService;
 
 class ClassementController extends Controller
 {
@@ -16,6 +17,7 @@ class ClassementController extends Controller
         $commerciaux = $request->input('matriculeCommerciaux');
         $idMission = $request->input('idMission');
         $success = Classement::saveFromCommerciaux($idMission,$commerciaux); 
+        PersonnelService::saveEquipeTemp($commerciaux,$coach,$idMission);
         if($success){
             $test = AccompagnementService::generatePlanning($idMission,$coach,$commerciaux);
         }

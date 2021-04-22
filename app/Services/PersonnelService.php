@@ -4,7 +4,10 @@ namespace App\Services;
 
 use App\Interfaces\CustomAuthService;
 use App\Models\Personnel;
+use App\Models\Classement;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 
 class PersonnelService {
 
@@ -74,4 +77,55 @@ class PersonnelService {
         return $personnels;
     }
 
+    public static function getAllFromMission(){
+        $result = [];
+        $missions = DB::table("mission")
+        ->where("statut","En_cours")
+        ->getAll();
+        foreach($missions as $mission){
+            $result[] = self::getFromMission($mission->Id_de_la_mission);
+        }
+        return $result;
+    }
+
+    public static function getFromMission($idMission){
+        $commerciaux = [];
+        $coach = [];
+        $equipe = DB::table("equipe_temporaire")
+        ->where("Id_de_la_mission",$idMission)
+        ->getAll();
+        foreach($equipe as $eq){
+            if($eq->type == "Coach"){
+                $coach[] = $eq->matricule_personnel;
+            }
+            else if($eq->type == "Commerciaux"){
+                $commerciaux[] = $eq->matricule_personnel;
+            }
+        }
+        return [
+            "idMission" => $idMission,
+            "Commerciaux" => $commerciaux,
+            "Coach" => $coach
+        ];
+    }
+
+    public static function saveEquipeTemp($commerciaux,$coach,$idMission){
+        try{
+        DB::table('equipe_temporaire')->insert([
+            'Id_de_la_mission' => $idMission,
+            'matricule_personnel' => $coach,
+            'type' => 'Coach',
+        ]);
+        foreach($commerciaux as $com){
+            DB::table('equipe_temporaire')->insert([
+                'Id_de_la_mission' => $idMission,
+                'matricule_personnel' => $com["Matricule"],
+                'type' => 'Commerciaux',
+            ]);
+        }
+        return true;
+        }catch(QueryException $e){
+            return false;
+        }
+    }
 }

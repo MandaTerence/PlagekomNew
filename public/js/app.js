@@ -17376,15 +17376,7 @@ __webpack_require__.r(__webpack_exports__);
           idMission: this.idMission
         }).then(function (response) {
           if (response.data.success) {
-            _this2.showModal = false;
-
-            _this2.$router.push({
-              name: 'planning',
-              query: {
-                idMission: _this2.idMission,
-                coach: _this2.coach
-              }
-            });
+            _this2.showModal = false; //this.$router.push({ name: 'planning', query: { idMission: this.idMission ,coach: this.coach} });
           } else if (!response.data.success) {
             alert('insertion echoué');
           }
@@ -17780,7 +17772,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "TimeLine",
   data: function data() {
-    return {};
+    return {
+      dateMission: null
+    };
   },
   beforeRouteEnter: function beforeRouteEnter(to, from, next) {
     if (!window.Laravel.isLoggedin) {
@@ -17790,7 +17784,12 @@ __webpack_require__.r(__webpack_exports__);
     next();
   },
   created: function created() {},
-  methods: {}
+  methods: {
+    loadMissionDate: function loadMissionDate() {
+      alert(this.dateMission);
+    }
+  },
+  components: {}
 });
 
 /***/ }),
@@ -19000,7 +18999,9 @@ var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("
 var _hoisted_6 = {
   "class": "panel-footer",
   style: {
-    "float": "top"
+    "float": "top",
+    "position": "absolute",
+    "z-index": "1"
   }
 };
 var _hoisted_7 = {
@@ -20363,11 +20364,39 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
+var _hoisted_1 = {
+  "class": "row"
+};
+var _hoisted_2 = {
+  "class": "form-group col-md-4"
+};
 
-var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"row\"><h3>Controle mission diego</h3></div><div class=\"row\"><div class=\"col-md-3\"><strong>Nombre equipe :</strong></div><div class=\"col-md-3\"><strong>Ville d animation :</strong></div><div class=\"col-md-3\"><strong>Durée totale controle :</strong></div><div class=\"col-md-3\"></div></div><hr><div class=\"row\"><h3>Commerrciaux :</h3></div><div class=\"row\"><table class=\"table table-hover\"><thead><tr class=\"bg-secondary\" style=\"color:white;\"><th scope=\"col-md-2\">Matricule</th><th scope=\"col-md-2\">Heure de controle</th><th scope=\"col-md-2\">Ville d&#39;animation</th><th scope=\"col-md-2\">Duree de controle</th><th scope=\"col-md-2\">code de sanction</th><th scope=\"col-md-2\">CA sanction</th><th scope=\"col-md-2\">Etat Controle</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div><hr><div class=\"row\"><h3>Coach :</h3></div><div class=\"row\"><table class=\"table table-hover\"><thead><tr class=\"bg-secondary\" style=\"color:white;\"><th scope=\"col-md-2\">Matricule</th><th scope=\"col-md-2\">Heure de controle</th><th scope=\"col-md-2\">Ville d&#39;animation</th><th scope=\"col-md-2\">Duree de controle</th><th scope=\"col-md-2\">code de sanction</th><th scope=\"col-md-2\">CA sanction</th><th scope=\"col-md-2\">Etat Controle</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div>", 8);
+var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("label", {
+  "for": "dateMission"
+}, "date", -1
+/* HOISTED */
+);
+
+var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div><div class=\"row\"><h3>Controle mission diego</h3></div><div class=\"row\"><div class=\"col-md-3\"><strong>Nombre equipe :</strong></div><div class=\"col-md-3\"><strong>Ville d animation :</strong></div><div class=\"col-md-3\"><strong>Durée totale controle :</strong></div><div class=\"col-md-3\"></div></div><hr><div class=\"row\"><h3>Commerrciaux :</h3></div><div class=\"row\"><table class=\"table table-hover\"><thead><tr class=\"bg-secondary\" style=\"color:white;\"><th scope=\"col-md-2\">Matricule</th><th scope=\"col-md-2\">Heure de controle</th><th scope=\"col-md-2\">Ville d&#39;animation</th><th scope=\"col-md-2\">Duree de controle</th><th scope=\"col-md-2\">code de sanction</th><th scope=\"col-md-2\">CA sanction</th><th scope=\"col-md-2\">Etat Controle</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div><hr><div class=\"row\"><h3>Coach :</h3></div><div class=\"row\"><table class=\"table table-hover\"><thead><tr class=\"bg-secondary\" style=\"color:white;\"><th scope=\"col-md-2\">Matricule</th><th scope=\"col-md-2\">Heure de controle</th><th scope=\"col-md-2\">Ville d&#39;animation</th><th scope=\"col-md-2\">Duree de controle</th><th scope=\"col-md-2\">code de sanction</th><th scope=\"col-md-2\">CA sanction</th><th scope=\"col-md-2\">Etat Controle</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div></div>", 1);
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", null, [_hoisted_1]);
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [_hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+    type: "date",
+    "class": "form-control",
+    id: "dateMission",
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+      return $data.dateMission = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dateMission]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    "class": "btn btn-secondary",
+    onClick: _cache[2] || (_cache[2] = function ($event) {
+      return $options.loadMissionDate();
+    })
+  }, " test ")])]), _hoisted_4], 64
+  /* STABLE_FRAGMENT */
+  );
 }
 
 /***/ }),
