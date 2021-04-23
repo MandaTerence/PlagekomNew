@@ -2,7 +2,13 @@
     <div class="row">
         <div class="form-group col-md-4">
             <label for="dateMission">date</label>
+            <button class="btn btn-secondary" v-on:click="prevDate()">
+                &#60;
+            </button>
             <input type="date" class="form-control" id="dateMission" v-model="dateMission">
+            <button class="btn btn-secondary" v-on:click="nextDate()">
+                &#62;
+            </button>
             <button class="btn btn-secondary" v-on:click="loadMissionDate()">
                 test
             </button>
@@ -100,6 +106,16 @@ export default {
         
     },
     methods: {
+        prevDate(){
+            if(this.dateMission != null){
+                this.dateMission = tomorrow.setDate(tomorrow.getDate()+1);
+            }
+        },
+        nextDate(){
+            if(this.dateMission != null){
+                this.dateMission += 1;
+            }
+        },
         loadMissionDate(){
             alert(this.dateMission);
         }
