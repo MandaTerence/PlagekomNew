@@ -1,17 +1,23 @@
 <template>
     <div class="row">
-        <div class="form-group col-md-4">
-            <label for="dateMission">date</label>
-            <button class="btn btn-secondary" v-on:click="prevDate()">
-                &#60;
-            </button>
-            <input type="date" class="form-control" id="dateMission" v-model="dateMission">
-            <button class="btn btn-secondary" v-on:click="nextDate()">
-                &#62;
-            </button>
-            <button class="btn btn-secondary" v-on:click="loadMissionDate()">
-                test
-            </button>
+        <div class="card col-md-4">
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="dateMission">date</label>
+                    <div class="form-control" id="dateMission">
+                        <input type="date" class="form-control"  v-model="dateMission">
+                    </div>
+                </div>
+                <div class="form-group">
+                </div>
+                <div v-if="dateMission!=null" class="row">
+                    <div class="form-group col-md-4">
+                        <button class="btn btn-secondary form-control" id="btnCheck" v-on:click="loadMissionDate()">
+                            check
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <div>
@@ -106,18 +112,16 @@ export default {
         
     },
     methods: {
-        prevDate(){
-            if(this.dateMission != null){
-                this.dateMission = tomorrow.setDate(tomorrow.getDate()+1);
-            }
-        },
-        nextDate(){
-            if(this.dateMission != null){
-                this.dateMission += 1;
-            }
+        test(){
+
         },
         loadMissionDate(){
-            alert(this.dateMission);
+            if(this.dateMission!=null){
+                axios.get('/api/personnels/getAllFromMission',{params: {jour: this.dateMission}}).then(response => {
+                   
+                });
+            }
+            //alert(this.dateMission);
         }
     },
     components: {

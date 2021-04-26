@@ -17785,18 +17785,16 @@ __webpack_require__.r(__webpack_exports__);
   },
   created: function created() {},
   methods: {
-    prevDate: function prevDate() {
-      if (this.dateMission != null) {
-        this.dateMission = tomorrow.setDate(tomorrow.getDate() + 1);
-      }
-    },
-    nextDate: function nextDate() {
-      if (this.dateMission != null) {
-        this.dateMission += 1;
-      }
-    },
+    test: function test() {},
     loadMissionDate: function loadMissionDate() {
-      alert(this.dateMission);
+      if (this.dateMission != null) {
+        axios.get('/api/personnels/getAllFromMission', {
+          params: {
+            jour: this.dateMission
+          }
+        }).then(function (response) {});
+      } //alert(this.dateMission);
+
     }
   },
   components: {}
@@ -20378,43 +20376,58 @@ var _hoisted_1 = {
   "class": "row"
 };
 var _hoisted_2 = {
-  "class": "form-group col-md-4"
+  "class": "card col-md-4"
+};
+var _hoisted_3 = {
+  "class": "card-body"
+};
+var _hoisted_4 = {
+  "class": "form-group"
 };
 
-var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("label", {
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("label", {
   "for": "dateMission"
 }, "date", -1
 /* HOISTED */
 );
 
-var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div><div class=\"row\"><h3>Controle mission diego</h3></div><div class=\"row\"><div class=\"col-md-3\"><strong>Nombre equipe :</strong></div><div class=\"col-md-3\"><strong>Ville d animation :</strong></div><div class=\"col-md-3\"><strong>Durée totale controle :</strong></div><div class=\"col-md-3\"></div></div><hr><div class=\"row\"><h3>Commerrciaux :</h3></div><div class=\"row\"><table class=\"table table-hover\"><thead><tr class=\"bg-secondary\" style=\"color:white;\"><th scope=\"col-md-2\">Matricule</th><th scope=\"col-md-2\">Heure de controle</th><th scope=\"col-md-2\">Ville d&#39;animation</th><th scope=\"col-md-2\">Duree de controle</th><th scope=\"col-md-2\">code de sanction</th><th scope=\"col-md-2\">CA sanction</th><th scope=\"col-md-2\">Etat Controle</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div><hr><div class=\"row\"><h3>Coach :</h3></div><div class=\"row\"><table class=\"table table-hover\"><thead><tr class=\"bg-secondary\" style=\"color:white;\"><th scope=\"col-md-2\">Matricule</th><th scope=\"col-md-2\">Heure de controle</th><th scope=\"col-md-2\">Ville d&#39;animation</th><th scope=\"col-md-2\">Duree de controle</th><th scope=\"col-md-2\">code de sanction</th><th scope=\"col-md-2\">CA sanction</th><th scope=\"col-md-2\">Etat Controle</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div></div>", 1);
+var _hoisted_6 = {
+  "class": "form-control",
+  id: "dateMission"
+};
+
+var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
+  "class": "form-group"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_8 = {
+  key: 0,
+  "class": "row"
+};
+var _hoisted_9 = {
+  "class": "form-group col-md-4"
+};
+
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div><div class=\"row\"><h3>Controle mission diego</h3></div><div class=\"row\"><div class=\"col-md-3\"><strong>Nombre equipe :</strong></div><div class=\"col-md-3\"><strong>Ville d animation :</strong></div><div class=\"col-md-3\"><strong>Durée totale controle :</strong></div><div class=\"col-md-3\"></div></div><hr><div class=\"row\"><h3>Commerrciaux :</h3></div><div class=\"row\"><table class=\"table table-hover\"><thead><tr class=\"bg-secondary\" style=\"color:white;\"><th scope=\"col-md-2\">Matricule</th><th scope=\"col-md-2\">Heure de controle</th><th scope=\"col-md-2\">Ville d&#39;animation</th><th scope=\"col-md-2\">Duree de controle</th><th scope=\"col-md-2\">code de sanction</th><th scope=\"col-md-2\">CA sanction</th><th scope=\"col-md-2\">Etat Controle</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div><hr><div class=\"row\"><h3>Coach :</h3></div><div class=\"row\"><table class=\"table table-hover\"><thead><tr class=\"bg-secondary\" style=\"color:white;\"><th scope=\"col-md-2\">Matricule</th><th scope=\"col-md-2\">Heure de controle</th><th scope=\"col-md-2\">Ville d&#39;animation</th><th scope=\"col-md-2\">Duree de controle</th><th scope=\"col-md-2\">code de sanction</th><th scope=\"col-md-2\">CA sanction</th><th scope=\"col-md-2\">Etat Controle</th></tr></thead><tbody><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div></div>", 1);
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [_hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
-    "class": "btn btn-secondary",
-    onClick: _cache[1] || (_cache[1] = function ($event) {
-      return $options.prevDate();
-    })
-  }, " < "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_4, [_hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
     type: "date",
     "class": "form-control",
-    id: "dateMission",
-    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
       return $data.dateMission = $event;
     })
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dateMission]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
-    "class": "btn btn-secondary",
-    onClick: _cache[3] || (_cache[3] = function ($event) {
-      return $options.nextDate();
-    })
-  }, " > "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
-    "class": "btn btn-secondary",
-    onClick: _cache[4] || (_cache[4] = function ($event) {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.dateMission]])])]), _hoisted_7, $data.dateMission != null ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    "class": "btn btn-secondary form-control",
+    id: "btnCheck",
+    onClick: _cache[2] || (_cache[2] = function ($event) {
       return $options.loadMissionDate();
     })
-  }, " test ")])]), _hoisted_4], 64
+  }, " check ")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), _hoisted_10], 64
   /* STABLE_FRAGMENT */
   );
 }

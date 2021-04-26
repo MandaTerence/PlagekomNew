@@ -77,29 +77,35 @@ class PersonnelService {
         return $personnels;
     }
 
-    public static function getAllFromMission(){
+    public static function getAllFromMission($jour='%'){
         $result = [];
         $missions = DB::table("mission")
         ->where("statut","En_cours")
-        ->getAll();
+        ->get();
         foreach($missions as $mission){
-            $result[] = self::getFromMission($mission->Id_de_la_mission);
+            $result[] = self::getFromMission($mission->Id_de_la_mission,$jour);
         }
         return $result;
     }
 
-    public static function getFromMission($idMission){
+    public static function getFromMission($idMission,$jour='%'){
         $commerciaux = [];
         $coach = [];
         $equipe = DB::table("equipe_temporaire")
         ->where("Id_de_la_mission",$idMission)
-        ->getAll();
+        ->get();
         foreach($equipe as $eq){
             if($eq->type == "Coach"){
-                $coach[] = $eq->matricule_personnel;
+                $personne = new Personnel();
+                $personne->Matricule = $eq->matricule_personnel;
+                $personne->getDetailControl($jour);
+                $coach[] = $personne;
             }
             else if($eq->type == "Commerciaux"){
-                $commerciaux[] = $eq->matricule_personnel;
+                $personne = new Personnel(); 
+                $personne->Matricule = $eq->matricule_personnel;
+                $personne->getDetailControl($jour);
+                $commerciaux[] = $personne;
             }
         }
         return [
@@ -111,19 +117,19 @@ class PersonnelService {
 
     public static function saveEquipeTemp($commerciaux,$coach,$idMission){
         try{
-        DB::table('equipe_temporaire')->insert([
-            'Id_de_la_mission' => $idMission,
-            'matricule_personnel' => $coach,
-            'type' => 'Coach',
-        ]);
-        foreach($commerciaux as $com){
             DB::table('equipe_temporaire')->insert([
                 'Id_de_la_mission' => $idMission,
-                'matricule_personnel' => $com["Matricule"],
-                'type' => 'Commerciaux',
+                'matricule_personnel' => $coach,
+                'type' => 'Coach',
             ]);
-        }
-        return true;
+            foreach($commerciaux as $com){
+                DB::table('equipe_temporaire')->insert([
+                    'Id_de_la_mission' => $idMission,
+                    'matricule_personnel' => $com["Matricule"],
+                    'type' => 'Commerciaux',
+                ]);
+            }
+            return true;
         }catch(QueryException $e){
             return false;
         }

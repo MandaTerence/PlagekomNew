@@ -59,11 +59,17 @@ class Personnel extends Model
         "mission"=>"MISSION"
     ];
 
-    public function getDetailControl(){
-        SanctionPersonnel::select()
-        ->where()
+    public function getDetailControl($jour='%'){
+        $this->sanctions = SanctionPersonnel::select("sanction.code_sanction","sanction.titre","sanction.valeur","sanction.unite")
+        ->where("sanction_personnel.matricule_personnel",$this->Matricule)
+        ->whereRaw("DATE(sanction_personnel.date) like '".$jour."'")
         ->join("sanction","sanction.id","=","sanction_personnel.id_sanction")
         ->get();
+        if(isset($this->sanctions)){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function getDetailPersonnel(){
