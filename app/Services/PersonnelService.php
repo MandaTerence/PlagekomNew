@@ -91,6 +91,22 @@ class PersonnelService {
     public static function getFromMission($idMission,$jour='%'){
         $commerciaux = [];
         $coach = [];
+        $ville ="inconnue";
+        $resSql= DB::table("planing")
+        ->select("Ville_d_annimation")
+        ->where("Id_de_la_mission",$idMission)
+        ->where("date",$jour)
+        ->first();
+        if(isset($resSql)){
+            $ville = $resSql->Ville_d_annimation;
+        }
+        else{
+            $ville = DB::table("planing")
+            ->select("Ville_d_annimation")
+            ->where("Id_de_la_mission",$idMission)
+            ->orderBy("Date","DESC")
+            ->first()->Ville_d_annimation;
+        }
         $equipe = DB::table("equipe_temporaire")
         ->where("Id_de_la_mission",$idMission)
         ->get();
@@ -98,18 +114,21 @@ class PersonnelService {
             if($eq->type == "Coach"){
                 $personne = new Personnel();
                 $personne->Matricule = $eq->matricule_personnel;
+                $personne->getDetailSanction($jour);
                 $personne->getDetailControl($jour);
                 $coach[] = $personne;
             }
             else if($eq->type == "Commerciaux"){
                 $personne = new Personnel(); 
                 $personne->Matricule = $eq->matricule_personnel;
+                $personne->getDetailSanction($jour);
                 $personne->getDetailControl($jour);
                 $commerciaux[] = $personne;
             }
         }
         return [
             "idMission" => $idMission,
+            "ville" => $ville,
             "Commerciaux" => $commerciaux,
             "Coach" => $coach
         ];

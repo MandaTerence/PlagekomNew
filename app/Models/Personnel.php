@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Facture;
 use App\Models\Produit;
 use App\Models\Accompagnement;
+use App\Models\Controle;
 
 class Personnel extends Model
 {
@@ -59,13 +60,24 @@ class Personnel extends Model
         "mission"=>"MISSION"
     ];
 
-    public function getDetailControl($jour='%'){
+    public function getDetailSanction($jour='%'){
         $this->sanctions = SanctionPersonnel::select("sanction.code_sanction","sanction.titre","sanction.valeur","sanction.unite")
         ->where("sanction_personnel.matricule_personnel",$this->Matricule)
         ->whereRaw("DATE(sanction_personnel.date) like '".$jour."'")
         ->join("sanction","sanction.id","=","sanction_personnel.id_sanction")
         ->get();
         if(isset($this->sanctions)){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    public function getDetailControl($jour='%'){
+        $this->controles = Controle::selectRaw("sim,debut,fin,TIMEDIFF(fin,debut) as duree")
+        ->where("commercial",$this->Matricule)
+        ->whereRaw("DATE(debut) like '".$jour."'")
+        ->get();
+        if(isset($this->controles)){
             return true;
         }else{
             return false;
@@ -85,7 +97,10 @@ class Personnel extends Model
             ->first()->Contact_du_personnel;
         }
         else{
-            $this->Id_de_la_mission = "aucune";
+            $this->Id_de_la_mission = DB::table("equipe_temporaire")
+            ->select("Id_de_la_mission")
+            ->where("matricule_personnel",$this->Matricule)
+            ->first()->Id_de_la_mission;
             $this->Coach = "aucun";
             $this->ContactCoach = "aucun";
         }

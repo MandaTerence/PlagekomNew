@@ -290,10 +290,10 @@ class PersonnelController extends Controller
 
     public function getAllFromMission(Request $request){
         $jour = $request->jour;
-        $personnels = PersonnelService::getAllFromMission($jour);
+        $missions = PersonnelService::getAllFromMission($jour);
         $response = [
             'success' => true,
-            'classementProduit' =>$personnels
+            'missions' =>$missions
         ];
         return $response;
     }

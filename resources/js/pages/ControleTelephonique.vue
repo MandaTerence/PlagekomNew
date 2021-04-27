@@ -118,6 +118,7 @@
                     <table class="table table-hover table-bordered" style="font-size:10px">
                         <thead >
                             <tr class="bg-secondary" style="color:white">
+                                <th scope="col-md-2">Date</th>
                                 <th scope="col-md-2">Code Sanction</th>
                                 <th scope="col-md-2">Designation</th>
                                 <th scope="col-md-2">Autres</th>
@@ -126,6 +127,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="sanctionP in sanctionsPersonnel" v-bind:key="sanctionP">
+                                <td scope="col-md-2"> {{ sanctionP.datetime }} </td>
                                 <td scope="col-md-2"> {{ sanctionP.code_sanction }} </td>
                                 <td scope="col-md-2"> {{ sanctionP.titre }} </td>
                                 <td scope="col-md-2"> </td>

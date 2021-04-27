@@ -26,7 +26,7 @@ class SanctionPersonnelController extends Controller
 
     public function getFromMatricule(Request $request){
         if(isset($request->matricule)){
-            $res =SanctionPersonnel::select("sanction_personnel.id","sanction.code_sanction","sanction.titre")
+            $res =SanctionPersonnel::selectRaw("sanction_personnel.id as id,sanction_personnel.date as datetime,DATE(sanction_personnel.date) as date,TIME(sanction_personnel.date) as time,sanction.code_sanction as code_sanction,sanction.titre as titre")
             ->where('matricule_personnel',$request->matricule)
             ->join('sanction', 'sanction.id', '=', 'sanction_personnel.id_sanction')
             ->get();
