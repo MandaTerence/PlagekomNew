@@ -1,5 +1,6 @@
 <template>
-    <div>
+<div class="page-inner" v-if="!exist">
+    <div v-if="!exist">
         <div class="card" >
             <div class="card-body ">
                 <div class="form-group">
@@ -12,50 +13,61 @@
             </div>
         </div>
     </div>
+</div>
+<div class="panel-header bg-secondary-gradient" v-if="exist">
+    <div class="page-inner py-4">
+        <h2 class="text-white pb-2 fw-bold">Controle Telephonique de {{ personnelData.Prenom }}</h2>
+        <h5 class="text-white op-7 mb-2">{{ matricule }}</h5>
+    </div>
+</div>
+<div class="page-inner">
     <div v-if="exist">
         <div class="card" >
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <table>
                             <tr>
                                 <td><strong>Nom Commercial:</strong></td>
-                                <td>{{ personnelData.Nom }}</td>
+                                <td style="text-align:right">{{ personnelData.Nom }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Prenom Commercial:</strong></td>
-                                <td>{{ personnelData.Prenom }}</td>
+                                <td style="text-align:right">{{ personnelData.Prenom }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Contact:</strong></td>
-                                <td>{{ personnelData.Contact_du_personnel }}</td>
+                                <td style="text-align:right">{{ personnelData.Contact_du_personnel }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Mission Actuel:</strong></td>
-                                <td>{{ personnelData.Id_de_la_mission }}</td>
+                                <td style="text-align:right">{{ personnelData.Id_de_la_mission }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Coach Commerciale:</strong></td>
-                                <td>{{ personnelData.Coach }}</td>
+                                <td style="text-align:right">{{ personnelData.Coach }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Contact Coach:</strong></td>
-                                <td>{{ personnelData.ContactCoach }}</td>
+                                <td style="text-align:right">{{ personnelData.ContactCoach }}</td>
                             </tr>
                         </table>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <table>
                             <tr>
                                 <td><strong>Nom Tuteur:</strong></td>
-                                <td>{{ personnelData.Nom_et_prenom_du_tuteur }}</td>
+                                <td style="text-align:right">{{ personnelData.Nom_et_prenom_du_tuteur }}</td>
                             </tr>
                             <tr>
                                 <td><strong>Contact du Tuteur:</strong></td>
-                                <td>{{ personnelData.Contact_du_tuteur }}</td>
+                                <td style="text-align:right">{{ personnelData.Contact_du_tuteur }}</td>
                             </tr>
                         </table>
                     </div>
+                </div>
+                <div class="form-group text-center">
+                    <button type="button" class="btn btn-secondary" v-on:click="resetCommerciaux">changer</button>
                 </div>
             </div>
         </div>
@@ -186,6 +198,7 @@
         </div>
         <!-- Modal  end -->
     </div>
+</div>
 </template>
 
 <script>
@@ -235,6 +248,14 @@ export default {
         }
     },
     methods: {
+        resetCommerciaux(){
+            this.exist = false;
+            this.matricule = '';
+            this.nouveauMatricule = '';
+            this.matricule = '';
+            this.sanctionsPersonnel = [];
+            localStorage.removeItem('matricule');
+        },
         removeSanctionPersonnel(id){
             for(let i=0;i<this.sanctionsPersonnel.length;i++){
                 if(this.sanctionsPersonnel[i].id == id){
@@ -368,8 +389,13 @@ export default {
         },
         loadURLdata(){
             let urlParams = new URLSearchParams(window.location.search);
+            
             if(urlParams.get('matricule')){
                 this.matricule = urlParams.get('matricule');
+                this.getPersonnel();
+            }
+            else if(localStorage.matricule){
+                this.matricule = localStorage.matricule;
                 this.getPersonnel();
             }
         },
@@ -385,6 +411,7 @@ export default {
             .then(response => {
                 this.exist=response.data.success;
                 if(this.exist){
+                    localStorage.matricule = this.matricule;
                     this.personnelData = response.data.personnel;
                     if(this.personnelData.Id_de_la_mission == "aucune"){
                         alert("attention ce commercial n est actuellement sur aucune mission");

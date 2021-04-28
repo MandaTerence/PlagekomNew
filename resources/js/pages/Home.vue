@@ -1,7 +1,9 @@
 <template>
+<div class="page-inner">
     <div>
         <h1>Bienvenue sur plagekom</h1>
     </div>
+</div>
 </template>
 
 <script>

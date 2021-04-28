@@ -376,9 +376,9 @@
 
     <div class="main-panel">
         <div class="content">
-            <div class="page-inner" >
+            <!-- <div class="page-inner"> -->
                 <router-view/>
-            </div>
+            <!-- </div> -->
         </div>
         <footer class="footer">
             <div class="container-fluid">

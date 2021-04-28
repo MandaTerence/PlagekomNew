@@ -1,4 +1,10 @@
 <template>
+<div class="panel-header bg-secondary-gradient">
+    <div class="page-inner py-4">
+        <h2 class="text-white pb-2 fw-bold">Planning d accompagnement</h2>
+    </div>
+</div>
+<div class="page-inner">
     <div class="row">
         <div class="card col-md-4" >
             <div class="card-body">
@@ -13,108 +19,108 @@
     </div>
     <div>
         <div v-for="planningCoach in plannings" v-bind:key="planningCoach">
-            <h3 v-if="planningCoach.accompagnement.length>0" v-on:click="displayPlanning(planningCoach.coach )">{{ planningCoach.coach.Coach  }}</h3>
-            
-                <div class="row">
-                    <div class="card col-md-4">
-                        <div class="form-group">
-                            <div class="card-body">
-                                <label for="equipeList">
-                                    <a v-on:click="toogleDisplayEquipe()">
-                                        <h3>Equipe</h3>
-                                    </a>
-                                </label>
-                                <div  id="equipeList" v-if="equipeDisplay">
-                                    <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                        <thead>
-                                            <tr>
-                                                <th> personnel </th>            
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
-                                                <td>{{ commercial.Commercial }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+            <div class="row">
+                <div class="card col-md-4">
+                    <div class="form-group">
+                        <div class="card-body">   
+                            <label for="equipeList">
+                                <a v-on:click="toogleDisplayEquipe()">
+                                    <div v-if="planningCoach.accompagnement.length>0" v-on:click="displayPlanning(planningCoach.coach )">Equipe du coach : {{ planningCoach.coach.Coach  }}</div>
+                                </a>
+                            </label>
+                            <div  id="equipeList" v-if="equipeDisplay">
+                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                                    <thead>
+                                        <tr>
+                                            <th> personnel </th>            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
+                                            <td>{{ commercial.Commercial }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="card col-md-8">
-                        <div class="card-body">
-                            <div class="row">
-                                    <table class="table table-hover">
-                                        <div v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
-                                            <tbody>
-                                                <tr style="text-align:center" class="col-md-12">
-                                                    <td>
-                                                        <div v-on:click="toogleVisibility(planning['jour'])" >
-                                                            <h3><a >{{ planning['jour'] }}</a></h3>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr v-if="planning.visibility==true">
-                                                    <td >
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <h3>Matin</h3>
-                                                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th> HEURE </th>
-                                                                            <th> MATRICULE </th>            
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td> {{ formatHeure(planning.matin[0].Heure_debut) }} à {{ formatHeure(planning.matin[0].Heure_fin) }}  </td>
-                                                                            <td v-on:click="goToPlanning(planning.matin[0].Commercial)"> {{ planning.matin[0].Commercial }}</td>                    
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td> {{ formatHeure(planning.matin[1].Heure_debut) }} à {{ formatHeure(planning.matin[1].Heure_fin) }}  </td>
-                                                                            <td v-on:click="goToPlanning(planning.matin[1].Commercial)"> {{ planning.matin[1].Commercial }} </td>                    
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <h3>Apres Midi</h3>
-                                                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th> HEURE </th>
-                                                                            <th> MATRICULE </th>            
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td> {{ formatHeure(planning.apresMidi[0].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
-                                                                            <td v-on:click="goToPlanning(planning.apresMidi[0].Commercial)"> {{ planning.apresMidi[0].Commercial }} </td>                    
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td> {{ formatHeure(planning.apresMidi[1].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
-                                                                            <td v-on:click="goToPlanning(planning.apresMidi[1].Commercial)"> {{ planning.apresMidi[1].Commercial }} </td>                    
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                </tr> 
-                                            </tbody>
-                                        </div>
-                                    </table>
-                                
-                            </div>
+            </div>
+            <div class="row">
+                <div class="card col-md-12">
+                    <div class="card-body">
+                        <strong >
+                            Planning d'Accompagnement :
+                        </strong>
+                        <div class="row" style="margin-top:20px">
+                            <table class="table table-hover" id="listePlanning">
+                                <tbody>
+                                    <div v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
+                                        <tr class="d-flex" style="text-align:center">
+                                            <td class="col-12">
+                                                <div v-on:click="toogleVisibility(planning['jour'])" >
+                                                    <h3><a >{{ planning['jour'] }}</a></h3>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="planning.visibility==true">
+                                            <td>
+                                                <div class="row d-flex" >
+                                                    <div class="col-md-6">
+                                                        <h3>Matin</h3>
+                                                        <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary align-items-center">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th> HEURE </th>
+                                                                    <th> MATRICULE </th>            
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> {{ formatHeure(planning.matin[0].Heure_debut) }} à {{ formatHeure(planning.matin[0].Heure_fin) }}  </td>
+                                                                    <td v-on:click="goToPlanning(planning.matin[0].Commercial)"> {{ planning.matin[0].Commercial }}</td>                    
+                                                                </tr>
+                                                                <tr>
+                                                                    <td> {{ formatHeure(planning.matin[1].Heure_debut) }} à {{ formatHeure(planning.matin[1].Heure_fin) }}  </td>
+                                                                    <td v-on:click="goToPlanning(planning.matin[1].Commercial)"> {{ planning.matin[1].Commercial }} </td>                    
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <h3>Apres Midi</h3>
+                                                        <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary align-items-center">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th> HEURE </th>
+                                                                    <th> MATRICULE </th>            
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td> {{ formatHeure(planning.apresMidi[0].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
+                                                                    <td v-on:click="goToPlanning(planning.apresMidi[0].Commercial)"> {{ planning.apresMidi[0].Commercial }} </td>                    
+                                                                </tr>
+                                                                <tr>
+                                                                    <td> {{ formatHeure(planning.apresMidi[1].Heure_debut) }} à {{ formatHeure(planning.apresMidi[1].Heure_fin) }}  </td>
+                                                                    <td v-on:click="goToPlanning(planning.apresMidi[1].Commercial)"> {{ planning.apresMidi[1].Commercial }} </td>                    
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr> 
+                                    </div>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-            
+            </div>
         </div>
     </div>
+</div>
 </template>
 
 <script>
@@ -140,22 +146,23 @@ export default {
     },
     created() {
         this.loadMissions();
-        this.loadPlannig();
         this.loadURLdata();
+        this.loadPlannig();
     },
     methods: {
         goToPlanning(matricule){
             this.$router.push({ path: 'controleTelephonique', query: { matricule: matricule } });
         },
         toogleVisibility(jour){
-           
-            for(let i = 0;i<this.plannings[0].accompagnement.length;i++){
-                if(this.plannings[0].accompagnement[i]['jour'] == jour){
-                    if(this.plannings[0].accompagnement[i].visibility == true){
-                        this.plannings[0].accompagnement[i].visibility = false;
-                    }
-                    else{
-                        this.plannings[0].accompagnement[i].visibility = true;
+            if(this.plannings.length>0){
+                for(let i = 0;i<this.plannings[0].accompagnement.length;i++){
+                    if(this.plannings[0].accompagnement[i]['jour'] == jour){
+                        if(this.plannings[0].accompagnement[i].visibility == true){
+                            this.plannings[0].accompagnement[i].visibility = false;
+                        }
+                        else{
+                            this.plannings[0].accompagnement[i].visibility = true;
+                        }
                     }
                 }
             }
@@ -168,8 +175,15 @@ export default {
             if(urlParams.get('idMission')){
                 this.idMission = urlParams.get('idMission');
             }
-            if(urlParams.get('coach'))
-            this.coach = urlParams.get('coach');
+            else if(localStorage.idMission){
+                this.idMission = localStorage.idMission;
+            }
+            if(urlParams.get('coach')){
+                this.coach = urlParams.get('coach');
+            }
+            else if(localStorage.coach){
+                this.coach = localStorage.coach;
+            }
         },
         loadMissions(){
             this.$axios.get('/api/missions',{params: {criteres: {Statut: 'En_cours'}}}) 
@@ -195,6 +209,8 @@ export default {
         },
         loadPlannig(){
             if((this.idMission!=null)&&(this.idMission!='')&&(this.coach!=null)&&(this.coach!='')){
+                localStorage.coach = this.coach;
+                localStorage.idMission = this.idMission;
                 this.$axios.get('/sanctum/csrf-cookie').then(response => {
                     axios.get('/api/classements/planning',{params: {idMission : this.idMission,coach : this.coach}}).then(response => {
                         this.plannings = response.data.plannings;
@@ -237,7 +253,7 @@ export default {
             }  
         },
         reloadPlannig(){
-            this.coach = 'all',
+            //this.coach = 'all',
             this.loadPlannig();
         },
     }
