@@ -17,4 +17,9 @@ class SanctionService {
         ->get();
     }
 
+    public static function getSanction($code="%"){
+        return Sanction::whereRaw("code_sanction like '".$code."%' or titre like '%".$code."%'")
+        ->get();
+    }
+
 }

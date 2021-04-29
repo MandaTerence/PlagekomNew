@@ -1,6 +1,5 @@
 <template>
     <div class="form-row">
-        
         <div class="form-group col-md-4">
             <label for="inputFonction">Fonction</label>
             <select class="form-control" id="inputFonction" v-model="idFonction" v-on:change="changeCustomId">

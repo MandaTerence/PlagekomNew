@@ -16,16 +16,24 @@
 </div>
 <div class="panel-header bg-secondary-gradient" v-if="exist">
     <div class="page-inner py-4">
-        <h2 class="text-white pb-2 fw-bold">Controle Telephonique de {{ personnelData.Prenom }}</h2>
-        <h5 class="text-white op-7 mb-2">{{ matricule }}</h5>
+        <div class="text-white pb-2 fw-bold row text-right d-flex justify-content-end" style="font-size:20px;margin-right:10px">
+            <a v-on:click="resetCommerciaux">x</a>
+        </div>
+        <h1 class="text-white pb-2 fw-bold">Controle Telephonique de {{ personnelData.Prenom }}</h1>
     </div>
 </div>
 <div class="page-inner">
     <div v-if="exist">
+        <h2 class="text-center"><span style="background-color:#f9fbfd">Info Commerciale</span></h2>
+        <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
         <div class="card" >
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4 d-block d-sm-none">
+                        <img src="assets/img/unknow.jpg" class="rounded-circle mx-auto d-block img-fluid d-flex justify-content-center" style="width:200px;height:200px">
+                        
+                    </div>
+                    <div class="col-md-4">
                         <table>
                             <tr>
                                 <td><strong>Nom Commercial:</strong></td>
@@ -53,7 +61,7 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <table>
                             <tr>
                                 <td><strong>Nom Tuteur:</strong></td>
@@ -65,88 +73,101 @@
                             </tr>
                         </table>
                     </div>
-                </div>
-                <div class="form-group text-center">
-                    <button type="button" class="btn btn-secondary" v-on:click="resetCommerciaux">changer</button>
+                    <div class="col-md-4 d-none d-sm-block">
+                        <img src="assets/img/unknow.jpg" class="rounded mx-auto d-block img-fluid d-flex justify-content-center" style="width:160px;height:160px">
+                        
+                    </div>
                 </div>
             </div>
         </div>
+        <h2 class="text-center"><span style="background-color:#f9fbfd">Info appels telephonique</span></h2>
+        <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
         <div class="card">
+            <div class="card-header">
+                <h2><span>Chronometre d'appel</span></h2>
+            </div>
             <div class="card-body">
                 <div class="row">
 
-                    <div class="form-group">
-                        <select class="form-control" v-model="sim">
+                    <div class="form-group col-4 text-center">
+                        <select class="form-control input-sm" v-model="sim">
                             <option value="Telma">Telma</option>
                             <option value="Orange">Orange</option>
                         </select>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group col-4 text-center" style="font-size:20px">
                         {{ tempsMinute }}
                     </div>
 
-                    <div v-if="!timerIsCounting" class="form-group">
-                        <button type="button" class="btn btn-success" v-on:click="startTimer">Demarrer</button>
+                    <div v-if="!timerIsCounting" class="form-group col-4 text-center">
+                        <button type="button" class="btn btn-success btn-sm" v-on:click="startTimer">Demarrer</button>
                     </div>
-                    <div v-if="timerIsCounting" class="form-group">
-                        <button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-danger" v-on:click="stopTimer">Arreter</button>
+                    <div v-if="timerIsCounting" class="form-group col-4 text-center" >
+                        <button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-danger btn-sm" v-on:click="stopTimer">Arreter</button>
                     </div>
 
                 </div>
             </div>
         </div>
+        <h2 class="text-center"><span style="background-color:#f9fbfd">Info Sanction</span></h2>
+        <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
         <div class="card">
+            
             <div class="card-body">
                 <div class="row">
-                    <div class="form-group">
+                    <div class="form-group col-4  text-center">
                         <select class="form-control" v-model="typePersonnel">
                             <option value="Commerciaux" selected>Commerciaux</option>
                             <option value="Coach">Coach</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" v-model="codeSanction" v-on:keyup="autoComplete" v-on:click="autoComplete" placeholder="code sanction">
+                    <div class="form-group col-4 ">
+                        <input type="text" class="form-control input-sm" v-model="codeSanction" v-on:keyup="autoComplete" v-on:click="autoComplete" placeholder="code sanction">
                         <div v-if="showAutoComplete" class="panel-footer" style="float:top;position: absolute;z-index: 1;">
                             <ul class="list-group">
                                 <li class="list-group-item" v-on:click.left="changeSanction(sanction.id,sanction.code_sanction,sanction.titre)" v-for="sanction in sanctions" v-bind:key="sanction" >
-                                    <div >{{ sanction.code_sanction }}</div>
+                                    <div >{{ sanction.titre }}</div>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <button type="button" class="btn btn-secondary form-control" v-on:click="AddSanction">Ajouter</button>
+                    <div class="form-group col-4 text-center">
+                        <button type="button" class="btn btn-secondary form-control btn-sm" v-on:click="AddSanction">Ajouter</button>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row text-center">
                     <textarea rows="3" class="form-control" readonly v-model="titreSanction"></textarea>
                 </div>
             </div>
         </div>
+        
         <div class="card">
+            <div class="card-header">
+                <h2><span>Tableau Sanction Telephonique Commercial</span></h2>
+            </div>
             <div class="card-body">
                 <div class="row">
-                    <table class="table table-hover table-bordered" style="font-size:10px">
-                        <thead >
-                            <tr class="bg-secondary" style="color:white">
-                                <th scope="col-md-2">Date</th>
-                                <th scope="col-md-2">Code Sanction</th>
-                                <th scope="col-md-2">Designation</th>
-                                <th scope="col-md-2">Autres</th>
-                                <th scope="col-md-2">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="sanctionP in sanctionsPersonnel" v-bind:key="sanctionP">
-                                <td scope="col-md-2"> {{ sanctionP.datetime }} </td>
-                                <td scope="col-md-2"> {{ sanctionP.code_sanction }} </td>
-                                <td scope="col-md-2"> {{ sanctionP.titre }} </td>
-                                <td scope="col-md-2"> </td>
-                                <td scope="col-md-2"> <button type="button" class="btn btn-danger" v-on:click="removeSanctionPersonnel(sanctionP.id)" >supprimer</button> </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead >
+                                <tr class="bg-secondary" style="color:white">
+                                    <th class="respText" scope="col-2">Date</th>
+                                    <th class="respText" scope="col-2">Code Sanction</th>
+                                    <th class="respText" scope="col-2">Designation</th>
+                                    <th class="respText" scope="col-2">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="sanctionP in sanctionsPersonnel" v-bind:key="sanctionP">
+                                    <td class="respText" scope="col-2"> {{ sanctionP.datetime }} </td>
+                                    <td class="respText" scope="col-2"> {{ sanctionP.code_sanction }} </td>
+                                    <td class="respText" scope="col-2"> {{ sanctionP.titre }} </td>
+                                    <td class="respText" scope="col-2"> <button type="button" class="btn btn-danger" v-on:click="removeSanctionPersonnel(sanctionP.id)" >supprimer</button> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

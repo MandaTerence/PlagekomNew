@@ -7,20 +7,57 @@
     </div>
     <div class="page-inner">
         <div v-if="!showClassements">
-            <SearchProduit v-model:produits="produits"/>
-            <ProduitTab v-model:produits="produits"/>
-            <div class="form-group col-md-4">
-                <label for="inputMission">Mission</label>
-                <select class="form-control" id="inputMission" v-model="idMission">
-                    <option v-bind:key="mission.Id_de_la_mission" v-bind:value="mission.Id_de_la_mission" v-for="mission in missions">{{ mission.Id_de_la_mission }}</option>
-                </select>
-            </div>
-            <SearchPersonnel v-model:commerciaux="commerciaux" v-model:coachs="coachs" v-model:idMission="idMission"/>
-            <EquipeTab v-model:equipes="coachs" titre="Coachs"/>
-            <EquipeTab v-model:equipes="commerciaux" titre="Commerciaux"/>
-            <div class="row" >
-                <div class="col-12 text-right">
-                    <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
+            <h2 class="text-center"><span style="background-color:#f9fbfd">Recherche personnel</span></h2>
+        <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row" id="searchPerso">
+                        <div class="form-group col-md-3">
+                            <label for="inputMission">Mission</label>
+                            <select class="form-control" id="inputMission" v-model="idMission">
+                                <option v-bind:key="mission.Id_de_la_mission" v-bind:value="mission.Id_de_la_mission" v-for="mission in missions">{{ mission.Id_de_la_mission }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="inputFonction">Fonction</label>
+                            <select class="form-control" id="inputFonction" v-model="idFonction" v-on:change="changeCustomId">
+                                <option v-bind:key="fonction.designation" v-bind:value="fonction.id" v-for="fonction in fonctions">{{ fonction.designation }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="inputMatricule">Matricule</label>
+                            <input type="text" placeholder="what are you looking for?" v-model="matricule" class="form-control" v-on:keyup="autoComplete" v-on:click="autoComplete">
+                            <div class="panel-footer" style="float:top;position: absolute;z-index: 1;" >
+                                <ul class="list-group">
+                                    <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
+                                        <div >{{ result.Matricule }}</div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <button class="d-none d-lg-block btn btn-secondary " style="margin:30px" v-on:click="addPersonnel">Ajouter</button>
+                        </div>
+                        <button class="d-block d-lg-none btn btn-secondary " style="margin:30px" v-on:click="addPersonnel">Ajouter</button>
+                    
+                    </div>
+                    <div class="row d-flex justify-content-center" id="resultPersonnel" >
+                        <div class="table-responsive col-md-5">
+                            <EquipeTab  v-model:equipes="coachs" titre="Coachs"/>
+                        </div>
+                        <div class="table-responsive offset-md-1 col-md-5">
+                            <EquipeTab  v-model:equipes="commerciaux" titre="Commerciaux"/>
+                        </div> 
+                    </div>
+                    <div class="row">
+                        <SearchProduit v-model:produits="produits"/>
+                        <ProduitTab v-model:produits="produits"/>
+                    </div>
+                    <div class="row" >
+                        <div class="col-12 text-right">
+                            <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -163,6 +200,7 @@ export default {
     },
     created() {
         this.loadMissions();
+        this.loadFonctions();
     },
     methods: {
         loadMissions(){
@@ -287,11 +325,126 @@ export default {
             }
             
         },
-        test(){
-            alert(this.idMission);
-            //let te =  this.getCodeProduitFromArray(this.produits);
-            //alert(te);
+        // search perso
+        loadFonctions(){
+            this.$axios.get('/api/fonctions') 
+            .then(response => {
+                if(response.data.success){
+                    this.fonctions = response.data.fonctions;
+                    this.idFonction = this.fonctions[0].id;
+                    this.customId = this.fonctions[0].customId;
+                }
+                else{
+                    console.log(response.data.message);
+                }
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
         },
+        searchAutoComplete(){
+            this.resultats = [];
+            if(this.customId == null){
+                axios.get('/api/personnels/getMatriculeByFonction',{params: {fonction: this.idFonction,search: this.matricule}}).then(response => {
+                    this.isSearchingAutoComplete = false;
+                    if(response.data.success){
+                        this.resultats = response.data.personnels;
+                    }
+                    else{
+                        alert(response.data.message);
+                    }
+                });
+            }
+            else{
+                this.customId.forEach(element => {
+                    axios.get('/api/personnels/getMatriculeByFonction',{params: {fonction: element,search: this.matricule}}).then(response => { 
+                        if(response.data.success){
+                            this.resultats = this.resultats.concat(response.data.personnels);
+                        }
+                        else{
+                            alert(response.data.message);
+                        }
+                    });
+                });
+                this.isSearchingAutoComplete = false;
+            }
+        },
+        addPersonnel(){
+            if(this.customId == null){
+                if((this.matricule!=null)&&(this.idFonction!=null)){
+                    axios.get('/api/personnels/getFirstWhere',{params: {criteres: {Fonction_actuelle: this.idFonction,Matricule: this.matricule}}}).then(response => {
+                        if(response.data.success){
+                            if(response.data.personnel.Fonction_actuelle == 2){
+                                if(this.coachs.length > (this.maxCoach-1)){
+                                    alert("il existe deja un coach");
+                                }else{
+                                    this.addEquipeFromCoach(response.data.personnel);
+                                }
+                            }else{
+                                if(this.commerciaux.length > (this.maxCommerciaux-1)){
+                                    alert("la limite de commerciaux :"+this.maxCommerciaux+" est deja atteinte");
+                                }else{
+                                    this.addPersonnelToTable(this.commerciaux,response.data.personnel);
+                                }
+                            }
+                        }
+                        else{
+                            alert('aucun resultat trouvé');
+                        }
+                    });
+                }
+            }else{
+                this.customId.forEach(element => {
+                    axios.get('/api/personnels/getFirstWhere',{params: {criteres: {Fonction_actuelle: element,Matricule: this.matricule}}}).then(response => {
+                        if(response.data.success){
+                            if(response.data.personnel.Fonction_actuelle == 2){
+                                if(this.coachs.length > (this.maxCoach-1)){
+                                    alert("il existe deja un coach");
+                                }else{
+                                    this.addPersonnelToTable(this.coachs,response.data.personnel);
+                                }
+                            }else{
+                                if(this.commerciaux.length > (this.maxCommerciaux-1)){
+                                    alert("la limite de commerciaux :"+this.maxCommerciaux+" est deja atteinte");
+                                }else{
+                                    this.addPersonnelToTable(this.commerciaux,response.data.personnel);
+                                }
+                            }
+                        }
+                    });  
+                });
+            }
+        },
+        addPersonnelToTable(table,personnel){
+            let exist = false
+            table.forEach(element => {
+                if(element.Matricule == personnel.Matricule){
+                    exist = true;
+                }
+            });
+            if(exist){
+                alert(personnel.Matricule+" est deja present");
+            }
+            else{
+                table.push(personnel);
+            }
+        },
+        addEquipeFromCoach(coach){
+            this.addPersonnelToTable(this.coachs,coach);
+            if(coach!=''){
+                axios.get('/api/personnels/getPersonnelFromCoach',{params: {coach: coach.Matricule,idMission: this.idMission}}).then(response => {
+                    for(let i=0;i<response.data.data.length;i++){
+                        if(this.commerciaux.length>=this.maxCommerciaux){
+                            
+                        }
+                        else if(response.data.data[i].Matricule!=coach.Matricule){
+                            this.addPersonnelToTable(this.commerciaux,response.data.data[i]);
+                        }
+                    }
+                });
+            }
+        },
+        // search perso
     },
     
     components: {

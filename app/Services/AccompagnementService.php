@@ -60,6 +60,49 @@ class AccompagnementService {
         return "ok test";
     }
 
+    public static function generatePlanningNew($idMission,$coach,$personnels=null){
+        if($personnels==null){
+            $personnels = DetailMission::getPersonnelFromCoach($coach,$idMission);
+        }
+        $matricules = [];
+        foreach($personnels as $p){
+            if(isset($p['Matricule'])){
+                $matricules[] = $p['Matricule'];
+            }
+            else{
+                $matricules[] = $p->Matricule;
+            }
+        }
+        $classement = Classement::getFromMatricules($idMission,$matricules);
+        $mission = Mission::getFirst([['Id_de_la_mission',$idMission]]);
+        $Date_depart = $mission->Date_depart;
+        $Date_de_fin = $mission->Date_de_fin;
+        $periods = self::date_range($Date_depart,$Date_de_fin);
+        $accArray = [];
+        for($i=0;$i<count($periods);$i++){
+            $p = str_replace('/', '-', $periods[$i]);
+            $jour = date('w', strtotime($p));
+            $dateInserer = date(self::DATE_FORMAT, strtotime($p));
+            foreach(self::JOUR_ACCOMPAGNEMENT as $plan){
+                if((($i%6)+1) == $plan['Date']){
+                    $com = $classement[$plan['place']-1];
+                    $acc = [
+                        'Id_de_la_mission'=>$idMission,
+                        'Commercial'=>$com->Commercial,
+                        'Coach'=>$coach,
+                        'Date'=>$dateInserer,
+                        'Heure_debut'=>$plan['Heure_debut'],
+                        'Heure_fin'=>$plan['Heure_fin'],
+                        'Ordre'=>$plan['Ordre']
+                    ];
+                    $accArray[] = $acc;
+                }
+            }
+        }
+        Accompagnement::insert($accArray);
+        return true;
+    }
+
     public static function generatePlanning($idMission,$coach,$personnels=null){
         if($personnels==null){
             $personnels = DetailMission::getPersonnelFromCoach($coach,$idMission);

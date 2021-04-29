@@ -14,7 +14,7 @@ class SanctionController extends Controller
 
     public function getAll(Request $request){
         $code=$request->codeSanction;
-        $res = SanctionService::getSanctionFromCode($code);
+        $res = SanctionService::getSanction($code);
         $response = [
             'success' => true,
             'sanctions' => $res,

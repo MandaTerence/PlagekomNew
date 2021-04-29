@@ -10004,3 +10004,8 @@ h3 {
     border-color: #dee2e6;
   }
 }
+@media (max-width: 544px) {
+  .respText {
+    font-size: 11px !important;
+  }
+}

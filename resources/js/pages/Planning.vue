@@ -46,26 +46,25 @@
                     </div>
                 </div>
             </div>
+            <h2 class="text-center"><span style="background-color:#f9fbfd">Planning d accompagnement</span></h2>
+                    <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="row">
                 <div class="card col-md-12">
                     <div class="card-body">
-                        <strong >
-                            Planning d'Accompagnement :
-                        </strong>
                         <div class="row" style="margin-top:20px">
-                            <table class="table table-hover" id="listePlanning">
+                            <table class="table table-hover d-flex justify-content-center" id="listePlanning"> 
                                 <tbody>
                                     <div v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
-                                        <tr class="d-flex" style="text-align:center">
+                                        <tr class="d-flex"  style="text-align:center">
                                             <td class="col-12">
                                                 <div v-on:click="toogleVisibility(planning['jour'])" >
-                                                    <h3><a >{{ planning['jour'] }}</a></h3>
+                                                    <h3><a >{{ getJourSemaine(planning['jour']) }}</a></h3>
                                                 </div>
                                             </td>
                                         </tr>
                                         <tr v-if="planning.visibility==true">
                                             <td>
-                                                <div class="row d-flex" >
+                                                <div class="row">
                                                     <div class="col-md-6">
                                                         <h3>Matin</h3>
                                                         <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary align-items-center">
@@ -87,6 +86,7 @@
                                                             </tbody>
                                                         </table>
                                                     </div>
+                                            
                                                     <div class="col-md-6">
                                                         <h3>Apres Midi</h3>
                                                         <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary align-items-center">
@@ -135,7 +135,16 @@ export default {
             plannings: [],
             coach: 'all',
             showPlanning: true,
-            isSearchingAutoComplete: false
+            isSearchingAutoComplete: false,
+            jourSemainde: [
+                'Dimanche',
+                'Lundi',
+                'Mardi',
+                'Mercredi',
+                'jeudi',
+                'Vendredi',
+                'Samedi',
+            ]
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -150,6 +159,10 @@ export default {
         this.loadPlannig();
     },
     methods: {
+        getJourSemaine(d){
+            let day =new Date(d);
+            return this.jourSemainde[day.getDay()]+" "+d;
+        },
         goToPlanning(matricule){
             this.$router.push({ path: 'controleTelephonique', query: { matricule: matricule } });
         },
