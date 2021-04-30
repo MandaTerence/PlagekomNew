@@ -7,26 +7,26 @@
     </div>
     <div class="page-inner">
         <div v-if="!showClassements">
-            <h2 class="text-center"><span style="background-color:#f9fbfd">Recherche personnel</span></h2>
-        <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+            <h2 class="text-center"><span style="background-color:#f9fbfd">Recherche de personnel</span></h2>
+            <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="card">
                 <div class="card-body">
                     <div class="row" id="searchPerso">
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-12 col-md-4">
                             <label for="inputMission">Mission</label>
-                            <select class="form-control" id="inputMission" v-model="idMission">
+                            <select class="form-control " id="inputMission" v-model="idMission">
                                 <option v-bind:key="mission.Id_de_la_mission" v-bind:value="mission.Id_de_la_mission" v-for="mission in missions">{{ mission.Id_de_la_mission }}</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-6 col-md-4">
                             <label for="inputFonction">Fonction</label>
-                            <select class="form-control" id="inputFonction" v-model="idFonction" v-on:change="changeCustomId">
+                            <select class="form-control " id="inputFonction" v-model="idFonction" v-on:change="changeCustomId">
                                 <option v-bind:key="fonction.designation" v-bind:value="fonction.id" v-for="fonction in fonctions">{{ fonction.designation }}</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-6 col-md-4">
                             <label for="inputMatricule">Matricule</label>
-                            <input type="text" placeholder="what are you looking for?" v-model="matricule" class="form-control" v-on:keyup="autoComplete" v-on:click="autoComplete">
+                            <input class="form-control "  type="text" placeholder="what are you looking for?" v-model="matricule" v-on:keyup="autoComplete" v-on:click="autoComplete">
                             <div class="panel-footer" style="float:top;position: absolute;z-index: 1;" >
                                 <ul class="list-group">
                                     <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
@@ -35,12 +35,20 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="form-group col-md-3">
-                            <button class="d-none d-lg-block btn btn-secondary " style="margin:30px" v-on:click="addPersonnel">Ajouter</button>
+                        <div class="row d-flex justify-content-end">
+                            <button class="btn btn-secondary " style="margin:30px" v-on:click="addPersonnel">Ajouter</button>
                         </div>
-                        <button class="d-block d-lg-none btn btn-secondary " style="margin:30px" v-on:click="addPersonnel">Ajouter</button>
-                    
                     </div>
+                    <div class="row" id="searchProduit">
+                        <SearchProduit v-model:produits="produits"/>
+                        <ProduitTab v-model:produits="produits"/>
+                    </div>
+                </div>
+            </div>
+            <h2 class="text-center"><span style="background-color:#f9fbfd">Resultat</span></h2>
+        <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+            <div class="card">
+                <div class="card-body">
                     <div class="row d-flex justify-content-center" id="resultPersonnel" >
                         <div class="table-responsive col-md-5">
                             <EquipeTab  v-model:equipes="coachs" titre="Coachs"/>
@@ -49,10 +57,7 @@
                             <EquipeTab  v-model:equipes="commerciaux" titre="Commerciaux"/>
                         </div> 
                     </div>
-                    <div class="row">
-                        <SearchProduit v-model:produits="produits"/>
-                        <ProduitTab v-model:produits="produits"/>
-                    </div>
+                    
                     <div class="row" >
                         <div class="col-12 text-right">
                             <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
