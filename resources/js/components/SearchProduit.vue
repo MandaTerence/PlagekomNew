@@ -1,9 +1,9 @@
 <template>
     <div class="form-row">
-        <div class="form-group col-md-4">
+        <div class="form-group col-6">
             <label for="inputProduit">Produit</label>
             <input type="text" placeholder="what are you looking for?" v-model="produitDesignation" class="form-control" v-on:keyup="autoComplete" v-on:click="autoComplete">
-            <div class="panel-footer" style="float:top">
+            <div class="panel-footer" style="float:top;position: absolute;z-index: 1;">
                 <ul class="list-group">
                     <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeProduit(result.Designation)" >
                         <div >{{ result.Designation }}</div>
@@ -11,8 +11,8 @@
                 </ul>
             </div>
         </div>
-        <div class="form-group col-md-4">
-            <button class="d-none d-lg-block btn btn-secondary " style="margin:30px" v-on:click="addProduit">Ajouter</button>
+        <div class="form-group col-6">
+            <button class="btn btn-secondary " style="margin:30px" v-on:click="addProduit">Ajouter</button>
         </div>
     </div>
 </template>

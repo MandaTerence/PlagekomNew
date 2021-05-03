@@ -7,22 +7,22 @@
                 <h4 class="text-right">Nombre: {{equipes.length }}</h4>
             </div>
         </div>
-        <div class="row">
+        <div class="row table-responsive">
             <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
                 <thead >
                     <tr class="bg-secondary" style="color:white">
-                        <th scope="col-md-2">matricule</th>
-                        <th scope="col-md-2 d-none">nom et prenom</th>
-                        <th scope="col-md-2">C.A</th>
-                        <th scope="col-md-1"></th>
+                        <th class="respText" scope="col-md-2">matricule</th>
+                        <th class="respText" scope="col-md-2 d-none">nom et prenom</th>
+                        <th class="respText" scope="col-md-2">C.A</th>
+                        <th class="respText" scope="col-md-1"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="equipe in equipes" v-bind:key="equipe">
-                        <td scope="col-md-2">{{ equipe.Matricule }}</td>
-                        <td scope="col-md-2">{{ equipe.Nom+equipe.Prenom }}</td>
-                        <td scope="col-md-2">{{ equipe.CA }}</td>
-                        <td scope="col-md-1">
+                        <td class="respText" scope="col-md-2">{{ equipe.Matricule }}</td>
+                        <td class="respText" scope="col-md-2">{{ equipe.Nom+equipe.Prenom }}</td>
+                        <td class="respText" scope="col-md-2">{{ equipe.CA }}</td>
+                        <td class="respText" scope="col-md-1">
                             <button class="btn btn-danger" v-on:click="remove(equipe.Matricule)">
                             <div class="d-none d-lg-block">
                                 supprimer

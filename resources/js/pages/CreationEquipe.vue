@@ -7,24 +7,26 @@
     </div>
     <div class="page-inner">
         <div v-if="!showClassements">
-            <h2 class="text-center"><span style="background-color:#f9fbfd">Recherche de personnel</span></h2>
+            <h2 class="text-center"><span style="background-color:#f9fbfd">Recherche</span></h2>
             <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="card">
                 <div class="card-body">
-                    <div class="row" id="searchPerso">
-                        <div class="form-group col-12 col-md-4">
+                    <h3>Recherche de personnel</h3>
+                    <hr/>
+                    <div class="row" id="rechercheNormal">
+                        <div class="form-group col-12 col-md-3">
                             <label for="inputMission">Mission</label>
                             <select class="form-control " id="inputMission" v-model="idMission">
                                 <option v-bind:key="mission.Id_de_la_mission" v-bind:value="mission.Id_de_la_mission" v-for="mission in missions">{{ mission.Id_de_la_mission }}</option>
                             </select>
                         </div>
-                        <div class="form-group col-6 col-md-4">
+                        <div class="form-group col-6 col-md-3">
                             <label for="inputFonction">Fonction</label>
                             <select class="form-control " id="inputFonction" v-model="idFonction" v-on:change="changeCustomId">
                                 <option v-bind:key="fonction.designation" v-bind:value="fonction.id" v-for="fonction in fonctions">{{ fonction.designation }}</option>
                             </select>
                         </div>
-                        <div class="form-group col-6 col-md-4">
+                        <div class="form-group col-6 col-md-3">
                             <label for="inputMatricule">Matricule</label>
                             <input class="form-control "  type="text" placeholder="what are you looking for?" v-model="matricule" v-on:keyup="autoComplete" v-on:click="autoComplete">
                             <div class="panel-footer" style="float:top;position: absolute;z-index: 1;" >
@@ -35,13 +37,23 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="row d-flex justify-content-end">
-                            <button class="btn btn-secondary " style="margin:30px" v-on:click="addPersonnel">Ajouter</button>
-                        </div>
+                        <div class="form-group col-6 col-md-3">
+                            <button class="btn btn-secondary" style="margin-top:30px; margin-right:5px" v-on:click="addPersonnel">Ajouter</button>
+                            <button class="btn btn-secondary" style="margin-top:30px" v-on:click="toogleAdvancedSearch"><i class="fas fa-bars" style="color:white"></i></button>
+                        </div>    
                     </div>
-                    <div class="row" id="searchProduit">
-                        <SearchProduit v-model:produits="produits"/>
-                        <ProduitTab v-model:produits="produits"/>
+                    <div v-if="showAdvancedSearch">
+                        <hr/>
+                        <h3>Recherche avance</h3>
+                        <hr/>
+                    </div>
+                    <div class="row" id="rechercheAvance" v-if="showAdvancedSearch">
+                        <div class="col-12">
+                            <SearchProduit v-model:produits="produits"/>
+                        </div>
+                        <div class="col-12">
+                            <ProduitTab v-model:produits="produits"/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -49,11 +61,13 @@
         <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="card">
                 <div class="card-body">
-                    <div class="row d-flex justify-content-center" id="resultPersonnel" >
-                        <div class="table-responsive col-md-5">
+                    <div class="row d-flex justify-content-center" id="resultCoach" >
+                        <div class="table-responsive col-md-12" style="margin-left:25px">
                             <EquipeTab  v-model:equipes="coachs" titre="Coachs"/>
                         </div>
-                        <div class="table-responsive offset-md-1 col-md-5">
+                    </div>
+                    <div class="row d-flex justify-content-center" id="resultCommerciaux" >
+                        <div class="table-responsive col-md-12" style="margin-left:25px">
                             <EquipeTab  v-model:equipes="commerciaux" titre="Commerciaux"/>
                         </div> 
                     </div>
@@ -77,7 +91,7 @@
     <div class="page-inner"> 
         <div>
             <ClassementTab v-model:classements="classements" v-model:classementReel="classementReel"/>
-            <button class="btn btn-secondary" v-on:click="toogleClassementsView()">retour </button>
+            <button class="btn btn-secondary" v-on:click="retourClassement">retour </button>
             <button class="btn btn-secondary" v-on:click="validateEquipe">Valider</button>
             <div name="modal" v-if="showModal" @close="showModal = false">
                 <div class="modal-mask">
@@ -173,6 +187,7 @@ export default {
         return {
             isSearchingAutoComplete: false,
             showClassements: false,
+            showAdvancedSearch: false,
             maxCoach:1,
             maxCommerciaux:8,
             showModal: false,
@@ -206,8 +221,24 @@ export default {
     created() {
         this.loadMissions();
         this.loadFonctions();
+        this.loadLocalData();
     },
     methods: {
+        retourClassement(){
+            this.toogleClassementsView();
+            localStorage.removeItem("classements");
+            localStorage.removeItem("classementReel");
+        },
+        loadLocalData(){
+            if(localStorage.getItem('classementReel') !== null){
+                this.classementReel = JSON.parse(localStorage.classementReel);
+                this.classements= JSON.parse(localStorage.classements);
+                this.showClassements = true;
+            }
+        },
+        toogleAdvancedSearch(){
+            (this.showAdvancedSearch)?this.showAdvancedSearch = false: this.showAdvancedSearch = true;
+        },
         loadMissions(){
             this.$axios.get('/api/missions',{params: {criteres: {Statut: 'En_cours'}}}) 
             .then(response => {
@@ -222,6 +253,11 @@ export default {
             .catch(function (error) {
                 console.error(error);
             });
+        },
+        fillPlaceTemp(classement){
+            for(let i= 0;i<classement.length;i++){
+                classement[i].placeTemp = classement[i].place;
+            }
         },
         fonctionOnChange(){
             this.resultats = [];
@@ -301,7 +337,10 @@ export default {
             axios.get('/api/personnels/getClassement',{params: {Matricules: matricules,Produits: produits}}).then(response => { 
                 if(response.data.personnels!=null){
                     this.classements = response.data.classements;
+                    localStorage.classements = JSON.stringify(this.classements);
+                    this.fillPlaceTemp(response.data.classementsReel);
                     this.classementReel = response.data.classementsReel;
+                    localStorage.classementReel = JSON.stringify(this.classementReel);
                     this.toogleClassementsView();
                 }
             });
@@ -327,8 +366,9 @@ export default {
                 this.classements.splice(place-1,1);
                 this.classements.splice(placeTemp-1, 0, elementTemp);
                 this.recalculPlace();
+                localStorage.sclassements = JSON.stringify(this.classements);
+                localStorage.classementReel = JSON.stringify(this.classementReel);
             }
-            
         },
         // search perso
         loadFonctions(){
