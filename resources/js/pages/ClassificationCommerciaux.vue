@@ -8,7 +8,11 @@
 </div>
 <div class="page-inner">
     <div class="row">
-        <div class="card">
+        <div class="card-body">
+            <ul class="nav nav-pills nav-secondary" role="tablist">
+                <li class="nav-item">
+                </li>
+            </ul>
         </div>
     </div>
 </div>
