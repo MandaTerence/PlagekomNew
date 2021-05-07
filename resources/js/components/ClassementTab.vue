@@ -1,44 +1,46 @@
 <template>
-    <div class="form-row">
-        <h1>Classement Reel</h1>
-        <table class="table table-hover">
-            <thead >
-                <tr class="bg-secondary" style="color:white">
-                    <th scope="col-md-2">matricule</th>
-                    <th scope="col-md-2">nom et prenom</th>
-                    <th scope="col-md-2">C.A</th>
-                    <th scope="col-md-1">place</th>
-                </tr>
-            </thead>
-            <tbody>  
-                <tr v-for="personnel in classementReel" v-bind:key="personnel">
-                    <td scope="col-md-2">{{ personnel.Matricule }}</td>
-                    <td scope="col-md-2">{{ personnel.Nom }}</td>
-                    <td scope="col-md-2">{{ personnel.CA }}</td>
-                    <th scope="col-md-2"><input type="number" v-model="personnel.placeTemp" v-on:change="changeClassement(personnel.place,personnel.placeTemp)"/></th>
-                </tr>
-            </tbody>
-        </table>
-        <div v-for="classement in classements" v-bind:key="classement">
-            <h1>{{ classement.titre }}</h1>
-            <table class="table table-hover"> 
-                <thead >
-                    <tr class="bg-secondary" style="color:white">
-                        <th scope="col-md-2">matricule</th>
-                        <th scope="col-md-2">nom et prenom</th>
-                        <th scope="col-md-2">C.A</th>
-                        <th scope="col-md-1"></th>
+    <div class="row">
+        <h2 class="text-center">classement proposé</h2>
+        <div class="table-responsive">
+            <table class="table table-hover respText">
+                <thead>
+                    <tr class="bg-secondary respText" style="color:white">
+                        <th class="respText">matricule</th>
+                        <th class="respText">nom et prenom</th>
+                        <th class="respText">place</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="personnel in classement.classement" v-bind:key="personnel">
-                        <td scope="col-md-2">{{ personnel.Matricule }}</td>
-                        <td scope="col-md-2">{{ personnel.Nom }}</td>
-                        <td scope="col-md-2">{{ personnel.CA }}</td>
-                        <td scope="col-md-1"></td>
+                    <tr class="respText" v-for="personnel in classementReel" v-bind:key="personnel">
+                        <td class="respText">{{ personnel.Matricule }}</td>
+                        <td class="respText">{{ personnel.Nom }}</td>
+                        <td class="respText"><input type="number" v-model="personnel.placeTemp" v-on:change="changeClassement(personnel.place,personnel.placeTemp)"/></td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="table-responsive" v-for="classement in classements" v-bind:key="classement">
+            <h1>{{ classement.titre }}</h1>
+            <div >
+                <table class="table table-hover respText"> 
+                    <thead>
+                        <tr class="bg-secondary respText" style="color:white">
+                            <th class="respText">matricule</th>
+                            <th class="respText">nom et prenom</th>
+                            <th class="respText">C.A</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="respText" v-for="personnel in classement.classement" v-bind:key="personnel">
+                            <td class="respText">{{ personnel.Matricule }}</td>
+                            <td class="respText">{{ personnel.Nom }}</td>
+                            <td class="respText">{{ personnel.CA }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </template>

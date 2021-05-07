@@ -1,3 +1,20 @@
+CREATE TABLE sanction (
+    Id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    code_sanction VARCHAR(50) NOT NULL,
+    titre VARCHAR(50) NOT NULL,
+    valeur INT NOT NULL,
+    unite VARCHAR(50) NOT NULL
+);
+CREATE TABLE sanction_personnel(
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    code_sanction VARCHAR(50) NOT NULL,
+    matricule_personnel VARCHAR(50)NOT NULL REFERENCES personnel(Matricule) ,
+    matricule_coach VARCHAR(50) NOT NULL REFERENCES  personnel(Matricule) ,
+    matricule_controlleur VARCHAR(50) NOT NULL REFERENCES personnel(Matricule) ,
+    date DATE DEFAULT NOW(),
+    id_sanction VARCHAR(50) NOT NULL REFERENCES sanction(code_sanction) ,
+    type_personnel VARCHAR(50) NOT NULL
+);       
 INSERT INTO `sanction` VALUES 
 (null,'C-ABS-01-TER','ABSENCE DU COACH AVEC LE GROUPE SUR LE TERRAIN	ABSENCE PISE A PIEDS',2500,'APP/HR'),
 (null,'V-ABS-02-TER','ABSENCE DE L’ANIMATEUR AVEC LE GROUPE SUR TERRAIN',2000,'APP/HR'),

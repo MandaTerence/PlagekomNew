@@ -345,9 +345,9 @@
                                     </router-link>   
                                 </li>
                                 <li>
-                                    <a href="overlay-sidebar.html">
+                                    <router-link to="/classificationCommerciaux" class="nav-item nav-link sub-category">
                                         <span class="sub-item">Classification commerciaux</span>
-                                    </a>
+                                    </router-link>   
                                 </li>
                             </ul>
                         </div>

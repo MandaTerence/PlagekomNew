@@ -15,7 +15,6 @@ use App\Models\Controle;
 
 class Personnel extends Model
 {
-
     use HasFactory,Notifiable;
     public static $DEFAULT_MAX_RESULT = 10;
     public static $DAY_INTERVAL = 190;
@@ -27,13 +26,12 @@ class Personnel extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        //'Matricule',
-        'Date_d_embauche',			 			 	
-        'Nom',	   		 			   	
-        'Prenom',	   		 			   	
-        'Date_de_naissance', 			 			   	
-        'Lieu_de_naissance', 	   		 			   	
-        'Sexe', 	   		 			   	
+        'Date_d_embauche',
+        'Nom',
+        'Prenom',
+        'Date_de_naissance',
+        'Lieu_de_naissance',
+        'Sexe',
         'Situation_Matrimoniale', 	   		 			   	
         'Nombre_d_enfant', 			   	
         'Cin_personnel', 	   		 			   	
@@ -42,16 +40,16 @@ class Personnel extends Model
         'Date_duplicata_cin_personnel',		
         'Lieu_de_dupliacata_cin_personnel',   				   	
         'Adresse_du_personnel', 			   	
-        'Contact_du_personnel',	   		 			   	
-        'Nom_et_prenom_du_tuteur',  		 			   	
-        'Lien_de_parente',	 			   	
+        'Contact_du_personnel',
+        'Nom_et_prenom_du_tuteur',
+        'Lien_de_parente',
         'Cin_du_tuteur',		   	
-        'Date_de_delivrance_cin_tuteur',		 			   	
-        'Adresse_du_tuteur',		 			   	
-        'Contact_du_tuteur',		 			   	
-        'Fonction_a_l_embauche',	 			   	
-        'Fonction_actuelle',			   	
-        'Mode_de_pass_login',		 			   	
+        'Date_de_delivrance_cin_tuteur',
+        'Adresse_du_tuteur',
+        'Contact_du_tuteur',
+        'Fonction_a_l_embauche',
+        'Fonction_actuelle',
+        'Mode_de_pass_login',
         'statut',
     ];
 
@@ -179,13 +177,12 @@ class Personnel extends Model
     }
 
     public function getCATotal($coef){
-        $this->CATotal = 
-            ($this->CAGlobal*$coef['global'])
+        $this->CATotal = 0
+            +($this->CAGlobal*$coef['global'])
             +($this->CAMission*$coef['mission'])
             +($this->CALocal*$coef['local'])
             +($this->CAProduitPlusCher*$coef['produitPlusCher'])
-            +($this->CAProduitMoinsCher*$coef['produitMoinsCher'])
-        ;
+            +($this->CAProduitMoinsCher*$coef['produitMoinsCher']);
         return $this->CATotal;
     }
 

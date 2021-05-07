@@ -10,6 +10,7 @@ import Planning from '../pages/Planning';
 import ControleTelephonique from '../pages/ControleTelephonique';
 import TimeLine from '../pages/TimeLine';
 import Classements from '../pages/Classements';
+import ClassificationCommerciaux from '../pages/ClassificationCommerciaux';
 
 import Books from '../components/Books';
 import AddBook from '../components/AddBook';
@@ -35,6 +36,11 @@ export const routes = [
         name: 'login',
         path: '/login',
         component: Login
+    },
+    {
+        name: 'classificationCommerciaux',
+        path: '/classificationCommerciaux',
+        component: ClassificationCommerciaux
     },
     {
         name: 'dashboard',
