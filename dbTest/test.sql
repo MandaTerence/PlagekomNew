@@ -1,3 +1,29 @@
+
+SELECT
+    p.Matricule,
+    p.Nom,
+    p.Prenom,
+    Sum(d.Quantite * pr.Prix_detail) as CA
+FROM personnel p
+JOIN facture f 
+    ON f.Matricule_personnel like p.Matricule
+JOIN detailvente d
+    ON d.Facture = f.id
+JOIN prix pr
+    ON d.ID_prix = pr.Id
+WHERE p.Fonction_actuelle like 1 OR  p.Fonction_actuelle like 6
+GROUP BY p.Matricule,p.Nom,p.Prenom
+ORDER BY CA DESC
+;
+
+DB::table('facture')
+        ->where('facture.Matricule_personnel','like',$this->Matricule)
+        ->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate])
+        ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA'))
+        ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
+        ->join('prix', 'detailvente.ID_prix', '=', 'prix.Id')
+
+
 Select * from malus join malus_detail on malus_detail.Id_malus = malus.Id;
 
 

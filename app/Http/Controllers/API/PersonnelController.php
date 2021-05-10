@@ -24,6 +24,30 @@ class PersonnelController extends Controller
         'produit' => []
     ];
 
+    public function getAllWithInfos(Request $request){
+/*
+    p.Matricule,
+    p.Nom,
+    p.Prenom,
+    Sum(d.Quantite * pr.Prix_detail) as CA
+FROM personnel p
+JOIN facture f 
+    ON f.Matricule_personnel like p.Matricule
+JOIN detailvente d
+    ON d.Facture = f.id
+JOIN prix pr
+    ON d.ID_prix = pr.Id
+WHERE p.Fonction_actuelle like 1 OR  p.Fonction_actuelle like 6
+GROUP BY p.Matricule,p.Nom,p.Prenom
+ORDER BY CA DESC
+;
+ */
+
+        $personnels = Personnel::select('Matricule','Nom','Prenom')
+        ->take(self::DEFAULT_MAX_RESULT)
+        ->get();
+    }
+
     public function index(Request $request){
         $personnels = Personnel::where(ControllerHelper::getConditions($request))
             ->take(self::DEFAULT_MAX_RESULT)

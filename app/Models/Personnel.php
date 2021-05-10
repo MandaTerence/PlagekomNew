@@ -251,6 +251,22 @@ class Personnel extends Model
         }
     }
 
+    public function getCA(){
+        $interval = getDateInterval(self::$DAY_INTERVAL);
+        $facture = DB::table('facture')
+        ->where('facture.Matricule_personnel','like',$this->Matricule)
+        ->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate])
+        ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA'))
+        ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
+        ->join('prix', 'detailvente.ID_prix', '=', 'prix.Id')
+        ->first();
+        $this->CA = 0;
+        if($facture->CA){
+            $this->CA = $facture->CA;
+        }
+        return $personnel;
+    }
+
     public function getFirstWhere(Request $request){
         $conditions = [];
         if(isset($request->criteres)){

@@ -19,7 +19,7 @@
 	</script>
 
 	<!-- CSS Files -->
-
+	<link rel="stylesheet"  href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
     <link rel="stylesheet"  href="{{ asset('assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet"  href="{{ asset('assets/css/atlantis.min.css') }}" >
 
@@ -44,11 +44,13 @@
 <script src="{{ mix('js/app.js') }}"></script>
 
 <script src="{{ asset('assets/js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js') }}"></script>
-    <!--   Core JS Files   -->
+	
+	<!--   Core JS Files   -->
     <script src="{{ asset('assets/js/core/jquery.3.2.1.min.js') }}"></script>
 	<script src="{{ asset('assets/js/core/popper.min.js') }}"></script>
 	<script src="{{ asset('assets/js/core/bootstrap.min.js') }}"></script>
-
+	<!--   Datatable  -->
+	<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
 	<!-- jQuery UI -->
 	<script src="{{ asset('assets/js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js') }}"></script>
 	<script src="{{ asset('assets/js/plugin/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js') }}"></script>
