@@ -58,6 +58,32 @@ class Personnel extends Model
         "mission"=>"MISSION"
     ];
 
+    public function getAssuidite(){
+        if(!isset($this->jourMission)){
+            $this->getJourMission();
+        }
+        if(!isset($this->jourTravail)){
+            $this->getJourTravail();
+        }
+        $this->assuidite = ($this->jourTravail*100)/$this->jourMission;
+    }
+
+    public function getJourMission(){
+        $this->jourMission = (int)DB::table("mission")
+        ->selectRaw("Sum(DATEDIFF(Date_de_fin, Date_depart)+1-FLOOR(DATEDIFF(Date_de_fin,Date_depart)/7)) as jourMission")
+        ->whereRaw("Id_de_la_mission in (select distinct Id_de_la_mission from facture where Matricule_personnel like '".$this->Matricule."')")
+        ->first()->jourMission;
+        return $this->jourMission;
+    }
+
+    public function getJourTravail(){
+        $this->jourTravail = DB::table("facture")
+        ->selectRaw("count(distinct Date) as jourTravail")
+        ->where("Matricule_personnel","like",$this->Matricule)
+        ->first()->jourTravail;
+        return $this->jourTravail;
+    }
+   
     public function getDetailSanction($jour='%'){
         $this->sanctions = SanctionPersonnel::select("sanction.code_sanction","sanction.titre","sanction.valeur","sanction.unite")
         ->where("sanction_personnel.matricule_personnel",$this->Matricule)

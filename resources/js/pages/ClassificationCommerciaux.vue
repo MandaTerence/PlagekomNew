@@ -37,14 +37,14 @@
                                 <th class="respText">Nombre de mission</th>
                             </tr>
                         </thead>
-                            <tr>
-                                <td class="respText">Classement</td>
-                                <td class="respText">Matricule</td>
-                                <td class="respText">Nom et Prenom</td>
-                                <td class="respText">C.A</td>
-                                <td class="respText">Nombre de Produit</td>
-                                <td class="respText">Assuidite</td>
-                                <td class="respText">Nombre de mission</td>
+                            <tr v-for="personnel in classification" v-bind:key="personnel">
+                                <td class="respText">{{ personnel.Place }}</td>
+                                <td class="respText">{{ personnel.Matricule }}</td>
+                                <td class="respText">{{ personnel.Nom+" "+personnel.Prenom }}</td>
+                                <td class="respText">{{ personnel.CA }}</td>
+                                <td class="respText">{{ personnel.nbrProduit}}</td>
+                                <td class="respText">{{ personnel.assuidite.toFixed(2) }} %</td>
+                                <td class="respText">{{ personnel.nbrMission}}</td>
                             </tr>
                         <tbody>
                         </tbody>
@@ -73,11 +73,14 @@ export default {
         next();
     },
     created() {
-        
+        this.getClassificationtout();
     },
     methods: {
         getClassificationtout(){
-
+            axios.get('/api/personnels/getAllWithInfos').then(response => {
+                this.classificationSave = response.data.personnels;
+                this.classification = this.classificationSave;
+            });
         }
     }
 }

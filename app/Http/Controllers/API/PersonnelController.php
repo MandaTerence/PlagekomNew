@@ -25,27 +25,26 @@ class PersonnelController extends Controller
     ];
 
     public function getAllWithInfos(Request $request){
-/*
-    p.Matricule,
-    p.Nom,
-    p.Prenom,
-    Sum(d.Quantite * pr.Prix_detail) as CA
-FROM personnel p
-JOIN facture f 
-    ON f.Matricule_personnel like p.Matricule
-JOIN detailvente d
-    ON d.Facture = f.id
-JOIN prix pr
-    ON d.ID_prix = pr.Id
-WHERE p.Fonction_actuelle like 1 OR  p.Fonction_actuelle like 6
-GROUP BY p.Matricule,p.Nom,p.Prenom
-ORDER BY CA DESC
-;
- */
-
-        $personnels = Personnel::select('Matricule','Nom','Prenom')
-        ->take(self::DEFAULT_MAX_RESULT)
+        $interval = getDateInterval(Personnel::$DAY_INTERVAL);
+        $personnels = Personnel::selectRaw('personnel.Matricule,personnel.Nom,personnel.Prenom,Sum(detailvente.Quantite * prix.Prix_detail) as CA,Sum(detailvente.Quantite) as nbrProduit,count( DISTINCT facture.Id_de_la_mission ) as nbrMission')
+        ->join('facture','facture.Matricule_personnel','like','personnel.Matricule')
+        ->join('detailvente','detailvente.Facture','=','facture.id')
+        ->join('prix','detailvente.ID_prix','=','prix.Id')
+        ->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate])
+        ->where('personnel.Fonction_actuelle','like','1')
+        ->orWhere('personnel.Fonction_actuelle','like','6')
+        ->groupBy('Matricule','Nom','Prenom')
+        ->orderBy('CA','DESC')
         ->get();
+        for($i=0;$i<count($personnels);$i++){
+            $personnels[$i]->Place = $i+1;
+            $personnels[$i]->getAssuidite();
+        }
+        $response = [
+            'success' => true,
+            'personnels' => $personnels,
+        ];
+        return $response;
     }
 
     public function index(Request $request){
