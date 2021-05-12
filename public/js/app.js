@@ -17132,16 +17132,146 @@ __webpack_require__.r(__webpack_exports__);
     next();
   },
   created: function created() {
-    this.getClassificationtout();
+    this.loadClassificationTout();
   },
   methods: {
-    getClassificationtout: function getClassificationtout() {
+    compareString: function compareString(a, b) {
+      if (a > b) return 1;else if (a < b) return -1;else return 0;
+    },
+    reorderClassification: function reorderClassification(colonne) {
+      if (this.classification.length > 1) {
+        if (typeof this.classification[0][colonne] == 'string') {
+          if (this.classification[0][colonne] - this.classification[1][colonne] > 0) {
+            this.classification.sort(function (a, b) {
+              return a[colonne] - b[colonne];
+            }); //console.log("int sup");
+          } else {
+            this.classification.sort(function (a, b) {
+              return b[colonne] - a[colonne];
+            }); //console.log("int inf");
+          }
+        } else {
+          if (this.classification[0][colonne] - this.classification[1][colonne] > 0) {
+            this.classification.sort(function (a, b) {
+              return a[colonne] - b[colonne];
+            }); //console.log("int sup");
+          } else {
+            this.classification.sort(function (a, b) {
+              return b[colonne] - a[colonne];
+            }); //console.log("int inf");
+          }
+        }
+      }
+    },
+    loadClassificationTout: function loadClassificationTout() {
       var _this = this;
 
-      axios.get('/api/personnels/getAllWithInfos').then(function (response) {
-        _this.classificationSave = response.data.personnels;
-        _this.classification = _this.classificationSave;
-      });
+      if (this.classificationSave["tout"] === undefined) {
+        axios.get('/api/personnels/getAllWithInfos').then(function (response) {
+          _this.classificationSave["tout"] = response.data.personnels;
+          _this.classification = _this.classificationSave["tout"];
+        });
+      } else {
+        this.classification = this.classificationSave["tout"];
+      }
+    },
+    replaceClassification: function replaceClassification(classNouveau) {
+      var classFinal = [];
+
+      for (var i = 0; i < classNouveau.length; i++) {
+        for (var j = 0; j < this.classificationSave["tout"].length; j++) {
+          if (this.classificationSave["tout"][j].Matricule == classNouveau[i].Matricule) {
+            classFinal.push(this.classificationSave["tout"][j]);
+            break;
+          }
+        }
+      }
+
+      this.classification = classFinal;
+    },
+    loadClassificationMission: function loadClassificationMission() {
+      var _this2 = this;
+
+      if (this.classificationSave["mission"] === undefined) {
+        axios.get('/api/personnels/getPersonnelEnMission').then(function (response) {
+          _this2.classificationSave["mission"] = response.data.personnels;
+
+          _this2.replaceClassification(_this2.classificationSave["mission"]);
+        });
+      } else {
+        this.replaceClassification(this.classificationSave["mission"]);
+      }
+    },
+    loadClassificationLocaux: function loadClassificationLocaux() {
+      var _this3 = this;
+
+      if (this.classificationSave["locaux"] === undefined) {
+        axios.get('/api/personnels/getPersonnelLocaux').then(function (response) {
+          _this3.classificationSave["locaux"] = response.data.personnels;
+
+          _this3.replaceClassification(_this3.classificationSave["locaux"]);
+        });
+      } else {
+        this.replaceClassification(this.classificationSave["locaux"]);
+      }
+    },
+    getClassificationRepos: function getClassificationRepos() {
+      var classFinal = [];
+
+      for (var i = 0; i < this.classificationSave["tout"].length; i++) {
+        var enMission = false;
+
+        for (var j = 0; j < this.classificationSave["mission"].length; j++) {
+          if (this.classificationSave["mission"][j].Matricule == this.classificationSave["tout"][i].Matricule) {
+            enMission = true;
+            break;
+          }
+        }
+
+        if (!enMission) {
+          for (var _j = 0; _j < this.classificationSave["locaux"].length; _j++) {
+            if (this.classificationSave["locaux"][_j].Matricule == this.classificationSave["tout"][i].Matricule) {
+              enMission = true;
+              break;
+            }
+          }
+        }
+
+        if (!enMission) {
+          classFinal.push(this.classificationSave["tout"][i]);
+        }
+      }
+
+      this.classification = classFinal;
+    },
+    loadClassificationRepos: function loadClassificationRepos() {
+      var _this4 = this;
+
+      if (this.classificationSave["mission"] === undefined) {
+        axios.get('/api/personnels/getPersonnelEnMission').then(function (response) {
+          _this4.classificationSave["mission"] = response.data.personnels;
+
+          if (_this4.classificationSave["locaux"] === undefined) {
+            axios.get('/api/personnels/getPersonnelLocaux').then(function (response) {
+              _this4.classificationSave["locaux"] = response.data.personnels;
+
+              _this4.getClassificationRepos();
+            });
+          } else {
+            _this4.getClassificationRepos();
+          }
+        });
+      } else {
+        if (this.classificationSave["locaux"] === undefined) {
+          axios.get('/api/personnels/getPersonnelLocaux').then(function (response) {
+            _this4.classificationSave["locaux"] = response.data.personnels;
+
+            _this4.getClassificationRepos();
+          });
+        } else {
+          this.getClassificationRepos();
+        }
+      }
     }
   }
 });
@@ -19774,89 +19904,39 @@ var _hoisted_3 = {
 var _hoisted_4 = {
   "class": "card-body"
 };
-
-var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("ul", {
+var _hoisted_5 = {
   "class": "nav nav-pills nav-secondary",
   role: "tablist"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("li", {
-  "class": "nav-item"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
-  "class": "nav-link active show",
-  "data-toggle": "pill",
-  role: "tab",
-  "aria-selected": "true"
-}, "Tous les commerciaux")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("li", {
-  "class": "nav-item submenu"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
-  "class": "nav-link show",
-  "data-toggle": "pill",
-  role: "tab",
-  "aria-selected": "false"
-}, "commerciaux en mission")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("li", {
-  "class": "nav-item"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
-  "class": "nav-link show",
-  "data-toggle": "pill",
-  role: "tab",
-  "aria-selected": "false"
-}, "commerciaux en local")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("li", {
-  "class": "nav-item"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
-  "class": "nav-link show",
-  "data-toggle": "pill",
-  role: "tab",
-  "aria-selected": "false"
-}, "commerciaux au repos")])], -1
-/* HOISTED */
-);
-
+};
 var _hoisted_6 = {
-  id: "tableau-commerciaux"
+  "class": "nav-item"
 };
 var _hoisted_7 = {
-  "class": "table-responsive"
+  "class": "nav-item submenu"
 };
 var _hoisted_8 = {
+  "class": "nav-item"
+};
+var _hoisted_9 = {
+  "class": "nav-item"
+};
+var _hoisted_10 = {
+  id: "tableau-commerciaux"
+};
+var _hoisted_11 = {
+  "class": "h4"
+};
+var _hoisted_12 = {
+  "class": "table-responsive"
+};
+var _hoisted_13 = {
   "class": "table table-hover table-bordered"
 };
-
-var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
+var _hoisted_14 = {
   "class": "bg-secondary",
   style: {
     "color": "white"
   }
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText"
-}, "Classement"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText"
-}, "Matricule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText"
-}, "Nom et Prenom"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText"
-}, "C.A"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText"
-}, "Nombre de Produit"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText"
-}, "Assuidite"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText"
-}, "Nombre de mission")])], -1
-/* HOISTED */
-);
-
-var _hoisted_10 = {
-  "class": "respText"
-};
-var _hoisted_11 = {
-  "class": "respText"
-};
-var _hoisted_12 = {
-  "class": "respText"
-};
-var _hoisted_13 = {
-  "class": "respText"
-};
-var _hoisted_14 = {
-  "class": "respText"
 };
 var _hoisted_15 = {
   "class": "respText"
@@ -19864,33 +19944,117 @@ var _hoisted_15 = {
 var _hoisted_16 = {
   "class": "respText"
 };
+var _hoisted_17 = {
+  "class": "respText"
+};
+var _hoisted_18 = {
+  "class": "respText"
+};
+var _hoisted_19 = {
+  "class": "respText"
+};
+var _hoisted_20 = {
+  "class": "respText"
+};
+var _hoisted_21 = {
+  "class": "respText"
+};
 
-var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, null, -1
+var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, null, -1
 /* HOISTED */
 );
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_4, [_hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_8, [_hoisted_9, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.classification, function (personnel) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("ul", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("li", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
+    "class": "nav-link active show",
+    "data-toggle": "pill",
+    role: "tab",
+    "aria-selected": "true",
+    onClick: _cache[1] || (_cache[1] = function () {
+      return $options.loadClassificationTout && $options.loadClassificationTout.apply($options, arguments);
+    })
+  }, "Tous les commerciaux")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("li", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
+    "class": "nav-link show",
+    "data-toggle": "pill",
+    role: "tab",
+    "aria-selected": "false",
+    onClick: _cache[2] || (_cache[2] = function () {
+      return $options.loadClassificationMission && $options.loadClassificationMission.apply($options, arguments);
+    })
+  }, "commerciaux en mission")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("li", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
+    "class": "nav-link show",
+    "data-toggle": "pill",
+    role: "tab",
+    "aria-selected": "false",
+    onClick: _cache[3] || (_cache[3] = function () {
+      return $options.loadClassificationLocaux && $options.loadClassificationLocaux.apply($options, arguments);
+    })
+  }, "commerciaux en local")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("li", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
+    "class": "nav-link show",
+    "data-toggle": "pill",
+    role: "tab",
+    "aria-selected": "false",
+    onClick: _cache[4] || (_cache[4] = function () {
+      return $options.loadClassificationRepos && $options.loadClassificationRepos.apply($options, arguments);
+    })
+  }, "commerciaux au repos")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_11, " total : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.classification.length), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+    "class": "respText",
+    onClick: _cache[5] || (_cache[5] = function ($event) {
+      return $options.reorderClassification('Place');
+    })
+  }, "Classement"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+    "class": "respText",
+    onClick: _cache[6] || (_cache[6] = function ($event) {
+      return $options.reorderClassification('Matricule');
+    })
+  }, "Matricule"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+    "class": "respText",
+    onClick: _cache[7] || (_cache[7] = function ($event) {
+      return $options.reorderClassification('Nom');
+    })
+  }, "Nom et Prenom"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+    "class": "respText",
+    onClick: _cache[8] || (_cache[8] = function ($event) {
+      return $options.reorderClassification('CA');
+    })
+  }, "C.A"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+    "class": "respText",
+    onClick: _cache[9] || (_cache[9] = function ($event) {
+      return $options.reorderClassification('nbrProduit');
+    })
+  }, "Nombre de Produit"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+    "class": "respText",
+    onClick: _cache[10] || (_cache[10] = function ($event) {
+      return $options.reorderClassification('assuidite');
+    })
+  }, "Assuidite"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+    "class": "respText",
+    onClick: _cache[11] || (_cache[11] = function ($event) {
+      return $options.reorderClassification('nbrMission');
+    })
+  }, "Nombre de mission")])]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.classification, function (personnel) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", {
       key: personnel
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.Place), 1
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.Place), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.Matricule), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.Matricule), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.Nom + " " + personnel.Prenom), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.Nom + " " + personnel.Prenom), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.CA), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.CA), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.nbrProduit), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.nbrProduit), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.assuidite.toFixed(2)) + " %", 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.assuidite.toFixed(2)) + " %", 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.nbrMission), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.nbrMission), 1
     /* TEXT */
     )]);
   }), 128
   /* KEYED_FRAGMENT */
-  )), _hoisted_17])])])])])])], 64
+  )), _hoisted_22])])])])])])], 64
   /* STABLE_FRAGMENT */
   );
 }

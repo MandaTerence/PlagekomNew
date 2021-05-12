@@ -24,6 +24,24 @@ class PersonnelController extends Controller
         'produit' => []
     ];
 
+    public function getPersonnelEnMission(Request $request){
+        $personnels = PersonnelService::getPersonnelsMission("MISSION");
+        $response = [
+            'success' => true,
+            'personnels' => $personnels,
+        ];
+        return $response;
+    }
+
+    public function getPersonnelLocaux(Request $request){
+        $personnels = PersonnelService::getPersonnelsMission("LOCAL");
+        $response = [
+            'success' => true,
+            'personnels' => $personnels,
+        ];
+        return $response;
+    }
+
     public function getAllWithInfos(Request $request){
         $interval = getDateInterval(Personnel::$DAY_INTERVAL);
         $personnels = Personnel::selectRaw('personnel.Matricule,personnel.Nom,personnel.Prenom,Sum(detailvente.Quantite * prix.Prix_detail) as CA,Sum(detailvente.Quantite) as nbrProduit,count( DISTINCT facture.Id_de_la_mission ) as nbrMission')
@@ -38,6 +56,8 @@ class PersonnelController extends Controller
         ->get();
         for($i=0;$i<count($personnels);$i++){
             $personnels[$i]->Place = $i+1;
+            $personnels[$i]->CA = (int)$personnels[$i]->CA;
+            $personnels[$i]->nbrProduit = (int)$personnels[$i]->nbrProduit;
             $personnels[$i]->getAssuidite();
         }
         $response = [

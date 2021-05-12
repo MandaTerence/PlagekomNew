@@ -11,7 +11,7 @@ use Illuminate\Database\QueryException;
 
 class PersonnelService {
 
-    public function getPersonnelsMission(){
+    public static function getPersonnelsMission($type){
         /*
          select distinct 
                 detailmission.personnel as Matricule
@@ -19,13 +19,22 @@ class PersonnelService {
             JOIN detailmission
                 on detailmission.Id_de_la_mission = mission.Id_de_la_mission
             where statut like 'En_cours'
-            AND Type_de_mission like 'MISSION'
+            AND Type_de_mission like 'LOCAL'
          */
-        DB::table("mission");
-    }
-
-    public function getPersonnelLocaux(){
-
+        $personnels = [];
+        $matricules =  DB::table("mission")
+        ->select("detailmission.personnel as Matricule")
+        ->distinct()
+        ->join("detailmission","detailmission.Id_de_la_mission","=","mission.Id_de_la_mission")
+        ->where("mission.statut","En_cours")
+        ->where("mission.Type_de_mission",$type)
+        ->get();
+        foreach($matricules as $matricule){
+            $personnel = new Personnel;
+            $personnel->Matricule = $matricule->Matricule;
+            $personnels[] = $personnel;
+        }
+        return $personnels;
     }
 
     public static function getPersonnelFromMatricule($matricules){
