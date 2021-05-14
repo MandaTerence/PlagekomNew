@@ -24,9 +24,24 @@
                 </li>
             </ul>
             <div id="tableau-commerciaux">
-                <div class="h4">
-                    total : {{ classification.length }}
+                <div class="row" style="margin-top:30px;margin-bottom:30px">
+                    <div class="col-md-3">
+                        <select class="form-control input-sm " v-model="filtre">
+                            <option value="CA" selected>par CA</option>
+                            <option value="nbrProduit">par Nombre de Produit</option>
+                            <option value="assuidite">par Assuidite</option>
+                            <option value="nbrMission">Nombre de mission</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-secondary " v-on:click="filtrer">
+                            filtre
+                        </button>
+                    </div>
                 </div>
+                <h4>
+                    total : {{ classification.length }}
+                </h4>
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered">
                         <thead>
@@ -66,7 +81,8 @@ export default {
         return {
             classificationSave: [],
             classification: [],
-            equipes: []
+            equipes: [],
+            filtre: 'CA',
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -79,6 +95,30 @@ export default {
         this.loadClassificationTout();
     },
     methods: {
+        filtrer(){
+            if(this.classification.length>1){
+                let colonne = this.filtre;
+                if(typeof this.classification[0][colonne]=='string'){
+                    this.classification.sort(function(b, a){
+                        if(a[colonne] < b[colonne]) { return -1; }
+                        if(a[colonne] > b[colonne]) { return 1; }
+                        return 0;
+                    })
+                    this.recalculplace();
+                }
+                else{
+                    this.classification.sort(function(a,b){
+                        return b[colonne]-a[colonne];
+                    });
+                    this.recalculplace();
+                }
+            }
+        },
+        recalculplace(){
+            for(let i=0;i<this.classification.length;i++){
+                this.classification[i].Place = i+1;
+            }
+        },
         compareString(a,b){
             if(a>b)
                 return 1;
@@ -90,16 +130,27 @@ export default {
         reorderClassification(colonne){
             if(this.classification.length>1){
                 if(typeof this.classification[0][colonne]=='string'){
-                    if(this.classification[0][colonne]-this.classification[1][colonne]>0){
-                        this.classification.sort(function(a,b){
+                    if(this.classification[0][colonne]>this.classification[1][colonne]){
+                        /*this.classification.sort(function(a,b){
                             return a[colonne]-b[colonne];
-                        });
+                        });*/
                         //console.log("int sup");
+                        this.classification.sort(function(a, b){
+                            if(a[colonne] < b[colonne]) { return -1; }
+                            if(a[colonne]> b[colonne]) { return 1; }
+                            return 0;
+                        })
                     }
                     else{
+                        /*
                         this.classification.sort(function(a,b){
                             return b[colonne]-a[colonne];
-                        });
+                        });*/
+                        this.classification.sort(function(b, a){
+                            if(a[colonne] < b[colonne]) { return -1; }
+                            if(a[colonne] > b[colonne]) { return 1; }
+                            return 0;
+                        })
                         //console.log("int inf");
                     }
                 }
@@ -142,6 +193,7 @@ export default {
                 }
             }
             this.classification = classFinal;
+            this.recalculplace();
         },
         loadClassificationMission(){
             if(this.classificationSave["mission"] === undefined ){

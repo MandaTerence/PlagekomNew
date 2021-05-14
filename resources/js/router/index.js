@@ -11,6 +11,7 @@ import ControleTelephonique from '../pages/ControleTelephonique';
 import TimeLine from '../pages/TimeLine';
 import Classements from '../pages/Classements';
 import ClassificationCommerciaux from '../pages/ClassificationCommerciaux';
+import Fiche from '../pages/Fiche';
 
 import Books from '../components/Books';
 import AddBook from '../components/AddBook';
@@ -41,6 +42,11 @@ export const routes = [
         name: 'classificationCommerciaux',
         path: '/classificationCommerciaux',
         component: ClassificationCommerciaux
+    },
+    {
+        name: 'Fiche',
+        path: '/Fiche',
+        component: Fiche
     },
     {
         name: 'dashboard',
@@ -82,7 +88,6 @@ export const routes = [
         path: '/TimeLine',
         component: TimeLine
     }
-    
 ];
 
 const router = createRouter({

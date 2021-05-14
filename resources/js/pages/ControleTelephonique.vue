@@ -31,7 +31,6 @@
                 <div class="row">
                     <div class="col-md-4 d-block d-sm-none">
                         <img src="assets/img/unknow.jpg" class="rounded-circle mx-auto d-block img-fluid d-flex justify-content-center" style="width:200px;height:200px">
-                        
                     </div>
                     <div class="col-md-4">
                         <table>
@@ -75,7 +74,6 @@
                     </div>
                     <div class="col-md-4 d-none d-sm-block">
                         <img src="assets/img/unknow.jpg" class="rounded mx-auto d-block img-fluid d-flex justify-content-center" style="width:160px;height:160px">
-                        
                     </div>
                 </div>
             </div>

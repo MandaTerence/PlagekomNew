@@ -324,9 +324,7 @@
                                     <router-link to="/planning"><span class="sub-item">Calendrier du mois</span></router-link>
                                 </li>
                                 <li>
-                                    <a href="components/panels.html">
-                                        <span class="sub-item">Fiche commerciale</span>
-                                    </a>
+                                    <router-link to="/Fiche"><span class="sub-item">Fiche commerciale</span></router-link>
                                 </li>
                             </ul>
                         </div>
