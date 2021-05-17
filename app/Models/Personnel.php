@@ -24,6 +24,29 @@ class Personnel extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
+    /*
+        1,2
+        3,4
+        5,6
+        7,8
+        9,10
+        11,12
+    */
+    public static $tabBis = [
+        ['moisBis'=>[11,12]],
+        ['moisBis'=>[11,12]],
+        ['moisBis'=>[11,12]],
+        ['moisBis'=>[1,2]],
+        ['moisBis'=>[1,2]],
+        ['moisBis'=>[3,4]],
+        ['moisBis'=>[3,4]],
+        ['moisBis'=>[5,6]],
+        ['moisBis'=>[5,6]],
+        ['moisBis'=>[7,8]],
+        ['moisBis'=>[7,8]],
+        ['moisBis'=>[9,10]],
+        ['moisBis'=>[9,10]]
+    ];
 
     protected $fillable = [
         'Date_d_embauche',
@@ -108,6 +131,32 @@ class Personnel extends Model
         }
     }
 
+    public function getStatutAnnuel(){
+        /*
+
+        */
+    }
+
+    public function getStatutbimestriel(){
+        $moisActuel = date('n');
+        $annee = '';
+        if(($moisActuel == 1)||($moisActuel == 2)){
+            $annee = date('Y', strtotime('-1 year'));
+        }
+        else{
+            $annee = date('Y');
+        }
+        $moisBis = self::$tabBis[$moisActuel]['moisBis'];
+        $this->pointMensuel = DB::Table("pointressource")
+        ->select(DB::raw('SUM(Eng+Pospect+Client_fidel) as pointMensuel'))
+        ->join("facture","facture.Id_facture","like","pointressource.Id_facture")
+        ->where("Matricule","like",$this->Matricule)
+        ->whereRaw("YEAR(facture.Date) like ".$annee."")
+        ->WhereRaw("MONTH(facture.Date) like ".$moisBis[0]."")
+        ->orWhereRaw("MONTH(facture.Date) like ".$moisBis[1]."")
+        ->first()->pointMensuel;
+    }
+
     public function getDetailPersonnel(){
         $detail = Accompagnement::select('Id_de_la_mission','Coach')
         ->where('Commercial',$this->Matricule)
@@ -121,10 +170,13 @@ class Personnel extends Model
             ->first()->Contact_du_personnel;
         }
         else{
-            $this->Id_de_la_mission = DB::table("equipe_temporaire")
+            $idMiss = DB::table("equipe_temporaire")
             ->select("Id_de_la_mission")
             ->where("matricule_personnel",$this->Matricule)
-            ->first()->Id_de_la_mission;
+            ->first();
+            if(isset($idMiss->Id_de_la_mission)){
+                $this->Id_de_la_mission = $idMiss->Id_de_la_mission;
+            }
             $this->Coach = "aucun";
             $this->ContactCoach = "aucun";
         }

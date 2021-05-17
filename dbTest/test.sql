@@ -1,3 +1,13 @@
+
+select SUM(Eng+Pospect+Client_fidel)
+select facture.Date
+from pointressource 
+JOIN facture ON pointressource.Id_facture like facture.Id_facture
+WHERE Matricule like 'COTN103'
+AND YEAR(facture.Date) like 2022;
+
+
+
 select distinct 
     detailmission.personnel as Matricule
 from mission 

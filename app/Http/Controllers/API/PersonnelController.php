@@ -313,6 +313,7 @@ class PersonnelController extends Controller
         $personnel = Personnel::whereRaw("Matricule like '".$request->matricule."' ")
         ->first();
         $personnel->getDetailPersonnel();
+        $personnel->getStatutbimestriel();
         if($personnel){
             $response = [
                 'success' => true,
