@@ -1,12 +1,18 @@
+select
+    sum(prix.Prix_detail*detailvente.Quantite)
+    from facture 
+    join detailvente on detailvente.Facture
+    join prix on detailvente.Id_prix like prix.Id
+    where Facture.Ress_sec_oplg like 'VP21039'
+    and Status like 'livre'
+;
 
 select SUM(Eng+Pospect+Client_fidel)
-select facture.Date
 from pointressource 
 JOIN facture ON pointressource.Id_facture like facture.Id_facture
-WHERE Matricule like 'COTN103'
-AND YEAR(facture.Date) like 2022;
-
-
+WHERE Matricule like 'VP00080'
+AND YEAR(facture.Date) like 2021
+AND MONTH(facture.Date) in (3,4);
 
 select distinct 
     detailmission.personnel as Matricule
@@ -23,8 +29,6 @@ JOIN equipe_temporaire
     on equipe_temporaire.Id_de_la_mission = equipe_temporaire.Id_de_la_mission
 where statut like 'En_cours'
 AND Type_de_mission like 'MISSION';
-
-
 
 select distinct Id_de_la_mission from facture where Matricule_personnel like 'VP12087';
 

@@ -81,6 +81,10 @@ class Personnel extends Model
         "mission"=>"MISSION"
     ];
 
+    public function getChiffreDAffaire(){
+        DB::table()
+    }
+
     public function getAssuidite(){
         if(!isset($this->jourMission)){
             $this->getJourMission();
@@ -132,29 +136,72 @@ class Personnel extends Model
     }
 
     public function getStatutAnnuel(){
-        /*
+        if(!isset($this->statutAnnuel)){
+            $this->getPointAnn();
+            if($this->pointAnnuel == 0){
+                $this->statutAnnuel = "Natural";
+            }
+            else{
+                $this->statutAnnuel = DB::Table("privillege")
+                ->select("Designation")
+                ->where('Point_initial', '<', $this->pointAnnuel)
+                ->where('Point_final','>=', $this->pointAnnuel)
+                ->where('Periode','Annuel')
+                ->first()->Designation;
+            }
+        }
+    }
 
-        */
+    public function getPointAnn(){
+        if(!isset($this->pointAnnuel)){
+            $annee = date('Y');
+            $pointAnnuel = DB::Table("pointressource")
+            ->join("facture","facture.Id_facture","like","pointressource.Id_facture")
+            ->where("pointressource.Matricule","like",$this->Matricule)
+            ->whereRaw("YEAR(facture.Date) like ".$annee."")
+            ->selectRaw(DB::raw('COALESCE(SUM(Eng+Pospect+Client_fidel),0) as pointAn'))
+            ->first()->pointAn;
+            $this->pointAnnuel = $pointAnnuel;
+        }
+    }
+
+    public function getPointBis(){
+        if(!isset($this->pointMensuel)){
+            $moisActuel = date('n');
+            $annee = '';
+            if(($moisActuel == 1)||($moisActuel == 2)){
+                $annee = date('Y', strtotime('-1 year'));
+            }
+            else{
+                $annee = date('Y');
+            }
+            $moisBis = self::$tabBis[$moisActuel]['moisBis'];
+            $pointMensuel = DB::Table("pointressource")
+            ->join("facture","facture.Id_facture","like","pointressource.Id_facture")
+            ->where("pointressource.Matricule","like",$this->Matricule)
+            ->whereRaw("YEAR(facture.Date) like ".$annee."")
+            ->WhereRaw("MONTH(facture.Date) in (".$moisBis[0].",".$moisBis[1].")")
+            ->selectRaw(DB::raw('COALESCE(SUM(Eng+Pospect+Client_fidel),0) as pointBis'))
+            ->first()->pointBis;
+            $this->pointMensuel = $pointMensuel;
+        }
     }
 
     public function getStatutbimestriel(){
-        $moisActuel = date('n');
-        $annee = '';
-        if(($moisActuel == 1)||($moisActuel == 2)){
-            $annee = date('Y', strtotime('-1 year'));
+        if(!isset($this->statutbimestriel)){
+            $this->getPointBis();
+            if($this->pointMensuel == 0){
+                $this->statutMensuel = "Beginner";
+            }
+            else{
+                $this->statutMensuel = DB::Table("privillege")
+                ->select("Designation")
+                ->where('Point_initial', '<', $this->pointMensuel)
+                ->where('Point_final','>=', $this->pointMensuel)
+                ->where('Periode','Bimestriels')
+                ->first()->Designation;
+            }
         }
-        else{
-            $annee = date('Y');
-        }
-        $moisBis = self::$tabBis[$moisActuel]['moisBis'];
-        $this->pointMensuel = DB::Table("pointressource")
-        ->select(DB::raw('SUM(Eng+Pospect+Client_fidel) as pointMensuel'))
-        ->join("facture","facture.Id_facture","like","pointressource.Id_facture")
-        ->where("Matricule","like",$this->Matricule)
-        ->whereRaw("YEAR(facture.Date) like ".$annee."")
-        ->WhereRaw("MONTH(facture.Date) like ".$moisBis[0]."")
-        ->orWhereRaw("MONTH(facture.Date) like ".$moisBis[1]."")
-        ->first()->pointMensuel;
     }
 
     public function getDetailPersonnel(){

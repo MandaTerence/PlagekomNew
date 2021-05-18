@@ -11,7 +11,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row">
-                <div class="col-md-3 d-none d-sm-block">
+                <div class="col-md-2 d-none d-sm-block">
                     <img src="assets/img/unknow.jpg" class="rounded mx-auto d-block img-fluid d-flex justify-content-center" style="width:160px;height:160px">
                 </div>
                 <div class="col-md-6">
@@ -42,15 +42,27 @@
                         </tr>
                     </table>
                 </div>
-                <div class="col-md-3">
-                    <tr>
-                        <td><strong>Statut Annuel:</strong></td>
-                        <td style="text-align:right"></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Point Annuel:</strong></td>
-                        <td style="text-align:right"></td>
-                    </tr>
+                <div class="col-md-4">
+                    <table >
+                        <tr>
+                            <td><strong>Statut Annuel:</strong></td>
+                            <td><strong>Point Annuel:</strong></td>
+                        </tr>
+                        <tr>
+                            <td>{{ personnelData.statutAnnuel }}</td>
+                            <td>{{ personnelData.pointAnnuel }}</td>
+                        </tr>
+                    </table>
+                    <table >
+                        <tr>
+                            <td><strong>Statut Mensuel:</strong></td>
+                            <td><strong>Point Mensuel:</strong></td>
+                        </tr>
+                        <tr>
+                            <td>{{ personnelData.statutMensuel }}</td>
+                            <td>{{ personnelData.pointMensuel }}</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
             <h3 class="text-center"><span style="background-color:#f9fbfd">Chiffre d'affaire mois en cours</span></h3>
@@ -206,31 +218,6 @@
 </div>
 </template>
 <script>
-/*
-    attributs:
-    -force      +2
-    -agilité    +1
-    -esprit     +0
-    -charisme   -1
-
-    combats:
-    -melee/parade
-    -distance/esquive
-    -magie/concentration
-
-    12 		2.77 	100
-    11 	 	8.33 	97.22
-    10	 	16.66 	91.66
-    9	 	27.77 	83.33
-    8 	 	41.66 	72.22
-    7 	 	58.33 	58.33
-    6 	 	72.22 	41.66
-    5 	 	83.33 	27.77
-    4 	 	91.66 	16.66
-    3 	 	97.22 	8.33
-    2 		100 	2.77
-
-*/
 export default {
     name: "Fiche",
     data() {
