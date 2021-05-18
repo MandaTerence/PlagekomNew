@@ -1,3 +1,6 @@
 npm install
 composer dump-autoload
 composer install
+
+rm .git/refs/remotes/origin/master
+git fetch
