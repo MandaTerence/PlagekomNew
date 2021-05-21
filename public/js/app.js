@@ -21605,7 +21605,76 @@ var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(
 /* HOISTED */
 );
 
-var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Chiffre d&#39;affaire mois en cours</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"text-left\">Vente sur facebook</td><td class=\"text-right\">45</td></tr><tr><td class=\"text-left\">Vente sur terrain</td><td class=\"text-right\">12</td></tr><tr><td class=\"text-left\">Nombre de produit</td><td class=\"text-right\">57</td></tr></tbody></table></div></div></div></div><h3 class=\"respText  text-center\"><span style=\"background-color:#f9fbfd;\">commission</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Commissions</td><td class=\"respText text-right\">45</td></tr><tr><td class=\"respText text-left\">Commission vente sur facebook</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Commission vente sur terrain</td><td class=\"respText text-right\">57</td></tr><tr><td class=\"respText text-left\">Salaire previsionnel du mois</td><td class=\"respText text-right\">57</td></tr><tr><td class=\"respText text-left\">Pourboire</td><td class=\"respText text-right\">57</td></tr><tr><td class=\"respText text-left\">Total Commande</td><td class=\"respText text-right\">57</td></tr></tbody></table></div></div></div></div><h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Avantage et bonus</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Bonus</td><td class=\"respText text-right\">45</td></tr><tr><td class=\"respText text-left\">Bonus Mensuelle</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Indemnité journalière</td><td class=\"respText text-right\">12</td></tr></tbody></table></div></div></div></div><h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Challenge</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Challenge</td><td class=\"respText text-right\">45</td></tr><tr><td class=\"respText text-left\">Challenge</td><td class=\"respText text-right\">12</td></tr></tbody></table></div></div></div></div><h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Déduction et sanction</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Deduction</td><td class=\"respText text-right\">45</td></tr><tr><td class=\"respText text-left\">Malus</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Sanction sur controle telephonique</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Absence</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Manques</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Autres deductions</td><td class=\"respText text-right\">12</td></tr></tbody></table></div></div></div>", 15);
+var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("h3", {
+  "class": "text-center"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", {
+  style: {
+    "background-color": "#f9fbfd"
+  }
+}, "Chiffre d'affaire mois en cours")], -1
+/* HOISTED */
+);
+
+var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("hr", {
+  style: {
+    "background-color": "#47e5ff",
+    "height": "2px",
+    "margin-top": "-22px"
+  }
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_25 = {
+  "class": "card"
+};
+var _hoisted_26 = {
+  "class": "card-body"
+};
+var _hoisted_27 = {
+  "class": "row-fluid"
+};
+var _hoisted_28 = {
+  "class": "span11"
+};
+var _hoisted_29 = {
+  "class": "table table-hover",
+  style: {
+    "white-space": "nowrap"
+  }
+};
+
+var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
+  "class": "text-left"
+}, "Vente sur facebook", -1
+/* HOISTED */
+);
+
+var _hoisted_31 = {
+  "class": "text-right"
+};
+
+var _hoisted_32 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
+  "class": "text-left"
+}, "Vente sur terrain", -1
+/* HOISTED */
+);
+
+var _hoisted_33 = {
+  "class": "text-right"
+};
+
+var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
+  "class": "text-left"
+}, "Nombre de produit", -1
+/* HOISTED */
+);
+
+var _hoisted_35 = {
+  "class": "text-right"
+};
+
+var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<h3 class=\"respText  text-center\"><span style=\"background-color:#f9fbfd;\">commission</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Commissions</td><td class=\"respText text-right\">45</td></tr><tr><td class=\"respText text-left\">Commission vente sur facebook</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Commission vente sur terrain</td><td class=\"respText text-right\">57</td></tr><tr><td class=\"respText text-left\">Salaire previsionnel du mois</td><td class=\"respText text-right\">57</td></tr><tr><td class=\"respText text-left\">Pourboire</td><td class=\"respText text-right\">57</td></tr><tr><td class=\"respText text-left\">Total Commande</td><td class=\"respText text-right\">57</td></tr></tbody></table></div></div></div></div><h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Avantage et bonus</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Bonus</td><td class=\"respText text-right\">45</td></tr><tr><td class=\"respText text-left\">Bonus Mensuelle</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Indemnité journalière</td><td class=\"respText text-right\">12</td></tr></tbody></table></div></div></div></div><h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Challenge</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Challenge</td><td class=\"respText text-right\">45</td></tr><tr><td class=\"respText text-left\">Challenge</td><td class=\"respText text-right\">12</td></tr></tbody></table></div></div></div></div><h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Déduction et sanction</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Deduction</td><td class=\"respText text-right\">45</td></tr><tr><td class=\"respText text-left\">Malus</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Sanction sur controle telephonique</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Absence</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Manques</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Autres deductions</td><td class=\"respText text-right\">12</td></tr></tbody></table></div></div></div>", 12);
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_5, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.Nom) + " " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.Prenom), 1
@@ -21628,7 +21697,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.pointMensuel), 1
   /* TEXT */
-  )])])])]), _hoisted_23])])])], 64
+  )])])])]), _hoisted_23, _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_30, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.CAFacebook) + " Ar", 1
+  /* TEXT */
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.CATerrain) + " Ar", 1
+  /* TEXT */
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.nbrProduit), 1
+  /* TEXT */
+  )])])])])])])]), _hoisted_36])])])], 64
   /* STABLE_FRAGMENT */
   );
 }

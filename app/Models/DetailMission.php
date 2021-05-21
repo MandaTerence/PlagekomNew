@@ -14,7 +14,7 @@ class DetailMission extends Model
     public $incrementing = true;
     public $timestamps = false;
 
-    protected $fillable = [ 
+    protected $fillable = [
         'Id_de_la_mission',  
         'personnel',
         'Equipe',

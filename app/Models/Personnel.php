@@ -24,14 +24,6 @@ class Personnel extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
-    /*
-        1,2
-        3,4
-        5,6
-        7,8
-        9,10
-        11,12
-    */
     public static $tabBis = [
         ['moisBis'=>[11,12]],
         ['moisBis'=>[11,12]],
@@ -57,12 +49,12 @@ class Personnel extends Model
         'Sexe',
         'Situation_Matrimoniale', 	   		 			   	
         'Nombre_d_enfant', 			   	
-        'Cin_personnel', 	   		 			   	
-        'Date_cin_personnel',		 			     
-        'Lieu_delivrance_du_cin_personnel', 	   		 			   
-        'Date_duplicata_cin_personnel',		
-        'Lieu_de_dupliacata_cin_personnel',   				   	
-        'Adresse_du_personnel', 			   	
+        'Cin_personnel',
+        'Date_cin_personnel',
+        'Lieu_delivrance_du_cin_personnel',
+        'Date_duplicata_cin_personnel',
+        'Lieu_de_dupliacata_cin_personnel',
+        'Adresse_du_personnel',
         'Contact_du_personnel',
         'Nom_et_prenom_du_tuteur',
         'Lien_de_parente',
@@ -81,8 +73,87 @@ class Personnel extends Model
         "mission"=>"MISSION"
     ];
 
+    /*
+
+    
+    select sum(detailvente.Quantite)
+    select detailvente.Quantite,date
+    from facture 
+    join detailvente on detailvente.Facture = facture.Id
+    join prix on detailvente.Id_prix = prix.Id
+    where Facture.Ress_sec_oplg = 'VP00080'
+    or Facture.Matricule_personnel = 'VP00080'
+    and MONTH(Date) = MONTH(CURRENT_DATE())
+    and YEAR(Date) = YEAR(CURRENT_DATE())
+;
+    */
+
     public function getChiffreDAffaire(){
-        DB::table()
+        $this->getCATerrain();
+        $this->getCAFacebook();
+        $this->getNbrProduit();
+    }
+
+    public function getNbrProduit(){
+        $nbrFb = DB::table("facture")
+        ->selectRaw("coalesce(sum(detailvente.Quantite),0) as nbr")
+        ->join("detailvente","detailvente.Facture","facture.Id")
+        ->join("prix","detailvente.Id_prix","prix.Id")
+        ->whereRaw("MONTH(CURRENT_DATE()) = MONTH(Date)")
+        ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(Date)")
+        ->whereRaw("Facture.Matricule_personnel = '".$this->Matricule."' ")
+        ->first()->nbr;
+        // ->orWhereRaw("Facture.Ress_sec_oplg = '".$this->Matricule."'")
+        $nbrTerrain = DB::table("facture")
+        ->selectRaw("coalesce(sum(detailvente.Quantite),0) as nbr")
+        ->join("detailvente","detailvente.Facture","facture.Id")
+        ->join("prix","detailvente.Id_prix","prix.Id")
+        ->whereRaw("MONTH(CURRENT_DATE()) = MONTH(Date)")
+        ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(Date)")
+        ->whereRaw("Facture.Ress_sec_oplg = '".$this->Matricule."'")
+        ->first()->nbr;
+        $this->nbrProduitFb = $nbrFb;
+        $this->nbrProduitTerrain = $nbrTerrain;
+        $this->nbrProduit = $nbrTerrain + $nbrFb;
+        return $this->nbrProduit;
+    }
+
+    public function getBonusMensuelle(){
+        if(!isset($this->pointMensuel)){
+            $this->getPointBis();
+        }
+    }
+
+    public function getIndemnite(){
+        if(!isset($this->pointMensuel)){
+            $this->getPointBis();
+        }
+    }
+
+    public function getCATerrain(){
+        $this->CATerrain = DB::table("facture")
+        ->selectRaw("coalesce(sum(prix.Prix_detail*detailvente.Quantite),0) as CATerrain")
+        ->join("detailvente","detailvente.Facture","facture.Id")
+        ->join("prix","detailvente.Id_prix","prix.Id")
+        ->where("Facture.Matricule_personnel",$this->Matricule)
+        ->where('Status','')
+        ->whereRaw("MONTH(CURRENT_DATE()) = MONTH(Date)")
+        ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(Date)")
+        ->first()->CATerrain;
+        return $this->CATerrain;
+    }
+
+    public function getCAFacebook(){
+        $this->CAFacebook = DB::table("facture")
+        ->selectRaw("coalesce(sum(prix.Prix_detail*detailvente.Quantite),0) as CAFacebook")
+        ->join("detailvente","detailvente.Facture","facture.Id")
+        ->join("prix","detailvente.Id_prix","prix.Id")
+        ->where("Facture.Ress_sec_oplg",$this->Matricule)
+        ->where("Status","livre")
+        ->whereRaw("MONTH(facture.Date) = MONTH(CURRENT_DATE())")
+        ->whereRaw("YEAR(Date) = YEAR(CURRENT_DATE())")
+        ->first()->CAFacebook;
+        return $this->CAFacebook;
     }
 
     public function getAssuidite(){
@@ -106,7 +177,7 @@ class Personnel extends Model
     public function getJourTravail(){
         $this->jourTravail = DB::table("facture")
         ->selectRaw("count(distinct Date) as jourTravail")
-        ->where("Matricule_personnel","like",$this->Matricule)
+        ->where("Matricule_personnel",$this->Matricule)
         ->first()->jourTravail;
         return $this->jourTravail;
     }
@@ -362,7 +433,7 @@ class Personnel extends Model
         if($personnel){
             $interval = getDateInterval(self::$DAY_INTERVAL);
             $facture = DB::table('facture')
-            ->where('facture.Matricule_personnel','like',$personnel->Matricule)
+            ->where('facture.Matricule_personnel',$personnel->Matricule)
             ->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate])
             ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA'))
             ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
@@ -379,7 +450,7 @@ class Personnel extends Model
     public function getCA(){
         $interval = getDateInterval(self::$DAY_INTERVAL);
         $facture = DB::table('facture')
-        ->where('facture.Matricule_personnel','like',$this->Matricule)
+        ->where('facture.Matricule_personnel',$this->Matricule)
         ->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate])
         ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA'))
         ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')

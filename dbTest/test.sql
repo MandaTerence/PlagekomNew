@@ -1,7 +1,25 @@
 select
+    *
+    from facture 
+    join detailvente on detailvente.Facture = facture.Id
+    join prix on detailvente.Id_prix like prix.Id
+    and Status like '' 
+    limit 2
+;
+
+select
     sum(prix.Prix_detail*detailvente.Quantite)
     from facture 
-    join detailvente on detailvente.Facture
+    join detailvente on detailvente.Facture = facture.Id
+    join prix on detailvente.Id_prix like prix.Id
+    where Facture.Matricule_personnel like 'VP00080'
+    and Status IS NULL
+;
+
+select
+    sum(prix.Prix_detail*detailvente.Quantite)
+    from facture 
+    join detailvente on detailvente.Facture = facture.Id
     join prix on detailvente.Id_prix like prix.Id
     where Facture.Ress_sec_oplg like 'VP21039'
     and Status like 'livre'

@@ -315,6 +315,7 @@ class PersonnelController extends Controller
         $personnel->getDetailPersonnel();
         $personnel->getStatutbimestriel();
         $personnel->getStatutAnnuel();
+        $personnel->getChiffreDAffaire();
         if($personnel){
             $response = [
                 'success' => true,

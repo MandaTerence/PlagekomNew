@@ -75,15 +75,15 @@
                                 <tbody>
                                     <tr>
                                         <td class="text-left">Vente sur facebook</td>
-                                        <td class="text-right">45</td>
+                                        <td class="text-right">{{  personnelData.CAFacebook }} Ar</td>
                                     </tr>
                                     <tr>
                                         <td class="text-left">Vente sur terrain</td>
-                                        <td class="text-right">12</td>
+                                        <td class="text-right">{{  personnelData.CATerrain}} Ar</td>
                                     </tr>
                                     <tr>
                                         <td class="text-left">Nombre de produit</td>
-                                        <td class="text-right">57</td>
+                                        <td class="text-right">{{ personnelData.nbrProduit}}</td>
                                     </tr>
                                 </tbody>
                             </table>
