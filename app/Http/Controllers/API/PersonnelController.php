@@ -316,6 +316,11 @@ class PersonnelController extends Controller
         $personnel->getStatutbimestriel();
         $personnel->getStatutAnnuel();
         $personnel->getChiffreDAffaire();
+        $personnel->getBonusMensuel();
+        $personnel->getIndemnite();
+        $personnel->getSanction();
+        $personnel->getJourAbsence();
+        $personnel->getMalusVente();
         if($personnel){
             $response = [
                 'success' => true,

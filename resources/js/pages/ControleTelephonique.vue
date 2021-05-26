@@ -124,7 +124,7 @@
                         <input type="text" class="form-control input-sm" v-model="codeSanction" v-on:keyup="autoComplete" v-on:click="autoComplete" placeholder="code sanction">
                         <div v-if="showAutoComplete" class="panel-footer" style="float:top;position: absolute;z-index: 1;">
                             <ul class="list-group">
-                                <li class="list-group-item" v-on:click.left="changeSanction(sanction.id,sanction.code_sanction,sanction.titre)" v-for="sanction in sanctions" v-bind:key="sanction" >
+                                <li class="list-group-item" v-on:click.left="changeSanction(sanction.Id,sanction.code_sanction,sanction.titre)" v-for="sanction in sanctions" v-bind:key="sanction" >
                                     <div >{{ sanction.titre }}</div>
                                 </li>
                             </ul>
@@ -298,12 +298,11 @@ export default {
         changeCommerciauxNouveau(){
             this.$router.push('controleTelephonique');
         },
-        changeSanction(id,code,titre){
-            //alert(window.Laravel.user.Matricule);
+        changeSanction(Id,code,titre){
             this.showAutoComplete = false;
             this.codeSanction = code;
             this.titreSanction = titre;
-            this.idSanction = id;
+            this.idSanction = Id;
         },
         autoComplete(){
             if((this.codeSanction.length > 2)&&(!this.isSearchingAutoComplete)){

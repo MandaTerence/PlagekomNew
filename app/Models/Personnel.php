@@ -73,20 +73,30 @@ class Personnel extends Model
         "mission"=>"MISSION"
     ];
 
-    /*
+    public function getMalusVente(){
+        $somme = DB::table('facture')
+        ->where('facture.Matricule_personnel','like',$this->Matricule)
+        //->whereRaw("MONTH(CURRENT_DATE()) = MONTH(date)")
+        //->whereRaw("YEAR(CURRENT_DATE()) = YEAR(date)")
+        ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0),date as CA'))
+        ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
+        ->join('prix', 'detailvente.ID_prix', '=', 'prix.Id')
+        ->join('mission','mission.Id_de_la_mission','like','facture.Id_de_la_mission')
+        ->groupBy('date')
+        ->get();
+        $this->malusVente = $somme;
+    }
 
-    
-    select sum(detailvente.Quantite)
-    select detailvente.Quantite,date
-    from facture 
-    join detailvente on detailvente.Facture = facture.Id
-    join prix on detailvente.Id_prix = prix.Id
-    where Facture.Ress_sec_oplg = 'VP00080'
-    or Facture.Matricule_personnel = 'VP00080'
-    and MONTH(Date) = MONTH(CURRENT_DATE())
-    and YEAR(Date) = YEAR(CURRENT_DATE())
-;
-    */
+    public function getSanction(){
+        $sanctions = DB::table("sanction_personnel")
+        ->join("sanction","sanction_personnel.id_sanction","=","sanction.Id")
+        ->selectRaw("coalesce(sum(valeur),0) as sanctions")
+        ->whereRaw("MONTH(CURRENT_DATE()) = MONTH(date)")
+        ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(date)")
+        ->where("sanction_personnel.matricule_personnel",$this->Matricule)
+        ->first()->sanctions;
+        $this->sommeSanctions = (int)$sanctions;
+    }
 
     public function getChiffreDAffaire(){
         $this->getCATerrain();
@@ -112,22 +122,23 @@ class Personnel extends Model
         ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(Date)")
         ->whereRaw("Facture.Ress_sec_oplg = '".$this->Matricule."'")
         ->first()->nbr;
-        $this->nbrProduitFb = $nbrFb;
-        $this->nbrProduitTerrain = $nbrTerrain;
+        $this->nbrProduitFb = (int)$nbrFb;
+        $this->nbrProduitTerrain = (int)$nbrTerrain;
         $this->nbrProduit = $nbrTerrain + $nbrFb;
         return $this->nbrProduit;
     }
 
-    public function getBonusMensuelle(){
-        if(!isset($this->pointMensuel)){
-            $this->getPointBis();
+    public function getBonusMensuel(){
+        if(!isset($this->idStatutMensuel)){
+            $this->getStatutbimestriel();
         }
-    }
-
-    public function getIndemnite(){
-        if(!isset($this->pointMensuel)){
-            $this->getPointBis();
-        }
+        $bonus = DB::table("Privilege_detail")
+        ->selectRaw("coalesce(sum(valeur),0) as bonusMensuel")
+        ->where("Id_type_privilege",1)
+        ->where("Id_privilege",$this->idStatutMensuel)
+        ->first()
+        ;
+        $this->bonusMensuel = (int)$bonus->bonusMensuel;
     }
 
     public function getCATerrain(){
@@ -174,12 +185,91 @@ class Personnel extends Model
         return $this->jourMission;
     }
 
+    public function getJourAbsence(){
+        $nbrJour = (int)DB::table("facture")
+        ->selectRaw("count(distinct Date) as nbrJour")
+        ->where("Matricule_personnel",$this->Matricule)
+        ->whereRaw("Month(Date) = Month(CURRENT_DATE)")
+        ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(Date)")
+        ->first()->nbrJour;
+        $nbrTravail = (int)DB::table("facture")
+        ->selectRaw("count(distinct Date) as nbrJour")
+        ->whereRaw("Month(Date) = Month(CURRENT_DATE)")
+        ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(Date)")
+        ->first()->nbrJour;
+        $this->nbrJourAbsence = $nbrTravail-$nbrJour;
+        $type = DB::table("detailmission")
+        ->select("Date_d_activation","Type_de_mission")
+        ->join("mission","mission.Id_de_la_mission","=","detailmission.Id_de_la_mission")
+        ->where("detailmission.personnel","like",$this->Matricule)
+        ->orderBy("Date_d_activation","desc")
+        ->first()->Type_de_mission;
+        $this->type = $type;
+        if(isset($type)){
+            $malus = DB::table("malus_absence")
+            ->select("Valeur")
+            ->where("Designation",$type)
+            ->first()->Valeur;
+            $this->malusAbsence = $malus*$this->nbrJourAbsence;
+        }
+        else{
+            $this->malusAbsence = 5000*$this->nbrJourAbsence;
+        }
+    }
+
+    public function getIndemnite(){
+        if(!isset($this->idStatutMensuel)){
+            $this->getPointBis();
+        }
+        if(!isset($this->jourTravailMensuel)){
+            $this->getJourTravailMensuel();
+        }
+        if(!isset($this->jourTravailLocaux)){
+            $this->getJourTravaillocaux();
+        }
+        $bonus = DB::table("Privilege_detail")
+        ->selectRaw("coalesce(sum(valeur),0) as bonus")
+        ->where("Id_type_privilege",2)
+        ->where("Id_privilege",$this->idStatutMensuel)
+        ->first()
+        ;
+        $this->IndemniteNormaux = ((int)$bonus->bonus)*$this->jourTravailMensuel;
+        $bonus = DB::table("Privilege_detail")
+        ->selectRaw("coalesce(sum(valeur),0) as bonus")
+        ->where("Id_type_privilege",7)
+        ->where("Id_privilege",$this->idStatutMensuel)
+        ->first()
+        ;
+        $this->Indemnitelocaux = ((int)$bonus->bonus)*$this->jourTravailLocaux;
+    }
+
     public function getJourTravail(){
         $this->jourTravail = DB::table("facture")
-        ->selectRaw("count(distinct Date) as jourTravail")
+        ->selectRaw("coalesce(count(distinct Date),0) as jourTravail")
         ->where("Matricule_personnel",$this->Matricule)
         ->first()->jourTravail;
         return $this->jourTravail;
+    }
+    public function getJourTravailMensuel(){
+        $this->jourTravailMensuel = DB::table("facture")
+        ->selectRaw("coalesce(count(distinct Date),0) as jourTravail")
+        ->where("Matricule_personnel",$this->Matricule)
+        ->whereRaw("MONTH(facture.Date) = MONTH(CURRENT_DATE())")
+        ->whereRaw("YEAR(Date) = YEAR(CURRENT_DATE())")
+        ->first()->jourTravail;
+        return $this->jourTravailMensuel;
+    }
+
+    public function getJourTravaillocaux(){
+        $this->jourTravailLocaux = DB::table("facture")
+        ->join ("mission","facture.Id_de_la_mission","=","mission.Id_de_la_mission")
+        ->selectRaw("coalesce(count(distinct Date),0) as jourTravail")
+        ->where("Matricule_personnel",$this->Matricule)
+        ->where("mission.type_de_mission","LOCAL")
+        ->whereRaw("MONTH(facture.Date) = MONTH(CURRENT_DATE())")
+        ->whereRaw("YEAR(Date) = YEAR(CURRENT_DATE())")
+        ->first()->jourTravail;
+        return $this->jourTravailLocaux;
     }
    
     public function getDetailSanction($jour='%'){
@@ -213,12 +303,14 @@ class Personnel extends Model
                 $this->statutAnnuel = "Natural";
             }
             else{
-                $this->statutAnnuel = DB::Table("privillege")
-                ->select("Designation")
+                $stat = DB::Table("privillege")
+                ->select("Designation","Id")
                 ->where('Point_initial', '<', $this->pointAnnuel)
                 ->where('Point_final','>=', $this->pointAnnuel)
                 ->where('Periode','Annuel')
-                ->first()->Designation;
+                ->first();
+                $this->statutAnnuel = $stat->Designation;
+                $this->idStatutAnnuel = $stat->Id;
             }
         }
     }
@@ -265,12 +357,14 @@ class Personnel extends Model
                 $this->statutMensuel = "Beginner";
             }
             else{
-                $this->statutMensuel = DB::Table("privillege")
-                ->select("Designation")
+                $stat = DB::Table("privillege")
+                ->select("Designation","Id")
                 ->where('Point_initial', '<', $this->pointMensuel)
                 ->where('Point_final','>=', $this->pointMensuel)
                 ->where('Periode','Bimestriels')
-                ->first()->Designation;
+                ->first();
+                $this->statutMensuel = $stat->Designation;
+                $this->idStatutMensuel = $stat->Id;
             }
         }
     }

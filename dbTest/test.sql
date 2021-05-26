@@ -1,8 +1,127 @@
+
+-- annuel: 12,13,14,15,17
+
+-- indemnite: 7,2,6,4
+
+--first day of the month
+
+select
+    count(distinct Date)
+from
+    facture
+where
+    Month(Date) = Month(CURRENT_DATE)
+;
+
+select * 
+from
+    facture
+join 
+;
+
+select
+    detailmission.Date_d_activation,
+    Type_de_mission
+from detailmission
+join mission on mission.Id_de_la_mission = detailmission.Id_de_la_mission
+where detailmission.personnel = 'VP00080'
+order by Date_d_activation desc
+limit 1;
+
+select
+    count(distinct Date)
+from
+    facture
+where
+    Matricule_personnel = 'VP00080'
+AND 
+    Month(Date) = Month(CURRENT_DATE)
+;
+
+select
+    Sum(DATEDIFF(Date_de_fin, DATE_SUB(CURRENT_DATE, INTERVAL DAYOFMONTH(CURRENT_DATE)-1 DAY))+1-FLOOR(DATEDIFF(Date_de_fin,Date_depart)/7)) as jourMission
+from mission
+where statut = 'En_cours';
+
+select * 
+from Privilege_detail
+where Id_type_privilege = 2
+and Id_privilege = 9
+;
+
+select count(distinct Date) as jourTravail
+from facture
+join mission on facture.Id_de_la_mission = mission.Id_de_la_mission
+
+select count(distinct Date) as jourTravail
+from facture
+join mission on facture.Id_de_la_mission = mission.Id_de_la_mission
+
+
+select coalesce(sum(valeur),0)
+from Privilege_detail
+    where Id_privilege = 9
+    and Id_type_privilege = 1
+;
+
+select
+    sum(detailvente.Quantite)
+    from facture 
+    join detailvente on detailvente.Facture = facture.Id
+    join prix on detailvente.Id_prix = prix.Id
+    where 
+    (Facture.Ress_sec_oplg = 'VP00080'
+    and Status like 'livre'
+    and MONTH(facture.Date) = MONTH(CURRENT_DATE())
+    and YEAR(Date) = YEAR(CURRENT_DATE())
+    )
+    OR
+    (Facture.Matricule_personnel = 'VP00080'
+    and Status like ''
+    and MONTH(facture.Date) = MONTH(CURRENT_DATE())
+    and YEAR(Date) = YEAR(CURRENT_DATE())
+    )
+;
+-- vente terrain
+select
+    sum(prix.Prix_detail*detailvente.Quantite)
+    from facture 
+    join detailvente on detailvente.Facture = facture.Id
+    join prix on detailvente.Id_prix = prix.Id
+    where Facture.Matricule_personnel = 'VP00080'
+    and Status like ''
+    and MONTH(facture.Date) = MONTH(CURRENT_DATE())
+    and YEAR(Date) = YEAR(CURRENT_DATE())
+;
+
+-- vente FB
+select
+    sum(prix.Prix_detail*detailvente.Quantite)
+    from facture 
+    join detailvente on detailvente.Facture = facture.Id
+    join prix on detailvente.Id_prix = prix.Id
+    where Facture.Ress_sec_oplg = 'VP00080'
+    and Status like 'livre'
+    and MONTH(facture.Date) = MONTH(CURRENT_DATE())
+    and YEAR(Date) = YEAR(CURRENT_DATE())
+;
+-- vente terrain
+select
+    sum(prix.Prix_detail*detailvente.Quantite)
+    from facture 
+    join detailvente on detailvente.Facture = facture.Id
+    join prix on detailvente.Id_prix = prix.Id
+    where Facture.Matricule_personnel = 'VP00080'
+    and Status like ''
+    and MONTH(facture.Date) = MONTH(CURRENT_DATE())
+    and YEAR(Date) = YEAR(CURRENT_DATE())
+;
+
 select
     *
     from facture 
     join detailvente on detailvente.Facture = facture.Id
-    join prix on detailvente.Id_prix like prix.Id
+    join prix on detailvente.Id_prix = prix.Id
     and Status like '' 
     limit 2
 ;
@@ -11,8 +130,8 @@ select
     sum(prix.Prix_detail*detailvente.Quantite)
     from facture 
     join detailvente on detailvente.Facture = facture.Id
-    join prix on detailvente.Id_prix like prix.Id
-    where Facture.Matricule_personnel like 'VP00080'
+    join prix on detailvente.Id_prix = prix.Id
+    where Facture.Matricule_personnel = 'VP00080'
     and Status IS NULL
 ;
 

@@ -83,7 +83,7 @@
                                     </tr>
                                     <tr>
                                         <td class="text-left">Nombre de produit</td>
-                                        <td class="text-right">{{ personnelData.nbrProduit}}</td>
+                                        <td class="text-right">{{ personnelData.nbrProduit}} Ar</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -139,15 +139,15 @@
                                 <tbody>
                                     <tr>
                                         <td class="respText text-left">Total Bonus</td>
-                                        <td class="respText text-right">45</td>
+                                        <td class="respText text-right">{{ personnelData.bonusMensuel + personnelData.IndemniteNormaux + personnelData.Indemnitelocaux}} Ar</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Bonus Mensuelle</td>
-                                        <td class="respText text-right">12</td>
+                                        <td class="respText text-right">{{ personnelData.bonusMensuel }} Ar</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Indemnité journalière</td>
-                                        <td class="respText text-right">12</td>
+                                        <td class="respText text-right">{{ personnelData.IndemniteNormaux + personnelData.Indemnitelocaux}} Ar</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -185,28 +185,28 @@
                         <table class="table table-hover" style="white-space: nowrap">
                             <tbody>
                                 <tr>
-                                    <td class="respText text-left">Total Deduction</td>
-                                    <td class="respText text-right">45</td>
+                                    <td class="respText text-left">total de deduction</td>
+                                    <td class="respText text-right">{{ personnelData.sommeSanctions + personnelData.malusAbsence }} Ar</td>
                                 </tr>
                                 <tr>
                                     <td class="respText text-left">Malus</td>
-                                    <td class="respText text-right">12</td>
+                                    <td class="respText text-right">0 Ar</td>
                                 </tr>
                                 <tr>
                                     <td class="respText text-left">Sanction sur controle telephonique</td>
-                                    <td class="respText text-right">12</td>
+                                    <td class="respText text-right">{{ personnelData.sommeSanctions }} Ar</td>
                                 </tr>
                                 <tr>
                                     <td class="respText text-left">Absence</td>
-                                    <td class="respText text-right">12</td>
+                                    <td class="respText text-right">{{ personnelData.malusAbsence }} Ar</td>
                                 </tr>
                                 <tr>
                                     <td class="respText text-left">Manques</td>
-                                    <td class="respText text-right">12</td>
+                                    <td class="respText text-right">0 Ar</td>
                                 </tr>
                                 <tr>
                                     <td class="respText text-left">Autres deductions</td>
-                                    <td class="respText text-right">12</td>
+                                    <td class="respText text-right">0 Ar</td>
                                 </tr>
                             </tbody>
                         </table>
