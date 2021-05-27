@@ -5,6 +5,33 @@
 
 --first day of the month
 
+$ventes = DB::table('facture')
+        ->where('facture.Matricule_personnel',$this->Matricule)
+        ->whereRaw("MONTH(CURRENT_DATE()) = MONTH(date)")
+        ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(date)")
+        ->selectRaw("COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA,date,Id_zone")
+        ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
+        ->join('prix', 'detailvente.ID_prix', '=', 'prix.Id')
+        ->groupBy('date','Id_zone')
+        ->get();
+
+select
+    *
+from malus_detail
+join malus on malus.Id = malus_detail.Id_malus
+;
+
+SELECT
+    COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA,date,Id_zone
+FROM facture
+join detailvente on detailvente.Facture = facture.id
+join prix on detailvente.ID_prix = prix.Id
+where facture.Matricule_personnel = 'VP00080'
+And MONTH(CURRENT_DATE()) = MONTH(date)
+And YEAR(CURRENT_DATE()) = YEAR(date)
+group By date,Id_zone
+;
+
 select
     count(distinct Date)
 from
@@ -29,7 +56,7 @@ order by Date_d_activation desc
 limit 1;
 
 select
-    count(distinct Date)
+    distinct Date
 from
     facture
 where

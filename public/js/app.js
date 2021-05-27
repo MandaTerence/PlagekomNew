@@ -21673,7 +21673,7 @@ var _hoisted_35 = {
   "class": "text-right"
 };
 
-var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<h3 class=\"respText  text-center\"><span style=\"background-color:#f9fbfd;\">commission</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Commissions</td><td class=\"respText text-right\">45</td></tr><tr><td class=\"respText text-left\">Commission vente sur facebook</td><td class=\"respText text-right\">12</td></tr><tr><td class=\"respText text-left\">Commission vente sur terrain</td><td class=\"respText text-right\">57</td></tr><tr><td class=\"respText text-left\">Salaire previsionnel du mois</td><td class=\"respText text-right\">57</td></tr><tr><td class=\"respText text-left\">Pourboire</td><td class=\"respText text-right\">57</td></tr><tr><td class=\"respText text-left\">Total Commande</td><td class=\"respText text-right\">57</td></tr></tbody></table></div></div></div></div><h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Avantage et bonus</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\">", 5);
+var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<h3 class=\"respText  text-center\"><span style=\"background-color:#f9fbfd;\">commission</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Commissions</td><td class=\"respText text-right\">0</td></tr><tr><td class=\"respText text-left\">Commission vente sur facebook</td><td class=\"respText text-right\">0</td></tr><tr><td class=\"respText text-left\">Commission vente sur terrain</td><td class=\"respText text-right\">0</td></tr><tr><td class=\"respText text-left\">Salaire previsionnel du mois</td><td class=\"respText text-right\">0</td></tr><tr><td class=\"respText text-left\">Pourboire</td><td class=\"respText text-right\">0</td></tr><tr><td class=\"respText text-left\">Total Commande</td><td class=\"respText text-right\">0</td></tr></tbody></table></div></div></div></div><h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Avantage et bonus</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\">", 5);
 
 var _hoisted_41 = {
   "class": "card"
@@ -21724,7 +21724,7 @@ var _hoisted_51 = {
   "class": "respText text-right"
 };
 
-var _hoisted_52 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Challenge</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Challenge</td><td class=\"respText text-right\">45</td></tr><tr><td class=\"respText text-left\">Challenge</td><td class=\"respText text-right\">12</td></tr></tbody></table></div></div></div></div><h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Déduction et sanction</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\">", 5);
+var _hoisted_52 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Challenge</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\"><div class=\"card\"><div class=\"card-body\"><div class=\"row-fluid\"><div class=\"span11\"><table class=\"table table-hover\" style=\"white-space:nowrap;\"><tbody><tr><td class=\"respText text-left\">Total Challenge</td><td class=\"respText text-right\">0</td></tr><tr><td class=\"respText text-left\">Challenge</td><td class=\"respText text-right\">0</td></tr></tbody></table></div></div></div></div><h3 class=\"text-center\"><span style=\"background-color:#f9fbfd;\">Déduction et sanction</span></h3><hr style=\"background-color:#47e5ff;height:2px;margin-top:-22px;\">", 5);
 
 var _hoisted_57 = {
   "class": "card"
@@ -21752,33 +21752,33 @@ var _hoisted_62 = {
   "class": "respText text-right"
 };
 
-var _hoisted_63 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
+var _hoisted_63 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
   "class": "respText text-left"
-}, "Malus"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
-  "class": "respText text-right"
-}, "0 Ar")], -1
+}, "Malus", -1
 /* HOISTED */
 );
 
-var _hoisted_64 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
+var _hoisted_64 = {
+  "class": "respText text-right"
+};
+
+var _hoisted_65 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
   "class": "respText text-left"
 }, "Sanction sur controle telephonique", -1
 /* HOISTED */
 );
 
-var _hoisted_65 = {
+var _hoisted_66 = {
   "class": "respText text-right"
 };
 
-var _hoisted_66 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
+var _hoisted_67 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
   "class": "respText text-left"
-}, "Absence", -1
+}, "Absence"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
+  "class": "respText text-right"
+}, "0 Ar"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("{{ personnelData.malusAbsence }} ")], -1
 /* HOISTED */
 );
-
-var _hoisted_67 = {
-  "class": "respText text-right"
-};
 
 var _hoisted_68 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", {
   "class": "respText text-left"
@@ -21829,13 +21829,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.IndemniteNormaux + $data.personnelData.Indemnitelocaux) + " Ar", 1
   /* TEXT */
-  )])])])])])])]), _hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.sommeSanctions + $data.personnelData.malusAbsence) + " Ar", 1
+  )])])])])])])]), _hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.sommeSanctions + $data.personnelData.malusVente) + " Ar", 1
   /* TEXT */
-  )]), _hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.sommeSanctions) + " Ar", 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.malusVente) + " Ar", 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_67, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.malusAbsence) + " Ar", 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [_hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.personnelData.sommeSanctions) + " Ar", 1
   /* TEXT */
-  )]), _hoisted_68, _hoisted_69])])])])])])])])], 64
+  )]), _hoisted_67, _hoisted_68, _hoisted_69])])])])])])])])], 64
   /* STABLE_FRAGMENT */
   );
 }

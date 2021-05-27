@@ -73,18 +73,35 @@ class Personnel extends Model
         "mission"=>"MISSION"
     ];
 
+
     public function getMalusVente(){
-        $somme = DB::table('facture')
-        ->where('facture.Matricule_personnel','like',$this->Matricule)
-        //->whereRaw("MONTH(CURRENT_DATE()) = MONTH(date)")
-        //->whereRaw("YEAR(CURRENT_DATE()) = YEAR(date)")
-        ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0),date as CA'))
+        $malus = DB::table('malus_detail')
+        ->select('Id_zone','montant_vente','valeur_malus')
+        ->join('malus','malus.Id','=','malus_detail.Id_malus')
+        ->orderBy('montant_vente','asc')
+        ->get();
+
+        $ventes = DB::table('facture')
+        ->where('facture.Matricule_personnel',$this->Matricule)
+        ->whereRaw("MONTH(CURRENT_DATE()) = MONTH(date)")
+        ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(date)")
+        ->selectRaw("COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA,date,Id_zone")
         ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
         ->join('prix', 'detailvente.ID_prix', '=', 'prix.Id')
-        ->join('mission','mission.Id_de_la_mission','like','facture.Id_de_la_mission')
-        ->groupBy('date')
+        ->groupBy('date','Id_zone')
         ->get();
-        $this->malusVente = $somme;
+
+        $montantMalus = 0;
+        foreach($ventes as $vente){
+            foreach($malus as $m){
+                if(($vente->Id_zone == $m->Id_zone)&&($vente->CA < $m->montant_vente)){
+                    $montantMalus += $m->valeur_malus;
+                    break;
+                }
+            }
+        }
+        
+        $this->malusVente = $montantMalus;
     }
 
     public function getSanction(){
@@ -168,13 +185,21 @@ class Personnel extends Model
     }
 
     public function getAssuidite(){
-        if(!isset($this->jourMission)){
-            $this->getJourMission();
-        }
-        if(!isset($this->jourTravail)){
-            $this->getJourTravail();
-        }
-        $this->assuidite = ($this->jourTravail*100)/$this->jourMission;
+        $dateDebut = DBtable("facture")
+        ->select("Date")
+        ->where("Matricule_personnel",$this->Matricule)
+        ->orderBy("Date","ASC")
+        ->first()->Date;
+        $nbrJour = (int)DB::table("facture")
+        ->selectRaw("count(distinct Date) as nbrJour")
+        ->where("Matricule_personnel",$this->Matricule)
+        ->first()->nbrJour;
+        $nbrTravail = (int)DB::table("facture")
+        ->selectRaw("count(distinct Date) as nbrJour")
+        ->where("Matricule_personnel",$this->Matricule)
+        ->whereRaw("")
+        ->first()->nbrJour;
+        $this->assuidite = ($nbrJour*100)/$nbrTravail;
     }
 
     public function getJourMission(){

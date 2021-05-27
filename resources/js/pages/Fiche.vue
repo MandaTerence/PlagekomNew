@@ -101,27 +101,27 @@
                                 <tbody>
                                     <tr>
                                         <td class="respText text-left">Total Commissions</td>
-                                        <td class="respText text-right">45</td>
+                                        <td class="respText text-right">0</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Commission vente sur facebook</td>
-                                        <td class="respText text-right">12</td>
+                                        <td class="respText text-right">0</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Commission vente sur terrain</td>
-                                        <td class="respText text-right">57</td>
+                                        <td class="respText text-right">0</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Salaire previsionnel du mois</td>
-                                        <td class="respText text-right">57</td>
+                                        <td class="respText text-right">0</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Pourboire</td>
-                                        <td class="respText text-right">57</td>
+                                        <td class="respText text-right">0</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Total Commande</td>
-                                        <td class="respText text-right">57</td>
+                                        <td class="respText text-right">0</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -165,11 +165,11 @@
                                 <tbody>
                                     <tr>
                                         <td class="respText text-left">Total Challenge</td>
-                                        <td class="respText text-right">45</td>
+                                        <td class="respText text-right">0</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Challenge</td>
-                                        <td class="respText text-right">12</td>
+                                        <td class="respText text-right">0</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -186,11 +186,11 @@
                             <tbody>
                                 <tr>
                                     <td class="respText text-left">total de deduction</td>
-                                    <td class="respText text-right">{{ personnelData.sommeSanctions + personnelData.malusAbsence }} Ar</td>
+                                    <td class="respText text-right">{{ personnelData.sommeSanctions + personnelData.malusVente }} Ar</td>
                                 </tr>
                                 <tr>
                                     <td class="respText text-left">Malus</td>
-                                    <td class="respText text-right">0 Ar</td>
+                                    <td class="respText text-right">{{ personnelData.malusVente }} Ar</td>
                                 </tr>
                                 <tr>
                                     <td class="respText text-left">Sanction sur controle telephonique</td>
@@ -198,7 +198,8 @@
                                 </tr>
                                 <tr>
                                     <td class="respText text-left">Absence</td>
-                                    <td class="respText text-right">{{ personnelData.malusAbsence }} Ar</td>
+                                    <td class="respText text-right">0 Ar</td>
+                                    <!--{{ personnelData.malusAbsence }} -->
                                 </tr>
                                 <tr>
                                     <td class="respText text-left">Manques</td>
