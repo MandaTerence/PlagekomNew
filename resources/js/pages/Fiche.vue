@@ -1,6 +1,5 @@
 <template>
 <div class="panel-header bg-secondary-gradient" >
-
     <div class="page-inner py-4">
         <div class="row text-white pb-2 fw-bold">
             <h1>Fiche Commercial</h1>
@@ -65,7 +64,7 @@
                     </table>
                 </div>
             </div>
-            <h3 class="text-center"><span style="background-color:#f9fbfd">Chiffre d'affaire mois en cours</span></h3>
+            <h3 class="text-center"><span style="background-color:#f9fbfd;margin-top:30px">Chiffre d'affaire mois en cours</span></h3>
             <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="card">
                 <div class="card-body">
@@ -91,7 +90,7 @@
                     </div>
                 </div>
             </div>
-            <h3 class="respText  text-center"><span style="background-color:#f9fbfd">commission</span></h3>
+            <h3 class="text-center"><span style="background-color:#f9fbfd">commission</span></h3>
             <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="card">
                 <div class="card-body">
@@ -101,27 +100,27 @@
                                 <tbody>
                                     <tr>
                                         <td class="respText text-left">Total Commissions</td>
-                                        <td class="respText text-right">0</td>
+                                        <td class="respText text-right">0 Ar</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Commission vente sur facebook</td>
-                                        <td class="respText text-right">0</td>
+                                        <td class="respText text-right">0 Ar</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Commission vente sur terrain</td>
-                                        <td class="respText text-right">0</td>
+                                        <td class="respText text-right">0 Ar</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Salaire previsionnel du mois</td>
-                                        <td class="respText text-right">0</td>
+                                        <td class="respText text-right">0 Ar</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Pourboire</td>
-                                        <td class="respText text-right">0</td>
+                                        <td class="respText text-right">0 Ar</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Total Commande</td>
-                                        <td class="respText text-right">0</td>
+                                        <td class="respText text-right">0 Ar</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -165,11 +164,11 @@
                                 <tbody>
                                     <tr>
                                         <td class="respText text-left">Total Challenge</td>
-                                        <td class="respText text-right">0</td>
+                                        <td class="respText text-right">0 Ar</td>
                                     </tr>
                                     <tr>
                                         <td class="respText text-left">Challenge</td>
-                                        <td class="respText text-right">0</td>
+                                        <td class="respText text-right">0 Ar</td>
                                     </tr>
                                 </tbody>
                             </table>

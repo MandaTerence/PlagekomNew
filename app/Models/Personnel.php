@@ -185,7 +185,7 @@ class Personnel extends Model
     }
 
     public function getAssuidite(){
-        $dateDebut = DBtable("facture")
+        $dateDebut = DB::table("facture")
         ->select("Date")
         ->where("Matricule_personnel",$this->Matricule)
         ->orderBy("Date","ASC")
@@ -352,7 +352,7 @@ class Personnel extends Model
             $this->pointAnnuel = $pointAnnuel;
         }
     }
-
+    (Y)
     public function getPointBis(){
         if(!isset($this->pointMensuel)){
             $moisActuel = date('n');
