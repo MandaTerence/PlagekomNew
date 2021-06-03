@@ -10,7 +10,7 @@ use App\Models\Accompagnement;
 
 class AccompagnementService {
 
-    CONST DATE_FORMAT = 'yy-m-d';
+    CONST DATE_FORMAT = 'Y-m-d';
 
     CONST JOUR_ACCOMPAGNEMENT = [
         //lundi
@@ -130,7 +130,7 @@ class AccompagnementService {
                 if((($i%6)+1) == $plan['Date']){
                     $com = $classement[$plan['place']-1];
                     $acc = [
-                        'Id_de_la_mission'=>$idMission,
+                        'Id_de_la_mission'=>$idMission, 
                         'Commercial'=>$com->Commercial,
                         'Coach'=>$coach,
                         'Date'=>$dateInserer,

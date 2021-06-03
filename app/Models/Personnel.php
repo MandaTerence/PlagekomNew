@@ -186,20 +186,42 @@ class Personnel extends Model
 
     public function getAssuidite(){
         $dateDebut = DB::table("facture")
-        ->select("Date")
+        ->selectRaw("DATE_SUB(Date, INTERVAL 1 DAY) as Date")
         ->where("Matricule_personnel",$this->Matricule)
         ->orderBy("Date","ASC")
+        ->first()->Date;
+        $dateFin = DB::table("facture")
+        ->selectRaw("DATE_ADD(Date, INTERVAL 1 DAY) as Date")
+        ->where("Matricule_personnel",$this->Matricule)
+        ->orderBy("Date","DESC")
         ->first()->Date;
         $nbrJour = (int)DB::table("facture")
         ->selectRaw("count(distinct Date) as nbrJour")
         ->where("Matricule_personnel",$this->Matricule)
+        ->whereRaw("'".$dateDebut."' < Date")
+        ->whereRaw("'".$dateFin."' > Date")
         ->first()->nbrJour;
         $nbrTravail = (int)DB::table("facture")
         ->selectRaw("count(distinct Date) as nbrJour")
-        ->where("Matricule_personnel",$this->Matricule)
-        ->whereRaw("")
+        ->whereRaw("'".$dateDebut."' < Date")
+        ->whereRaw("'".$dateFin."' > Date")
         ->first()->nbrJour;
         $this->assuidite = ($nbrJour*100)/$nbrTravail;
+
+        /*
+        $jj = DB::table("facture")
+        ->selectRaw("distinct Date")
+        ->where("Matricule_personnel",$this->Matricule)
+        ->whereRaw("'".$dateDebut."' < Date")
+        ->get();
+        $this->jj = $jj;
+
+        $jj = DB::table("facture")
+        ->selectRaw("distinct Date")
+        ->whereRaw("'".$dateDebut."' < Date")
+        ->get();
+        $this->jj = $jj;
+        */
     }
 
     public function getJourMission(){
@@ -352,7 +374,7 @@ class Personnel extends Model
             $this->pointAnnuel = $pointAnnuel;
         }
     }
-    (Y)
+
     public function getPointBis(){
         if(!isset($this->pointMensuel)){
             $moisActuel = date('n');

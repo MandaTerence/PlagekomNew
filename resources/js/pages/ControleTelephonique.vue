@@ -1,5 +1,5 @@
 <template>
-<div class="page-inner" v-if="!exist">
+    <div class="page-inner" v-if="!exist">
     <div v-if="!exist">
         <div class="card" >
             <div class="card-body ">
@@ -13,16 +13,16 @@
             </div>
         </div>
     </div>
-</div>
-<div class="panel-header bg-secondary-gradient" v-if="exist">
+    </div>
+    <div class="panel-header bg-secondary-gradient" v-if="exist">
     <div class="page-inner py-4">
         <div class="text-white pb-2 fw-bold row text-right d-flex justify-content-end" style="font-size:20px;margin-right:10px">
             <a v-on:click="resetCommerciaux">x</a>
         </div>
         <h1 class="text-white pb-2 fw-bold">Controle Telephonique de {{ personnelData.Prenom }}</h1>
     </div>
-</div>
-<div class="page-inner">
+    </div>
+    <div class="page-inner">
     <div v-if="exist">
         <h2 class="text-center"><span style="background-color:#f9fbfd">Info Commerciale</span></h2>
         <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
@@ -210,14 +210,33 @@
                         </table>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" v-on:click="validateControle">valider</button>   
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#exitModal" v-on:click="validateControle">valider</button>   
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="exitModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel" >Valider Controle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        insertion reussit
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">ok</button>   
                     </div>
                 </div>
             </div>
         </div>
         <!-- Modal  end -->
     </div>
-</div>
+    </div>
 </template>
 
 <script>

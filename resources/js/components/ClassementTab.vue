@@ -1,6 +1,6 @@
 <template>
     <div class="row">
-        <h2 class="text-center">classement proposé</h2>
+        <h1 class="text-center">classement proposé</h1>
         <div class="table-responsive">
             <table class="table table-hover respText">
                 <thead>
@@ -13,7 +13,7 @@
                 <tbody>
                     <tr class="respText" v-for="personnel in classementReel" v-bind:key="personnel">
                         <td class="respText">{{ personnel.Matricule }}</td>
-                        <td class="respText">{{ personnel.Nom }}</td>
+                            <td class="respText">{{ personnel.Nom }}</td>
                         <td class="respText"><input type="number" v-model="personnel.placeTemp" v-on:change="changeClassement(personnel.place,personnel.placeTemp)"/></td>
                     </tr>
                 </tbody>
@@ -44,7 +44,6 @@
         </div>
     </div>
 </template>
-
 <script>
 export default {
     name: "ClassementTab",

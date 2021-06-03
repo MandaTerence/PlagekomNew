@@ -75,7 +75,6 @@
                             <EquipeTab  v-model:equipes="commerciaux" titre="Commerciaux"/>
                         </div> 
                     </div>
-                    
                     <div class="row" >
                         <div class="col-12 text-right">
                             <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
@@ -158,7 +157,6 @@
                                         </td>
                                     </tr>
                                 </tbody>
-
                             </table>
                         </div>
                         <div class="modal-footer">
@@ -173,7 +171,6 @@
         </div>
     </div>
 </div>
-
 </template>
 
 <script>

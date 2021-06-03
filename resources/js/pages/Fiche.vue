@@ -6,15 +6,36 @@
         </div>
     </div>
 </div>
-<div class="page-inner">
+<div v-if="!(matricule == '')" class="page-inner">
+    <div class="card">
+        <div class="card-body">
+            <div class="chart-container" style="min-height: 375px"><div style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;" class="chartjs-size-monitor">
+                <div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
+                    <div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0">
+                    </div>
+                </div>
+                <div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
+                    <div style="position:absolute;width:200%;height:200%;left:0; top:0">
+                    </div>
+                </div>
+            </div>
+                <canvas id="statisticsChart" style="display: block; width: 583px; height: 375px;" width="583" height="375" class="chartjs-render-monitor">
+                </canvas>
+            </div>
+            <div id="myChartLegend"><ul class="0-legend html-legend"><li><span style="background-color:#f3545d"></span>Subscribers</li><li><span style="background-color:#fdaf4b"></span>New Visitors</li><li><span style="background-color:#177dff"></span>Active Users</li></ul></div>
+        </div>
+    </div>
     <div class="card">
         <div class="card-body">
             <div class="row">
-                <div class="col-md-2 d-none d-sm-block">
-                    <img src="assets/img/unknow.jpg" class="rounded mx-auto d-block img-fluid d-flex justify-content-center" style="width:160px;height:160px">
+                <div class="col-md-3 d-none d-sm-block">
+                    <img src="assets/img/unknow.jpg" class="mx-auto img-fluid d-flex justify-content-center" style="width:160px;height:160px">
                 </div>
-                <div class="col-md-6">
-                   <table>
+                <div class="col-md-3 d-block d-sm-none">
+                    <img src="assets/img/unknow.jpg" class="avatar-img rounded-circle mx-auto img-fluid d-flex justify-content-center" style="width:160px;height:160px">
+                </div>
+                <div class="col-md-5 textresp">
+                    <table>
                         <tr>
                             <td><strong>Nom et prenom:</strong></td>
                             <td style="text-align:right">{{ personnelData.Nom }} {{ personnelData.Prenom }}</td>
@@ -64,121 +85,122 @@
                     </table>
                 </div>
             </div>
-            <h3 class="text-center"><span style="background-color:#f9fbfd;margin-top:30px">Chiffre d'affaire mois en cours</span></h3>
-            <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-            <div class="card">
-                <div class="card-body">
-                    <div class='row-fluid'>
-                        <div class='span11'>
-                            <table class="table table-hover" style="white-space: nowrap">
-                                <tbody>
-                                    <tr>
-                                        <td class="text-left">Vente sur facebook</td>
-                                        <td class="text-right">{{  personnelData.CAFacebook }} Ar</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-left">Vente sur terrain</td>
-                                        <td class="text-right">{{  personnelData.CATerrain}} Ar</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-left">Nombre de produit</td>
-                                        <td class="text-right">{{ personnelData.nbrProduit}} Ar</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+            <div style="margin-top: 40px">
+                <h3 class="text-center"><span style="background-color:#f9fbfd;margin-top:30px">Chiffre d'affaire mois en cours</span></h3>
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <div class="card" style="margin-top: 20 px;margin-bottom: 30 px">
+                    <div class="card-body">
+                        <div class='row-fluid'>
+                            <div class='span11'>
+                                <table class="table table-hover" style="white-space: nowrap">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-left">Vente sur facebook</td>
+                                            <td class="text-right">{{  personnelData.CAFacebook }} Ar</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left">Vente sur terrain</td>
+                                            <td class="text-right">{{  personnelData.CATerrain}} Ar</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left">Nombre de produit</td>
+                                            <td class="text-right">{{ personnelData.nbrProduit}} </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <h3 class="text-center"><span style="background-color:#f9fbfd">commission</span></h3>
-            <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-            <div class="card">
-                <div class="card-body">
-                    <div class='row-fluid'>
-                        <div class='span11'>
-                            <table class="table table-hover" style="white-space: nowrap">
-                                <tbody>
-                                    <tr>
-                                        <td class="respText text-left">Total Commissions</td>
-                                        <td class="respText text-right">0 Ar</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="respText text-left">Commission vente sur facebook</td>
-                                        <td class="respText text-right">0 Ar</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="respText text-left">Commission vente sur terrain</td>
-                                        <td class="respText text-right">0 Ar</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="respText text-left">Salaire previsionnel du mois</td>
-                                        <td class="respText text-right">0 Ar</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="respText text-left">Pourboire</td>
-                                        <td class="respText text-right">0 Ar</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="respText text-left">Total Commande</td>
-                                        <td class="respText text-right">0 Ar</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <h3 class="text-center"><span style="background-color:#f9fbfd">commission</span></h3>
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <div class="card">
+                    <div class="card-body">
+                        <div class='row-fluid'>
+                            <div class='span11'>
+                                <table class="table table-hover" style="white-space: nowrap">
+                                    <tbody>
+                                        <tr>
+                                            <td class="respText text-left">Total Commissions</td>
+                                            <td class="respText text-right">0 Ar</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="respText text-left">Commission vente sur facebook</td>
+                                            <td class="respText text-right">0 Ar</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="respText text-left">Commission vente sur terrain</td>
+                                            <td class="respText text-right">0 Ar</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="respText text-left">Salaire previsionnel du mois</td>
+                                            <td class="respText text-right">0 Ar</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="respText text-left">Pourboire</td>
+                                            <td class="respText text-right">0 Ar</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="respText text-left">Total Commande</td>
+                                            <td class="respText text-right">0 Ar</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <h3 class="text-center"><span style="background-color:#f9fbfd">Avantage et bonus</span></h3>
-            <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-            <div class="card">
-                <div class="card-body">
-                    <div class='row-fluid'>
-                        <div class='span11'>
-                            <table class="table table-hover" style="white-space: nowrap">
-                                <tbody>
-                                    <tr>
-                                        <td class="respText text-left">Total Bonus</td>
-                                        <td class="respText text-right">{{ personnelData.bonusMensuel + personnelData.IndemniteNormaux + personnelData.Indemnitelocaux}} Ar</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="respText text-left">Bonus Mensuelle</td>
-                                        <td class="respText text-right">{{ personnelData.bonusMensuel }} Ar</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="respText text-left">Indemnité journalière</td>
-                                        <td class="respText text-right">{{ personnelData.IndemniteNormaux + personnelData.Indemnitelocaux}} Ar</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <h3 class="text-center"><span style="background-color:#f9fbfd">Avantage et bonus</span></h3>
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <div class="card">
+                    <div class="card-body">
+                        <div class='row-fluid'>
+                            <div class='span11'>
+                                <table class="table table-hover" style="white-space: nowrap">
+                                    <tbody>
+                                        <tr>
+                                            <td class="respText text-left">Total Bonus</td>
+                                            <td class="respText text-right">{{ personnelData.bonusMensuel + personnelData.IndemniteNormaux + personnelData.Indemnitelocaux}} Ar</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="respText text-left">Bonus Mensuelle</td>
+                                            <td class="respText text-right">{{ personnelData.bonusMensuel }} Ar</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="respText text-left">Indemnité journalière</td>
+                                            <td class="respText text-right">{{ personnelData.IndemniteNormaux + personnelData.Indemnitelocaux}} Ar</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <h3 class="text-center"><span style="background-color:#f9fbfd">Challenge</span></h3>
-            <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-            <div class="card">
-                <div class="card-body">
-                    <div class='row-fluid'>
-                        <div class='span11'>
-                            <table class="table table-hover" style="white-space: nowrap">
-                                <tbody>
-                                    <tr>
-                                        <td class="respText text-left">Total Challenge</td>
-                                        <td class="respText text-right">0 Ar</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="respText text-left">Challenge</td>
-                                        <td class="respText text-right">0 Ar</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <h3 class="text-center"><span style="background-color:#f9fbfd">Challenge</span></h3>
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <div class="card">
+                    <div class="card-body">
+                        <div class='row-fluid'>
+                            <div class='span11'>
+                                <table class="table table-hover" style="white-space: nowrap">
+                                    <tbody>
+                                        <tr>
+                                            <td class="respText text-left">Total Challenge</td>
+                                            <td class="respText text-right">0 Ar</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="respText text-left">Challenge</td>
+                                            <td class="respText text-right">0 Ar</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <h3 class="text-center"><span style="background-color:#f9fbfd">Déduction et sanction</span></h3>
-            <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-            <div class="card">
+                <h3 class="text-center"><span style="background-color:#f9fbfd">Déduction et sanction</span></h3>
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <div class="card">
                 <div class='row-fluid'>
                     <div class='span11'>
                         <table class="table table-hover" style="white-space: nowrap">
@@ -213,9 +235,14 @@
                     </div>
                 </div>
             </div>
+            </div>
         </div>
     </div>
 </div>
+<div v-if="(matricule == '')" class="page-inner">
+    test
+</div>
+    
 </template>
 <script>
 export default {
@@ -243,10 +270,10 @@ export default {
                 this.matricule = urlParams.get('matricule');
                 this.getPersonnel();
             }
-            else if(localStorage.matricule){
+            /*else if(localStorage.matricule){
                 this.matricule = localStorage.matricule;
                 this.getPersonnel();
-            }
+            }*/
         },
         getPersonnel(){
             this.$axios.get('/api/personnels/getPersonnelData',{params: {matricule: this.matricule }}) 
