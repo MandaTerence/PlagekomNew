@@ -1,5 +1,10 @@
 <template>
-<div class="wrapper">
+<div class="wrapper" v-if="!isLoggedIn">
+    <div class="content" >
+        <router-view/>
+    </div>
+</div>
+<div class="wrapper" v-if="isLoggedIn">
     <div class="main-header">
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="purple">
@@ -258,7 +263,6 @@
         <!-- End Navbar -->
     </div>
 
-    <!-- Sidebar -->
     <div class="sidebar" v-if="isLoggedIn">			
         <div class="sidebar-wrapper scrollbar scrollbar-inner">
             <div class="sidebar-content">
@@ -367,12 +371,11 @@
             </div>
         </div>
     </div>
-    <!-- End Sidebar -->
 
     <div class="main-panel">
-        <div class="content">
+        <div class="content" >
             <!-- <div class="page-inner"> -->
-                <router-view/>
+            <router-view/>
             <!-- </div> -->
         </div>
         <footer class="footer">
@@ -398,7 +401,7 @@
                 </nav>
                 <div class="copyright ml-auto">
                     2018, made with <i class="fa fa-heart heart text-danger"></i> by <a href="https://www.themekita.com">ThemeKita</a>
-                </div>				
+                </div>
             </div>
         </footer>
     </div>
@@ -494,6 +497,6 @@ export default {
                 this.dropdownListDisplay[i] = "none";
             }
         }
-    },
+    }
 }
 </script>

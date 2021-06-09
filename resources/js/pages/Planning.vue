@@ -12,7 +12,7 @@
                     <label for="inputMission">Mission</label>
                     <select class="form-control" id="inputMission" v-model="idMission" v-on:change="reloadPlannig();">
                         <option v-bind:key="mission.Id_de_la_mission" v-bind:value="mission.Id_de_la_mission" v-for="mission in missions">{{ mission.Id_de_la_mission }}</option>
-                    </select> 
+                    </select>
                 </div>
             </div>
         </div>
@@ -32,7 +32,7 @@
                                 <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
                                     <thead>
                                         <tr>
-                                            <th> personnel </th>            
+                                            <th> personnel </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -47,14 +47,15 @@
                 </div>
             </div>
             <h2 class="text-center"><span style="background-color:#f9fbfd">Planning d accompagnement</span></h2>
-                    <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="row">
                 <div class="card col-md-12">
                     <div class="card-body">
                         <div class="row" style="margin-top:20px">
                             <table class="table table-hover d-flex justify-content-center" id="listePlanning"> 
                                 <tbody>
-                                    <div v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
+                                    <div v-for="planning in planningCoach.a
+                                    +ccompagnement" v-bind:key="planning">
                                         <tr class="d-flex"  style="text-align:center">
                                             <td class="col-12">
                                                 <div v-on:click="toogleVisibility(planning['jour'])" >
@@ -227,8 +228,10 @@ export default {
                 this.$axios.get('/sanctum/csrf-cookie').then(response => {
                     axios.get('/api/classements/planning',{params: {idMission : this.idMission,coach : this.coach}}).then(response => {
                         this.plannings = response.data.plannings;
-                        for(let i=0;i<this.plannings[0].accompagnement.length;i++){
-                            this.plannings[0].accompagnement[i].visibility = false;
+                        if(this.plannings.length>0){
+                            for(let i=0;i<this.plannings[0].accompagnement.length;i++){
+                                this.plannings[0].accompagnement[i].visibility = false;
+                            }
                         }
                     });  
                 });
@@ -266,7 +269,6 @@ export default {
             }  
         },
         reloadPlannig(){
-            //this.coach = 'all',
             this.loadPlannig();
         },
     }

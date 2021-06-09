@@ -1,7 +1,7 @@
 <template>
     <div class="page-inner" v-if="!exist">
     <div v-if="!exist">
-        <div class="card" >
+        <div class="card">
             <div class="card-body ">
                 <div class="form-group">
                     <label for="matricule">Matricule</label>
@@ -16,21 +16,23 @@
     </div>
     <div class="panel-header bg-secondary-gradient" v-if="exist">
     <div class="page-inner py-4">
-        <div class="text-white pb-2 fw-bold row text-right d-flex justify-content-end" style="font-size:20px;margin-right:10px">
-            <a v-on:click="resetCommerciaux">x</a>
+        <div class="text-white pb-2 fw-bold row text-right d-flex justify-content-end" >
+            <a class="text-right" v-on:click="resetCommerciaux"><div class="icon-preview"><i class="far fa-times-circle" style="font-size:30px"></i></div></a>
         </div>
-        <h1 class="text-white pb-2 fw-bold">Controle Telephonique de {{ personnelData.Prenom }}</h1>
+        <h1 class="text-white pb-2 fw-bold" >Controle Telephonique de {{ personnelData.Prenom }}</h1>
     </div>
     </div>
     <div class="page-inner">
     <div v-if="exist">
-        <h2 class="text-center"><span style="background-color:#f9fbfd">Info Commerciale</span></h2>
+        <h2 class="text-center">
+            <span style="background-color:#f9fbfd">Info Commerciale</span>
+        </h2>
         <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
         <div class="card" >
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4 d-block d-sm-none">
-                        <img src="assets/img/unknow.jpg" class="rounded-circle mx-auto d-block img-fluid d-flex justify-content-center" style="width:200px;height:200px">
+                        <img src="assets/img/unknow.jpg" class="rounded-circle mx-auto d-block img-fluid d-flex justify-content-center" style="width:200px;height:200px;border: 5px solid #6861ce;">
                     </div>
                     <div class="col-md-4">
                         <table>
@@ -111,7 +113,6 @@
         <h2 class="text-center"><span style="background-color:#f9fbfd">Info Sanction</span></h2>
         <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
         <div class="card">
-            
             <div class="card-body">
                 <div class="row">
                     <div class="form-group col-4  text-center">
@@ -139,7 +140,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="card">
             <div class="card-header">
                 <h2><span>Tableau Sanction Telephonique Commercial</span></h2>
@@ -155,21 +155,20 @@
                                     <th class="respText" scope="col-2">Designation</th>
                                     <th class="respText" scope="col-2">Action</th>
                                 </tr>
-                            </thead>
-                            <tbody>
+                            </thead> 
+                            <tbody> 
                                 <tr v-for="sanctionP in sanctionsPersonnel" v-bind:key="sanctionP">
                                     <td class="respText" scope="col-2"> {{ sanctionP.datetime }} </td>
                                     <td class="respText" scope="col-2"> {{ sanctionP.code_sanction }} </td>
                                     <td class="respText" scope="col-2"> {{ sanctionP.titre }} </td>
                                     <td class="respText" scope="col-2"> <button type="button" class="btn btn-danger" v-on:click="removeSanctionPersonnel(sanctionP.id)" >supprimer</button> </td>
                                 </tr>
-                            </tbody>
+                            </tbody> 
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-        
         <!-- Modal -->
         <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -215,7 +214,6 @@
                 </div>
             </div>
         </div>
-
         <div class="modal fade" id="exitModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
