@@ -1,7 +1,7 @@
 <template>
 <div class="page-inner" v-if="!(missions.length>0)">
     <div class="row">
-        <div class="card col-md-4">
+        <div class="card col-md-12">
             <div class="card-body">
                 <div class="form-group">
                     <label for="dateMission">Selectionner la date</label>
@@ -11,12 +11,10 @@
                 </div>
                 <div class="form-group">
                 </div>
-                <div v-if="dateMission!=null" >
-                    <div class="form-group text-center">
-                        <button class="btn btn-secondary form-control" id="btnCheck" v-on:click="loadMissionDate()">
-                            verifier
-                        </button>
-                    </div>
+                <div class="form-group row justify-content-center" v-if="dateMission!=null">
+                    <button class="btn btn-secondary form-control btn-round col-md-2" id="btnCheck" v-on:click="loadMissionDate()">
+                        verifier
+                    </button>
                 </div>
             </div>
         </div>
@@ -27,11 +25,19 @@
         <h2 class="text-white pb-2 fw-bold">Timeline du {{ dateMission }}</h2>
     </div>
 </div>
-<div class="page-inner">
-    <div v-for="mission in missions" v-bind:key="mission">
-        <div v-if="mission.Commerciaux.length>1" class="card">
-            <div class="card-body">
-                <div style="margin:20px">
+<div class="page-inner" v-if="(missions.length>0)">
+    <div class="card">
+        <div class="card-body">
+            <div class="row" style="margin-bottom:60px;">
+                <div class="col-2">
+                    <button v-on:click="retour" class="btn btn-secondary btn-round">
+                        <i class="fas fa-angle-left" style="margin-right: 10px;"></i>
+                        <span >retour</span>
+                    </button>
+                </div>
+            </div>
+            <div v-for="mission in missions" v-bind:key="mission">
+                <div v-if="mission.Commerciaux.length>1" style="margin:20px">
                     <div class="row"><h3>{{ mission.idMission }}</h3></div>
                     <div class="row">
                         <div class="col-md-3">
@@ -194,9 +200,9 @@
 </div>
 </template>
 <script>
-
 export default {
     name: "TimeLine",
+    
     data() {
         return {
             dateMission: null,
@@ -216,8 +222,9 @@ export default {
         }
     },
     methods: {
-        test(){
-
+        retour(){
+            localStorage.removeItem('dateMission');
+            this.missions = [];
         },
         getTotalCASanction(sanctions){
             let valeur = 0;

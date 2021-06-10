@@ -17,7 +17,7 @@
     <div class="panel-header bg-secondary-gradient" v-if="exist">
     <div class="page-inner py-4">
         <div class="text-white pb-2 fw-bold row text-right d-flex justify-content-end" >
-            <a class="text-right" v-on:click="resetCommerciaux"><div class="icon-preview"><i class="far fa-times-circle" style="font-size:30px"></i></div></a>
+            <a class="text-right" v-on:click="resetCommerciaux"><div class="icon-preview"><i class="far fa-times-circle" style="font-size:30px;cursor: pointer;"></i></div></a>
         </div>
         <h1 class="text-white pb-2 fw-bold" >Controle Telephonique de {{ personnelData.Prenom }}</h1>
     </div>
