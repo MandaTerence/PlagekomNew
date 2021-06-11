@@ -17,7 +17,7 @@
     <div class="panel-header bg-secondary-gradient" v-if="exist">
     <div class="page-inner py-4">
         <div class="text-white pb-2 fw-bold row text-right d-flex justify-content-end" >
-            <a class="text-right" v-on:click="resetCommerciaux"><div class="icon-preview"><i class="far fa-times-circle" style="font-size:30px;cursor: pointer;"></i></div></a>
+            <a class="text-right" v-on:click="resetCommerciaux" style="margin-right:10px"><div class="icon-preview"><i class="far fa-times-circle" style="font-size:30px;cursor: pointer;"></i></div></a>
         </div>
         <h1 class="text-white pb-2 fw-bold" >Controle Telephonique de {{ personnelData.Prenom }}</h1>
     </div>
@@ -31,7 +31,7 @@
         <div class="card" >
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4 d-block d-sm-none">
+                    <div class="col-md-4 d-block d-sm-none" style="margin-bottom: 30px;">
                         <img src="assets/img/unknow.jpg" class="rounded-circle mx-auto d-block img-fluid d-flex justify-content-center" style="width:200px;height:200px;border: 5px solid #6861ce;">
                     </div>
                     <div class="col-md-4">
@@ -101,7 +101,7 @@
                     </div>
 
                     <div v-if="!timerIsCounting" class="form-group col-4 text-center">
-                        <button type="button" class="btn btn-success btn-sm" v-on:click="startTimer">Demarrer</button>
+                        <button type="button" class="btn btn-success btn-round" v-on:click="startTimer">Demarrer</button>
                     </div>
                     <div v-if="timerIsCounting" class="form-group col-4 text-center" >
                         <button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-danger btn-sm" v-on:click="stopTimer">Arreter</button>
@@ -132,7 +132,7 @@
                         </div>
                     </div>
                     <div class="form-group col-4 text-center">
-                        <button type="button" class="btn btn-secondary form-control btn-sm" v-on:click="AddSanction">Ajouter</button>
+                        <button type="button" class="btn btn-secondary btn-round" v-on:click="AddSanction"> Ajouter </button>
                     </div>
                 </div>
                 <div class="row text-center">
