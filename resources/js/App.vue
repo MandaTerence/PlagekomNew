@@ -1,6 +1,6 @@
 <template>
 <div class="wrapper" v-if="!isLoggedIn">
-    <div class="content" >
+    <div class="content">
         <router-view/>
     </div>
 </div>
@@ -360,9 +360,9 @@
                         <div v-if="displaySideBar[2]['display']==true">
                             <ul class="nav nav-collapse">
                                 <li>
-                                    <a href="forms/forms.html">
+                                    <router-link to="/Salaire" class="nav-item nav-link sub-category">
                                         <span class="sub-item">Salaire du mois</span>
-                                    </a>
+                                    </router-link>
                                 </li>
                             </ul>
                         </div>
@@ -500,3 +500,6 @@ export default {
     }
 }
 </script>
+<style>
+
+</style>

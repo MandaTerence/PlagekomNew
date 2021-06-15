@@ -11,6 +11,8 @@ use Illuminate\Database\QueryException;
 
 class PersonnelService {
 
+    const pourCentSalaire = 15;
+
     public static function getPersonnelsMission($type){
         /*
          select distinct 
@@ -20,7 +22,7 @@ class PersonnelService {
                 on detailmission.Id_de_la_mission = mission.Id_de_la_mission
             where statut like 'En_cours'
             AND Type_de_mission like 'LOCAL'
-         */
+        */
         $personnels = [];
         $matricules =  DB::table("mission")
         ->select("detailmission.personnel as Matricule")
@@ -44,6 +46,18 @@ class PersonnelService {
             $personnel->Matricule = $matricule;
             $personnel->getNomFromMAtricule();
             $personnels[] = $personnel;
+        }
+        return $personnels;
+    }
+
+    public static function getAllSalaire(){
+        $personnels = Personnel::select("Matricule","Nom","Prenom")
+        ->get();
+        foreach($personnels as $personnel){
+            $personnel->getCA();
+            $personnel->salaire = (self::pourCentSalaire/100)*$personnel->CA;
+            unset($personnel->CA);
+            $personnel->getMalusVente();
         }
         return $personnels;
     }

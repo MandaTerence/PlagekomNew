@@ -8,7 +8,7 @@
                     <input type="text" class="form-control" id="matricule"  placeholder="Matricule" v-model="nouveauMatricule">
                 </div>
                 <div class="form-group text-center">
-                    <button type="button" class="btn btn-secondary" v-on:click="changeCommerciaux">controler</button>
+                    <button type="submit" class="btn btn-secondary btn-round col-6" v-on:click="changeCommerciaux">controler</button>
                 </div>
             </div>
         </div>

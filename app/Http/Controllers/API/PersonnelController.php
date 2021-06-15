@@ -24,6 +24,15 @@ class PersonnelController extends Controller
         'produit' => []
     ];
 
+    public function getAllSalaire(Request $request){
+        $personnels = PersonnelService::getAllSalaire();
+        $response = [
+            'success' => true,
+            'personnels' => $personnels,
+        ];
+        return $response;
+    }
+
     public function getPersonnelEnMission(Request $request){
         $personnels = PersonnelService::getPersonnelsMission("MISSION");
         $response = [

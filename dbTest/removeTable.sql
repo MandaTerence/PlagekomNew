@@ -1,0 +1,10 @@
+DROP TABLE detailmission;
+DROP TABLE detailvente;
+DROP TABLE equipe_coach;
+DROP TABLE facture;
+DROP TABLE mission;
+DROP TABLE personnel;
+DROP TABLE planing;
+DROP TABLE pointressource;
+DROP TABLE prix;
+DROP TABLE produit;

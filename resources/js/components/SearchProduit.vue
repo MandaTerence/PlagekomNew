@@ -83,7 +83,6 @@ export default {
             else{
                 alert('ce produit a deja etait ajouter');
             }
-            
         }
     }
 }

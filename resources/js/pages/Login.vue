@@ -17,30 +17,26 @@
                     <div class="card-body">
                         <form>
                             <div class="form-group row justify-content-center">
-                                <div class="input-group input-login col-md-6 justify-content-center">
+                                <div class="input-group input-login col-12 justify-content-center">
                                     <i class="fa fa-user"></i>
-                                    <input id="qsdqs" type="text" class="form-control input-pill" v-model="matricule" placeholder="Matricule"
+                                    <input id="qsdqs" type="text" class="form-control input-pill respText" v-model="matricule" placeholder="Matricule"
                                     autofocus autocomplete="on">
                                 </div>
                             </div>
                             <div class="form-group row justify-content-center">
-                                <div class="input-group input-password col-md-6 justify-content-center">
-                                 
-                                        <i class="fa fa-lock"></i>
-
-                                    <input id="password" type="password" class="form-control input-pill" v-model="password" placeholder="mot de passe"
+                                <div class="input-group input-password col-12 justify-content-center">
+                                    <i class="fa fa-lock"></i>
+                                    <input id="password" type="password" class="form-control input-pill respText" v-model="password" placeholder="mot de passe"
                                     autocomplete="off">
                                 </div>
                             </div>
-
                             <div class="form-group row">
                                 <div class="col-md-12 text-center">
-                                    <button type="submit" class="btn btn-secondary" style="cursor: pointer; border-radius: 20px;" @click="handleSubmit">
+                                    <button type="submit" class="btn btn-secondary col-12" style="cursor: pointer; border-radius: 20px;" @click="handleSubmit">
                                         se connecter
                                     </button>
                                 </div>
                             </div>
-
                         </form>
                     </div>
                 </div>

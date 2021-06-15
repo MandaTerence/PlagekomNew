@@ -12,6 +12,7 @@ import TimeLine from '../pages/TimeLine';
 import Classements from '../pages/Classements';
 import ClassificationCommerciaux from '../pages/ClassificationCommerciaux';
 import Fiche from '../pages/Fiche';
+import Salaire from '../pages/Salaire';
 
 import Books from '../components/Books';
 import AddBook from '../components/AddBook';
@@ -87,6 +88,11 @@ export const routes = [
         name: 'TimeLine',
         path: '/TimeLine',
         component: TimeLine
+    },
+    {
+        name: 'Salaire',
+        path: '/Salaire',
+        component: Salaire
     }
 ];
 
