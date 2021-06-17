@@ -1,176 +1,220 @@
 <template>
-<div v-if="!showClassements">
-    <div class="panel-header bg-secondary-gradient">
-        <div class="page-inner py-4">
-            <h2 class="text-white pb-2 fw-bold">Creation d'equipe</h2>
+    <div v-if="!showClassements">
+        <div class="panel-header bg-secondary-gradient">
+            <div class="page-inner py-4">
+                <h2 class="text-white pb-2 fw-bold">Creation d'equipe</h2>
+            </div>
         </div>
-    </div>
-    <div class="page-inner">
-        <div v-if="!showClassements">
-            <h2 class="text-center"><span style="background-color:#f9fbfd">Recherche</span></h2>
-            <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-            <div class="card">
-                <div class="card-body">
-                    <h3>Recherche de personnel</h3>
-                    <hr/>
-                    <div class="row" id="rechercheNormal">
-                        <div class="form-group col-12 col-md-3">
-                            <label for="inputMission">Mission</label>
-                            <select class="form-control " id="inputMission" v-model="idMission">
-                                <option v-bind:key="mission.Id_de_la_mission" v-bind:value="mission.Id_de_la_mission" v-for="mission in missions">{{ mission.Id_de_la_mission }}</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-6 col-md-3">
-                            <label for="inputFonction">Fonction</label>
-                            <select class="form-control " id="inputFonction" v-model="idFonction" v-on:change="changeCustomId">
-                                <option v-bind:key="fonction.designation" v-bind:value="fonction.id" v-for="fonction in fonctions">{{ fonction.designation }}</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-6 col-md-3">
-                            <label for="inputMatricule">Matricule</label>
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <input class="form-control"  type="text" placeholder="what are you looking for?" v-model="matricule" v-on:keyup="autoComplete" v-on:click="autoComplete">
-                                </div>
-                                <div class="panel-footer" style="float:top;position: absolute;z-index: 1;width: -moz-available;" >
-                                    <ul class="list-group">
-                                        <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
-                                            <div >{{ result.Matricule }}</div>
-                                        </li>
-                                    </ul>
+        <div class="page-inner">
+            <div v-if="!showClassements">
+                <h2 class="text-center"><span style="background-color:#f9fbfd">Recherche</span></h2>
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>Recherche de personnel</h3>
+                        <hr/>
+                        <div class="row" id="rechercheNormal">
+                            <div class="form-group col-12 col-md-3">
+                                <label for="inputMission">Mission</label>
+                                <select class="form-control " id="inputMission" v-model="idMission">
+                                    <option v-bind:key="mission.Id_de_la_mission" v-bind:value="mission.Id_de_la_mission" v-for="mission in missions">{{ mission.Id_de_la_mission }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-6 col-md-3">
+                                <label for="inputFonction">Fonction</label>
+                                <select class="form-control " id="inputFonction" v-model="idFonction" v-on:change="changeCustomId">
+                                    <option v-bind:key="fonction.designation" v-bind:value="fonction.id" v-for="fonction in fonctions">{{ fonction.designation }}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-6 col-md-3">
+                                <label for="inputMatricule">Matricule</label>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <input class="form-control"  type="text" placeholder="what are you looking for?" v-model="matricule" v-on:keyup="autoComplete" v-on:click="autoComplete">
+                                    </div>
+                                    <div class="panel-footer" style="float:top;position: absolute;z-index: 1;width: -moz-available;" >
+                                        <ul class="list-group">
+                                            <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
+                                                <div >{{ result.Matricule }}</div>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="form-group col-6 col-md-3">
+                                <button class="btn btn-secondary btn-sm justify-content-center" style="margin-top:30px; margin-right:5px" v-on:click="addPersonnel">Ajouter</button>
+                                <button class="btn btn-secondary btn-sm justify-content-center" style="margin-top:30px" v-on:click="toogleAdvancedSearch"><i class="fas fa-bars" style="color:white"></i></button>
+                            </div>
                         </div>
-                        <div class="form-group col-6 col-md-3">
-                            <button class="btn btn-secondary justify-content-center" style="margin-top:30px; margin-right:5px" v-on:click="addPersonnel">Ajouter</button>
-                            <button class="btn btn-secondary justify-content-center" style="margin-top:30px" v-on:click="toogleAdvancedSearch"><i class="fas fa-bars" style="color:white"></i></button>
+                        <div v-if="showAdvancedSearch">
+                            <hr/>
+                            <h3>Recherche avance</h3>
+                            <hr/>
                         </div>
-                    </div>
-                    <div v-if="showAdvancedSearch">
-                        <hr/>
-                        <h3>Recherche avance</h3>
-                        <hr/>
-                    </div>
-                    <div class="row" id="rechercheAvance" v-if="showAdvancedSearch">
-                        <div class="col-12">
-                            <SearchProduit v-model:produits="produits"/>
-                        </div>
-                        <div class="col-12">
-                            <ProduitTab v-model:produits="produits"/>
+                        <div class="row" id="rechercheAvance" v-if="showAdvancedSearch">
+                            <div class="col-12">
+                                <SearchProduit v-model:produits="produits"/>
+                            </div>
+                            <div class="col-12">
+                                <ProduitTab v-model:produits="produits"/>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <h2 class="text-center"><span style="background-color:#f9fbfd">Resultat</span></h2>
-            <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row d-flex justify-content-center" id="resultCoach" >
-                        <div class="table-responsive col-12" style="margin-left:25px">
-                            <EquipeTab  v-model:equipes="coachs" titre="Coachs"/>
+                <h2 class="text-center"><span style="background-color:#f9fbfd">Resultat</span></h2>
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <div class="card">
+                    <!--
+                    <div class="card-body">
+                        <div class="row d-flex justify-content-center" id="resultCoach" >
+                            <div class="table-responsive col-12" style="margin-left:25px">
+                                <EquipeTab  v-model:equipes="coachs" titre="Coachs"/>
+                            </div>
+                        </div>
+                        <div class="row d-flex justify-content-center" id="resultCommerciaux" >
+                            <div class="table-responsive col-12" style="margin-left:25px">
+                                <EquipeTab  v-model:equipes="commerciaux" titre="Commerciaux"/>
+                            </div> 
+                        </div>
+                        <div class="row" >
+                            <div class="col-12 text-right">
+                                <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="row d-flex justify-content-center" id="resultCommerciaux" >
-                        <div class="table-responsive col-12" style="margin-left:25px">
-                            <EquipeTab  v-model:equipes="commerciaux" titre="Commerciaux"/>
-                        </div> 
-                    </div>
-                    <div class="row" >
-                        <div class="col-12 text-right">
-                            <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
+                    -->
+                    <div class="card-body">
+                        <div class="row">
+                            <button v-bind:class="buttonTeamA" v-on:click="toogleAvtiveTeamButton(1)">
+                                Equipe 1
+                             </button>
+                            <button v-bind:class="buttonTeamB" v-on:click="toogleAvtiveTeamButton(2)">
+                                Equipe 2
+                            </button>
+                        </div>
+                        <div>
+                            <div class="row">
+                                <div class="table-responsive table-sm">
+                                    <table class="table">
+                                        <thead >
+                                            <tr class="bg-secondary" style="color:white">
+                                                <th class="respText" scope="col-md-2">matricule</th>
+                                                <th class="respText" scope="col-md-2 d-none">nom et prenom</th>
+                                                <th class="respText" scope="col-md-2">C.A</th>
+                                                <th class="respText" scope="col-md-1"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="equipe in equipes" v-bind:key="equipe">
+                                                <td class="respText" scope="col-md-2">{{ equipe.Matricule }}</td>
+                                                <td class="respText" scope="col-md-2">{{ equipe.Nom+equipe.Prenom }}</td>
+                                                <td class="respText" scope="col-md-2">{{ equipe.CA }}</td>
+                                                <td class="respText" scope="col-md-1">
+                                                    <button class="btn btn-danger" v-on:click="remove(equipe.Matricule)">
+                                                    <div class="d-none d-lg-block">
+                                                        supprimer
+                                                    </diV>
+                                                    <div class="d-block d-lg-none">
+                                                    X
+                                                    </div>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<div v-if="showClassements">
-    <div class="panel-header bg-secondary-gradient">
-        <div class="page-inner py-4">
-            <h2 class="text-white pb-2 fw-bold">Classements</h2>
+    <div v-if="showClassements">
+        <div class="panel-header bg-secondary-gradient">
+            <div class="page-inner py-4">
+                <h2 class="text-white pb-2 fw-bold">Classements</h2>
+            </div>
         </div>
-    </div>
-    <div class="page-inner"> 
-        <ClassementTab v-model:classements="classements" v-model:classementReel="classementReel"/>
-        <button class="btn btn-secondary" v-on:click="retourClassement">retour </button>
-        <button class="btn btn-secondary" v-on:click="validateEquipe">Valider</button>
-        <div name="modal" v-if="showModal" @close="showModal = false">
-            <div class="modal-mask">
-                <div class="modal-wrapper">
-                    <div class="modal-container">
-                        <div class="modal-body">
-                            <table class="table table-hover">
-                                <thead >
-                                    <tr class="bg-secondary" style="color:white">
-                                        <th scope="col-md-2">matricule</th>
-                                        <th scope="col-md-2">nom et prenom</th>
-                                        <th scope="col-md-2">C.A</th>
-                                        <th scope="col-md-1"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="coach in coachs" v-bind:key="coach">
-                                        <td scope="col-md-2">{{ coach.Matricule }}</td>
-                                        <td scope="col-md-2">{{ coach.Nom+" "+coach.Prenom }}</td>
-                                        <td scope="col-md-2">{{ coach.CA }}</td>
-                                        <td scope="col-md-1">
-                                            <button class="btn btn-danger" v-on:click="remove(coachs,coach.Matricule)">
-                                            <div class="d-none d-lg-block">
-                                                supprimer
-                                            </diV>
-                                            <div class="d-block d-lg-none">
-                                            X
-                                            </div>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <table class="table table-hover">
-                                <thead >
-                                    <tr class="bg-secondary" style="color:white">
-                                        <th scope="col-md-2">matricule</th>
-                                        <th scope="col-md-2 d-none">nom et prenom</th>
-                                        <th scope="col-md-2">C.A</th>
-                                        <th scope="col-md-2">place</th>
-                                        <th scope="col-md-1"></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="classement in classements" v-bind:key="classement">
-                                        <td scope="col-md-2" v-if="classement.place == classement.placeOriginal">{{ classement.Matricule }}</td>
-                                        <td scope="col-md-2" style="color:red" v-else-if="classement.place > classement.placeOriginal">{{ classement.Matricule }} ({{  classement.placeOriginal - classement.place }} place)</td>
-                                        <td scope="col-md-2" style="color:green" v-else>{{ classement.Matricule }} (+{{  classement.placeOriginal - classement.place }} place)</td>
-                                        <td scope="col-md-2">{{ classement.Nom+classement.Prenom }}</td>
-                                        <td scope="col-md-2">{{ classement.CA }}</td>
-                                        <th scope="col-md-2"><input type="number" v-model="classement.placeTemp" v-on:change="changeClassement(classement.place,classement.placeTemp)"/></th>
-                                        <td scope="col-md-1">
-                                            <button class="btn btn-danger" v-on:click="remove(classement,classement.Matricule)">
-                                            <div class="d-none d-lg-block">
-                                                supprimer
-                                            </diV>
-                                            <div class="d-block d-lg-none">
+        <div class="page-inner"> 
+            <ClassementTab v-model:classements="classements" v-model:classementReel="classementReel"/>
+            <button class="btn btn-secondary" v-on:click="retourClassement">retour </button>
+            <button class="btn btn-secondary" v-on:click="validateEquipe">Valider</button>
+            <div name="modal" v-if="showModal" @close="showModal = false">
+                <div class="modal-mask">
+                    <div class="modal-wrapper">
+                        <div class="modal-container">
+                            <div class="modal-body">
+                                <table class="table table-hover">
+                                    <thead >
+                                        <tr class="bg-secondary" style="color:white">
+                                            <th scope="col-md-2">matricule</th>
+                                            <th scope="col-md-2">nom et prenom</th>
+                                            <th scope="col-md-2">C.A</th>
+                                            <th scope="col-md-1"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="coach in coachs" v-bind:key="coach">
+                                            <td scope="col-md-2">{{ coach.Matricule }}</td>
+                                            <td scope="col-md-2">{{ coach.Nom+" "+coach.Prenom }}</td>
+                                            <td scope="col-md-2">{{ coach.CA }}</td>
+                                            <td scope="col-md-1">
+                                                <button class="btn btn-danger" v-on:click="remove(coachs,coach.Matricule)">
+                                                <div class="d-none d-lg-block">
+                                                    supprimer
+                                                </diV>
+                                                <div class="d-block d-lg-none">
                                                 X
-                                            </div>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <slot name="footer">
-                                <button class="btn btn-secondary" v-on:click="validateEquipe">Valider</button>
-                                <button class="btn btn-secondary" v-on:click="showModal = false">retour</button>
-                            </slot>
+                                                </div>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table class="table table-hover">
+                                    <thead >
+                                        <tr class="bg-secondary" style="color:white">
+                                            <th scope="col-md-2">matricule</th>
+                                            <th scope="col-md-2 d-none">nom et prenom</th>
+                                            <th scope="col-md-2">C.A</th>
+                                            <th scope="col-md-2">place</th>
+                                            <th scope="col-md-1"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="classement in classements" v-bind:key="classement">
+                                            <td scope="col-md-2" v-if="classement.place == classement.placeOriginal">{{ classement.Matricule }}</td>
+                                            <td scope="col-md-2" style="color:red" v-else-if="classement.place > classement.placeOriginal">{{ classement.Matricule }} ({{  classement.placeOriginal - classement.place }} place)</td>
+                                            <td scope="col-md-2" style="color:green" v-else>{{ classement.Matricule }} (+{{  classement.placeOriginal - classement.place }} place)</td>
+                                            <td scope="col-md-2">{{ classement.Nom+classement.Prenom }}</td>
+                                            <td scope="col-md-2">{{ classement.CA }}</td>
+                                            <th scope="col-md-2"><input type="number" v-model="classement.placeTemp" v-on:change="changeClassement(classement.place,classement.placeTemp)"/></th>
+                                            <td scope="col-md-1">
+                                                <button class="btn btn-danger" v-on:click="remove(classement,classement.Matricule)">
+                                                <div class="d-none d-lg-block">
+                                                    supprimer
+                                                </diV>
+                                                <div class="d-block d-lg-none">
+                                                    X
+                                                </div>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <slot name="footer">
+                                    <button class="btn btn-secondary" v-on:click="validateEquipe">Valider</button>
+                                    <button class="btn btn-secondary" v-on:click="showModal = false">retour</button>
+                                </slot>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </template>
 
 <script>
@@ -208,7 +252,10 @@ export default {
 
             resultats: [],
             classements: [],
-            classementReel: []
+            classementReel: [],
+
+            buttonTeamA: "btn btn-secondary btn-border",
+            buttonTeamB: "btn btn-secondary"
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -223,6 +270,16 @@ export default {
         this.loadLocalData();
     },
     methods: {
+        toogleAvtiveTeamButton(team){
+            if(team==1){
+                this.buttonTeamA="btn btn-secondary";
+                this.buttonTeamB="btn btn-secondary btn-border";
+            }
+            else{
+                this.buttonTeamA="btn btn-secondary btn-border";
+                this.buttonTeamB="btn btn-secondary ";
+            }
+        },
         retourClassement(){
             this.toogleClassementsView();
             localStorage.removeItem("classements");
@@ -489,8 +546,7 @@ export default {
             }
         },
         // search perso
-    },
-    
+    },   
     components: {
         EquipeTab,
         SearchPersonnel,
@@ -498,5 +554,7 @@ export default {
         ProduitTab,
         ClassementTab
     }
+
 }
+
 </script>
