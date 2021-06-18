@@ -7,7 +7,9 @@
         </div>
         <div class="page-inner">
             <div v-if="!showClassements">
-                <h2 class="text-center"><span style="background-color:#f9fbfd">Recherche</span></h2>
+                <h2 class="text-center">
+                    <span style="background-color:#f9fbfd">Recherche</span>
+                </h2>
                 <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
                 <div class="card">
                     <div class="card-body">
@@ -92,36 +94,25 @@
                                 Equipe 2
                             </button>
                         </div>
-                        <div>
-                            <div class="row">
-                                <div class="table-responsive table-sm">
-                                    <table class="table">
-                                        <thead >
-                                            <tr class="bg-secondary" style="color:white">
-                                                <th class="respText" scope="col-md-2">matricule</th>
-                                                <th class="respText" scope="col-md-2 d-none">nom et prenom</th>
-                                                <th class="respText" scope="col-md-2">C.A</th>
-                                                <th class="respText" scope="col-md-1"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr v-for="equipe in equipes" v-bind:key="equipe">
-                                                <td class="respText" scope="col-md-2">{{ equipe.Matricule }}</td>
-                                                <td class="respText" scope="col-md-2">{{ equipe.Nom+equipe.Prenom }}</td>
-                                                <td class="respText" scope="col-md-2">{{ equipe.CA }}</td>
-                                                <td class="respText" scope="col-md-1">
-                                                    <button class="btn btn-danger" v-on:click="remove(equipe.Matricule)">
-                                                    <div class="d-none d-lg-block">
-                                                        supprimer
-                                                    </diV>
-                                                    <div class="d-block d-lg-none">
-                                                    X
-                                                    </div>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        <div class="row">
+                            <div class="table-responsive table-sm">
+                                <div class="card-body">
+                                    <div class="row d-flex justify-content-center" id="resultCoach" >
+                                        <div class="table-responsive col-12" style="margin-left:25px">
+                                            <EquipeTab  v-model:equipes="coachs" titre="Coachs"/>
+                                        </div>
+                                    </div>
+                                    <div class="row d-flex justify-content-center" id="resultCommerciaux" >
+                                        <div class="table-responsive col-12" style="margin-left:25px">
+                                            <EquipeTab  v-model:equipes="commerciaux" titre="Commerciaux"/>
+                                        </div> 
+                                    </div>
+                                    <div class="row" >
+                                        <div class="col-12 text-right">
+                                            <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -164,7 +155,7 @@
                                                     supprimer
                                                 </diV>
                                                 <div class="d-block d-lg-none">
-                                                X
+                                                    X
                                                 </div>
                                                 </button>
                                             </td>
@@ -188,7 +179,9 @@
                                             <td scope="col-md-2" style="color:green" v-else>{{ classement.Matricule }} (+{{  classement.placeOriginal - classement.place }} place)</td>
                                             <td scope="col-md-2">{{ classement.Nom+classement.Prenom }}</td>
                                             <td scope="col-md-2">{{ classement.CA }}</td>
-                                            <th scope="col-md-2"><input type="number" v-model="classement.placeTemp" v-on:change="changeClassement(classement.place,classement.placeTemp)"/></th>
+                                            <th scope="col-md-2">
+                                                <input type="number" v-model="classement.placeTemp" v-on:change="changeClassement(classement.place,classement.placeTemp)"/>
+                                            </th>
                                             <td scope="col-md-1">
                                                 <button class="btn btn-danger" v-on:click="remove(classement,classement.Matricule)">
                                                 <div class="d-none d-lg-block">
@@ -246,6 +239,7 @@ export default {
 
             idFonction: null,
             idMission: "n",
+
             idProduit: null,
 
             customId: null,
@@ -253,6 +247,9 @@ export default {
             resultats: [],
             classements: [],
             classementReel: [],
+
+            EquipeA: [],
+            EquipeB: [],
 
             buttonTeamA: "btn btn-secondary btn-border",
             buttonTeamB: "btn btn-secondary"
