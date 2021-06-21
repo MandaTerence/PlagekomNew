@@ -17654,8 +17654,14 @@ __webpack_require__.r(__webpack_exports__);
       resultats: [],
       classements: [],
       classementReel: [],
-      EquipeA: [],
-      EquipeB: [],
+      EquipeA: {
+        coachs: [],
+        commerciaux: []
+      },
+      EquipeB: {
+        coachs: [],
+        commerciaux: []
+      },
       buttonTeamA: "btn btn-secondary btn-border",
       buttonTeamB: "btn btn-secondary"
     };
@@ -17666,6 +17672,15 @@ __webpack_require__.r(__webpack_exports__);
     }
 
     next();
+  },
+  computed: {
+    selectedTeam: function selectedTeam() {
+      if (this.buttonTeamA == "btn btn-secondary" && this.buttonTeamA != "btn btn-secondary btn-border") {
+        return "A";
+      } else {
+        return "B";
+      }
+    }
   },
   created: function created() {
     this.loadMissions();
@@ -17810,23 +17825,35 @@ __webpack_require__.r(__webpack_exports__);
     getClassement: function getClassement() {
       var _this3 = this;
 
-      var matricules = this.getMatriculeFromArray(this.commerciaux);
+      /*
+      let matricules = this.getMatriculeFromArray(this.commerciaux);
+      let produits =  this.getCodeProduitFromArray(this.produits);
+      this.classements.splice(0,this.classements.length);
+      axios.get('/api/personnels/getClassement',{params: {Matricules: matricules,Produits: produits}}).then(response => { 
+          if(response.data.personnels!=null){
+              this.classements = response.data.classements;
+              localStorage.classements = JSON.stringify(this.classements);
+              this.fillPlaceTemp(response.data.classementsReel);
+              this.classementReel = response.data.classementsReel;
+              localStorage.classementReel = JSON.stringify(this.classementReel);
+              this.toogleClassementsView();
+          }
+      });
+      */
       var produits = this.getCodeProduitFromArray(this.produits);
+      var matriculeA = this.getMatriculeFromArray(this.EquipeA.commerciaux);
+      var matriculeB = this.getMatriculeFromArray(this.EquipeB.commerciaux);
       this.classements.splice(0, this.classements.length);
       axios.get('/api/personnels/getClassement', {
         params: {
           Matricules: matricules,
+          matriculeA: matriculeA,
+          matriculeB: matriculeB,
           Produits: produits
         }
       }).then(function (response) {
         if (response.data.personnels != null) {
           _this3.classements = response.data.classements;
-          localStorage.classements = JSON.stringify(_this3.classements);
-
-          _this3.fillPlaceTemp(response.data.classementsReel);
-
-          _this3.classementReel = response.data.classementsReel;
-          localStorage.classementReel = JSON.stringify(_this3.classementReel);
 
           _this3.toogleClassementsView();
         }
@@ -17912,6 +17939,20 @@ __webpack_require__.r(__webpack_exports__);
         this.isSearchingAutoComplete = false;
       }
     },
+    addToEquipe: function addToEquipe(personnel) {
+      if (this.selectedTeam == "A") {
+        this.addPersonnelToTable(this.EquipeA.commerciaux, personnel);
+      } else {
+        this.addPersonnelToTable(this.EquipeB.commerciaux, personnel);
+      }
+    },
+    addToCoachEquipe: function addToCoachEquipe(personnel) {
+      if (this.selectedTeam == "A") {
+        this.addPersonnelToTable(this.EquipeA.coachs, personnel);
+      } else {
+        this.addPersonnelToTable(this.EquipeB.coachs, personnel);
+      }
+    },
     addPersonnel: function addPersonnel() {
       var _this6 = this;
 
@@ -17930,13 +17971,15 @@ __webpack_require__.r(__webpack_exports__);
                 if (_this6.coachs.length > _this6.maxCoach - 1) {
                   alert("il existe deja un coach");
                 } else {
+                  _this6.addToCoachEquipe(response.data.personnel);
+
                   _this6.addEquipeFromCoach(response.data.personnel);
                 }
               } else {
                 if (_this6.commerciaux.length > _this6.maxCommerciaux - 1) {
                   alert("la limite de commerciaux :" + _this6.maxCommerciaux + " est deja atteinte");
                 } else {
-                  _this6.addPersonnelToTable(_this6.commerciaux, response.data.personnel);
+                  _this6.addToEquipe(response.data.personnel);
                 }
               }
             } else {
@@ -17959,13 +18002,15 @@ __webpack_require__.r(__webpack_exports__);
                 if (_this6.coachs.length > _this6.maxCoach - 1) {
                   alert("il existe deja un coach");
                 } else {
-                  _this6.addPersonnelToTable(_this6.coachs, response.data.personnel);
+                  _this6.addToCoachEquipe(response.data.personnel);
+
+                  _this6.addEquipeFromCoach(response.data.personnel);
                 }
               } else {
                 if (_this6.commerciaux.length > _this6.maxCommerciaux - 1) {
                   alert("la limite de commerciaux :" + _this6.maxCommerciaux + " est deja atteinte");
                 } else {
-                  _this6.addPersonnelToTable(_this6.commerciaux, response.data.personnel);
+                  _this6.addToEquipe(response.data.personnel);
                 }
               }
             }
@@ -17987,12 +18032,31 @@ __webpack_require__.r(__webpack_exports__);
         table.push(personnel);
       }
     },
+    //addEquipeFromCoach(coach){
     addEquipeFromCoach: function addEquipeFromCoach(coach) {
       var _this7 = this;
 
-      this.addPersonnelToTable(this.coachs, coach);
+      //this.addPersonnelToTable(this.coachs,coach);
 
-      if (coach != '') {
+      /*
+      if(coach!=''){
+          axios.get('/api/personnels/getPersonnelFromCoach',{params: {coach: coach.Matricule,idMission: this.idMission}}).then(response => {
+              for(let i=0;i<response.data.data.length;i++){
+                  if(this.commerciaux.length>=this.maxCommerciaux){
+                      
+                  }
+                  else if(response.data.data[i].Matricule!=coach.Matricule){
+                      this.addToEquipe(response.data.data[i]);
+                  }
+              }
+          });
+      }
+      EquipeA: {
+          coachs : [],
+          commerciaux : []
+      },
+      */
+      if (this.selectedTeam == "A") {
         axios.get('/api/personnels/getPersonnelFromCoach', {
           params: {
             coach: coach.Matricule,
@@ -18000,8 +18064,21 @@ __webpack_require__.r(__webpack_exports__);
           }
         }).then(function (response) {
           for (var i = 0; i < response.data.data.length; i++) {
-            if (_this7.commerciaux.length >= _this7.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
-              _this7.addPersonnelToTable(_this7.commerciaux, response.data.data[i]);
+            if (_this7.EquipeA.commerciaux.length >= _this7.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
+              _this7.addToEquipe(response.data.data[i]);
+            }
+          }
+        });
+      } else {
+        axios.get('/api/personnels/getPersonnelFromCoach', {
+          params: {
+            coach: coach.Matricule,
+            idMission: this.idMission
+          }
+        }).then(function (response) {
+          for (var i = 0; i < response.data.data.length; i++) {
+            if (_this7.EquipeB.commerciaux.length >= _this7.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
+              _this7.addToEquipe(response.data.data[i]);
             }
           }
         });
@@ -21218,9 +21295,13 @@ var _hoisted_34 = {
   "class": "card-body"
 };
 var _hoisted_35 = {
-  "class": "row"
+  "class": "row",
+  style: {
+    "margin-left": "20px"
+  }
 };
 var _hoisted_36 = {
+  key: 0,
   "class": "row"
 };
 var _hoisted_37 = {
@@ -21256,10 +21337,46 @@ var _hoisted_44 = {
   "class": "col-12 text-right"
 };
 var _hoisted_45 = {
+  key: 1,
+  "class": "row"
+};
+var _hoisted_46 = {
+  "class": "table-responsive table-sm"
+};
+var _hoisted_47 = {
+  "class": "card-body"
+};
+var _hoisted_48 = {
+  "class": "row d-flex justify-content-center",
+  id: "resultCoach"
+};
+var _hoisted_49 = {
+  "class": "table-responsive col-12",
+  style: {
+    "margin-left": "25px"
+  }
+};
+var _hoisted_50 = {
+  "class": "row d-flex justify-content-center",
+  id: "resultCommerciaux"
+};
+var _hoisted_51 = {
+  "class": "table-responsive col-12",
+  style: {
+    "margin-left": "25px"
+  }
+};
+var _hoisted_52 = {
+  "class": "row"
+};
+var _hoisted_53 = {
+  "class": "col-12 text-right"
+};
+var _hoisted_54 = {
   key: 1
 };
 
-var _hoisted_46 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
+var _hoisted_55 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
   "class": "panel-header bg-secondary-gradient"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
   "class": "page-inner py-4"
@@ -21269,26 +21386,26 @@ var _hoisted_46 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(
 /* HOISTED */
 );
 
-var _hoisted_47 = {
+var _hoisted_56 = {
   "class": "page-inner"
 };
-var _hoisted_48 = {
+var _hoisted_57 = {
   "class": "modal-mask"
 };
-var _hoisted_49 = {
+var _hoisted_58 = {
   "class": "modal-wrapper"
 };
-var _hoisted_50 = {
+var _hoisted_59 = {
   "class": "modal-container"
 };
-var _hoisted_51 = {
+var _hoisted_60 = {
   "class": "modal-body"
 };
-var _hoisted_52 = {
+var _hoisted_61 = {
   "class": "table table-hover"
 };
 
-var _hoisted_53 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
+var _hoisted_62 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
   "class": "bg-secondary",
   style: {
     "color": "white"
@@ -21305,36 +21422,36 @@ var _hoisted_53 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(
 /* HOISTED */
 );
 
-var _hoisted_54 = {
+var _hoisted_63 = {
   scope: "col-md-2"
 };
-var _hoisted_55 = {
+var _hoisted_64 = {
   scope: "col-md-2"
 };
-var _hoisted_56 = {
+var _hoisted_65 = {
   scope: "col-md-2"
 };
-var _hoisted_57 = {
+var _hoisted_66 = {
   scope: "col-md-1"
 };
 
-var _hoisted_58 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
+var _hoisted_67 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
   "class": "d-none d-lg-block"
 }, " supprimer ", -1
 /* HOISTED */
 );
 
-var _hoisted_59 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
+var _hoisted_68 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
   "class": "d-block d-lg-none"
 }, " X ", -1
 /* HOISTED */
 );
 
-var _hoisted_60 = {
+var _hoisted_69 = {
   "class": "table table-hover"
 };
 
-var _hoisted_61 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
+var _hoisted_70 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
   "class": "bg-secondary",
   style: {
     "color": "white"
@@ -21353,50 +21470,50 @@ var _hoisted_61 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(
 /* HOISTED */
 );
 
-var _hoisted_62 = {
+var _hoisted_71 = {
   key: 0,
   scope: "col-md-2"
 };
-var _hoisted_63 = {
+var _hoisted_72 = {
   key: 1,
   scope: "col-md-2",
   style: {
     "color": "red"
   }
 };
-var _hoisted_64 = {
+var _hoisted_73 = {
   key: 2,
   scope: "col-md-2",
   style: {
     "color": "green"
   }
 };
-var _hoisted_65 = {
+var _hoisted_74 = {
   scope: "col-md-2"
 };
-var _hoisted_66 = {
+var _hoisted_75 = {
   scope: "col-md-2"
 };
-var _hoisted_67 = {
+var _hoisted_76 = {
   scope: "col-md-2"
 };
-var _hoisted_68 = {
+var _hoisted_77 = {
   scope: "col-md-1"
 };
 
-var _hoisted_69 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
+var _hoisted_78 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
   "class": "d-none d-lg-block"
 }, " supprimer ", -1
 /* HOISTED */
 );
 
-var _hoisted_70 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
+var _hoisted_79 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
   "class": "d-block d-lg-none"
 }, " X ", -1
 /* HOISTED */
 );
 
-var _hoisted_71 = {
+var _hoisted_80 = {
   "class": "modal-footer"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -21519,18 +21636,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, " Equipe 2 ", 2
   /* CLASS */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_EquipeTab, {
-    equipes: $data.coachs,
+  )]), $data.buttonTeamA == 'btn btn-secondary' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_EquipeTab, {
+    equipes: $data.EquipeA.coachs,
     "onUpdate:equipes": _cache[13] || (_cache[13] = function ($event) {
-      return $data.coachs = $event;
+      return $data.EquipeA.coachs = $event;
     }),
     titre: "Coachs"
   }, null, 8
   /* PROPS */
   , ["equipes"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_41, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_EquipeTab, {
-    equipes: $data.commerciaux,
+    equipes: $data.EquipeA.commerciaux,
     "onUpdate:equipes": _cache[14] || (_cache[14] = function ($event) {
-      return $data.commerciaux = $event;
+      return $data.EquipeA.commerciaux = $event;
     }),
     titre: "Commerciaux"
   }, null, 8
@@ -21540,66 +21657,87 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[15] || (_cache[15] = function () {
       return $options.getClassement && $options.getClassement.apply($options, arguments);
     })
-  }, "lancer le classement")])])])])])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showClassements ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ClassementTab, {
+  }, "lancer le classement")])])])])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_EquipeTab, {
+    equipes: $data.EquipeB.coachs,
+    "onUpdate:equipes": _cache[16] || (_cache[16] = function ($event) {
+      return $data.EquipeB.coachs = $event;
+    }),
+    titre: "Coachs"
+  }, null, 8
+  /* PROPS */
+  , ["equipes"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_EquipeTab, {
+    equipes: $data.EquipeB.commerciaux,
+    "onUpdate:equipes": _cache[17] || (_cache[17] = function ($event) {
+      return $data.EquipeB.commerciaux = $event;
+    }),
+    titre: "Commerciaux"
+  }, null, 8
+  /* PROPS */
+  , ["equipes"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    "class": "btn btn-secondary",
+    onClick: _cache[18] || (_cache[18] = function () {
+      return $options.getClassement && $options.getClassement.apply($options, arguments);
+    })
+  }, "lancer le classement")])])])])]))])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showClassements ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_54, [_hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ClassementTab, {
     classements: $data.classements,
-    "onUpdate:classements": _cache[16] || (_cache[16] = function ($event) {
+    "onUpdate:classements": _cache[19] || (_cache[19] = function ($event) {
       return $data.classements = $event;
     }),
     classementReel: $data.classementReel,
-    "onUpdate:classementReel": _cache[17] || (_cache[17] = function ($event) {
+    "onUpdate:classementReel": _cache[20] || (_cache[20] = function ($event) {
       return $data.classementReel = $event;
     })
   }, null, 8
   /* PROPS */
   , ["classements", "classementReel"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     "class": "btn btn-secondary",
-    onClick: _cache[18] || (_cache[18] = function () {
+    onClick: _cache[21] || (_cache[21] = function () {
       return $options.retourClassement && $options.retourClassement.apply($options, arguments);
     })
   }, "retour "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     "class": "btn btn-secondary",
-    onClick: _cache[19] || (_cache[19] = function () {
+    onClick: _cache[22] || (_cache[22] = function () {
       return $options.validateEquipe && $options.validateEquipe.apply($options, arguments);
     })
   }, "Valider"), $data.showModal ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
     key: 0,
     name: "modal",
-    onClose: _cache[22] || (_cache[22] = function ($event) {
+    onClose: _cache[25] || (_cache[25] = function ($event) {
       return $data.showModal = false;
     })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_52, [_hoisted_53, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.coachs, function (coach) {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_61, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.coachs, function (coach) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", {
       key: coach
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(coach.Matricule), 1
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(coach.Matricule), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(coach.Nom + " " + coach.Prenom), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(coach.Nom + " " + coach.Prenom), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_56, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(coach.CA), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(coach.CA), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_66, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
       "class": "btn btn-danger",
       onClick: function onClick($event) {
         return _ctx.remove($data.coachs, coach.Matricule);
       }
-    }, [_hoisted_58, _hoisted_59], 8
+    }, [_hoisted_67, _hoisted_68], 8
     /* PROPS */
     , ["onClick"])])]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_60, [_hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.classements, function (classement) {
+  ))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_69, [_hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.classements, function (classement) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", {
       key: classement
-    }, [classement.place == classement.placeOriginal ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("td", _hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Matricule), 1
+    }, [classement.place == classement.placeOriginal ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("td", _hoisted_71, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Matricule), 1
     /* TEXT */
-    )) : classement.place > classement.placeOriginal ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("td", _hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Matricule) + " (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.placeOriginal - classement.place) + " place)", 1
+    )) : classement.place > classement.placeOriginal ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("td", _hoisted_72, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Matricule) + " (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.placeOriginal - classement.place) + " place)", 1
     /* TEXT */
-    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("td", _hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Matricule) + " (+" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.placeOriginal - classement.place) + " place)", 1
+    )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("td", _hoisted_73, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Matricule) + " (+" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.placeOriginal - classement.place) + " place)", 1
     /* TEXT */
-    )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Nom + classement.Prenom), 1
+    )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Nom + classement.Prenom), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.CA), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_75, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.CA), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", _hoisted_76, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
       type: "number",
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return classement.placeTemp = $event;
@@ -21609,25 +21747,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, null, 40
     /* PROPS, HYDRATE_EVENTS */
-    , ["onUpdate:modelValue", "onChange"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, classement.placeTemp]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    , ["onUpdate:modelValue", "onChange"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, classement.placeTemp]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_77, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
       "class": "btn btn-danger",
       onClick: function onClick($event) {
         return _ctx.remove(classement, classement.Matricule);
       }
-    }, [_hoisted_69, _hoisted_70], 8
+    }, [_hoisted_78, _hoisted_79], 8
     /* PROPS */
     , ["onClick"])])]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "footer", {}, function () {
+  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_80, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.renderSlot)(_ctx.$slots, "footer", {}, function () {
     return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
       "class": "btn btn-secondary",
-      onClick: _cache[20] || (_cache[20] = function () {
+      onClick: _cache[23] || (_cache[23] = function () {
         return $options.validateEquipe && $options.validateEquipe.apply($options, arguments);
       })
     }, "Valider"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
       "class": "btn btn-secondary",
-      onClick: _cache[21] || (_cache[21] = function ($event) {
+      onClick: _cache[24] || (_cache[24] = function ($event) {
         return $data.showModal = false;
       })
     }, "retour")];
