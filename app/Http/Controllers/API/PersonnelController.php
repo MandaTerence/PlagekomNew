@@ -156,21 +156,67 @@ class PersonnelController extends Controller
             }
         }
         $resultatEquipeA = [
-            'classementTotal' => ClassementService::getClassementTotal($equipeA,self::DEFAULT_COEF),
-            'classementGlobal' => ClassementService::getClassementGlobal($equipeA),
-            'classementLocal' => ClassementService::getClassementLocal($equipeA),
-            'classementMission' => ClassementService::getClassementMission($equipeA),
-            'classementProduitMoinsCher' => ClassementService::getClassementProduitMoinsCher($equipeA),
-            'classementProduitPlusCher' => ClassementService::getClassementProduitPlusCher($equipeA),
+            'classementReel' => ClassementService::getClassementTotal($equipeA,self::DEFAULT_COEF),
+            'classementDetail' =>[
+                [
+                    'nom' =>'classementGlobal',
+                    'classement' => ClassementService::getClassementGlobal($equipeA)
+                ]
+                ,
+                [
+                    'nom' => 'classementLocal',
+                    'classement' => ClassementService::getClassementLocal($equipeB)
+                ]
+                ,
+                [
+                    'nom' =>'classementMission',
+                    'classement' => ClassementService::getClassementMission($equipeA)
+                ]
+            ]
         ];
+        if(isset($request->Produits)){
+            $resultatEquipeA->classementDetail[] = 
+            [
+                'nom' => 'classementProduitPlusCher',
+                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
+            ];
+            $resultatEquipeA->classementDetail[] = 
+            [
+                'nom' => 'classementProduitPlusCher',
+                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
+            ];
+        };
         $resultatEquipeB = [
-            'classementTotal' => ClassementService::getClassementTotal($equipeB,self::DEFAULT_COEF),
-            'classementGlobal' => ClassementService::getClassementGlobal($equipeB),
-            'classementLocal' => ClassementService::getClassementLocal($equipeB),
-            'classementMission' => ClassementService::getClassementMission($equipeB),
-            'classementProduitMoinsCher' => ClassementService::getClassementProduitMoinsCher($equipeB),
-            'classementProduitPlusCher' => ClassementService::getClassementProduitPlusCher($equipeB),
+            'classementReel' => ClassementService::getClassementTotal($equipeB,self::DEFAULT_COEF),
+            'classementDetail' =>[
+                [
+                    'nom' =>'classementGlobal',
+                    'classement' => ClassementService::getClassementGlobal($equipeB)
+                ]
+                ,
+                [
+                    'nom' => 'classementLocal',
+                    'classement' => ClassementService::getClassementLocal($equipeB)
+                ]
+                ,
+                [
+                    'nom' =>'classementMission',
+                    'classement' => ClassementService::getClassementMission($equipeB)
+                ]
+            ]
         ];
+        if(isset($request->Produits)){
+            $resultatEquipeA->classementDetail[] = 
+            [
+                'nom' => 'classementProduitPlusCher',
+                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
+            ];
+            $resultatEquipeA->classementDetail[] = 
+            [
+                'nom' => 'classementProduitPlusCher',
+                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
+            ];
+        };
 
         $success = true;
         $message = 'resultat trouvé';

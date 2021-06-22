@@ -148,43 +148,81 @@
         </div>
         <div class="page-inner">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-6 d-flex justify-content-start">
+                    <button style="margin:20px" class="btn-round btn btn-secondary " v-on:click="retourClassement">
+                        <span>retour</span>
+                    </button>
+                </div>
+                <div class="col-6 d-flex justify-content-end">
+                    <button style="margin:20px" class="btn-round btn btn-secondary d-flex justify-content-end" >
+                        <span>valider</span>
+                    </button>
+                </div>
+                
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
                     <div class="card">
+                        <div class="card-header">
+                            Classement Proposé pour l'équipe A du coach {{ EquipeA.coachs[0].Matricule }} 
+                        </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
                                     <thead >
                                         <tr class="bg-secondary" style="color:white">
-                                            <th class="respText" scope="col-md-2">matricule</th>
-                                            <th class="respText" scope="col-md-2 d-none">nom et prenom</th>
-                                            <th class="respText" scope="col-md-2">C.A</th>
-                                            <th class="respText" scope="col-md-1">place</th>
+                                            <th class="respText" >matricule</th>
+                                            <th class="respText" >nom et prenom</th>
+                                            <th class="respText" >place</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="equipe in ClassementA" v-bind:key="equipe">
-                                            <td class="respText" scope="col-md-2">{{ equipe.Matricule }}</td>
-                                            <td class="respText" scope="col-md-2">{{ equipe.Nom+equipe.Prenom }}</td>
-                                            <td class="respText" scope="col-md-2">{{ equipe.CA }} Ar</td>
-                                            <td class="respText" scope="col-md-1">
-                                                <button class="btn btn-danger" v-on:click="remove(equipe.Matricule)">
-                                                    <div class="d-none d-lg-block">
-                                                        supprimer
-                                                    </diV>
-                                                    <div class="d-block d-lg-none">
-                                                        X
-                                                    </div>
-                                                </button>
+                                            <td class="respText" >{{ equipe.Matricule }}</td>
+                                            <td class="respText" >{{ equipe.Nom }}</td>
+                                            <td class="respText" >
+                                                <input type="number" v-model="equipe.placeTemp" v-on:change="changeClassement(ClassementA,equipe.place,equipe.placeTemp)"/>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>        
+                            <div class="card">
+                                <div class="card-header">             
+                                    <h1><a v-on:click="toogleDetail('A')">Detail</a></h1>
+                                </div>
+                                <div class="card-body" v-if="showDetailA==true">
+                                    <div v-for="Classement in ClassementDetailA" v-bind:key="Classement">
+                                        <h1>{{ Classement.nom }}</h1>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                                                <thead >
+                                                    <tr class="bg-secondary" style="color:white">
+                                                        <th class="respText" >matricule</th>
+                                                        <th class="respText" >nom et prenom</th>
+                                                        <th class="respText" >CA</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="equipe in Classement.classement" v-bind:key="equipe">
+                                                        <td class="respText" >{{ equipe.Matricule }}</td>
+                                                        <td class="respText" >{{ equipe.Nom }}</td>
+                                                        <td class="respText" >{{ equipe.CA }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-sm-6">
                     <div class="card">
+                        <div class="card-header">
+                            Classement Proposé pour l'équipe B du coach {{ EquipeB.coachs[0].Matricule }} 
+                        </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
@@ -192,28 +230,47 @@
                                         <tr class="bg-secondary" style="color:white">
                                             <th class="respText" scope="col-md-2">matricule</th>
                                             <th class="respText" scope="col-md-2 d-none">nom et prenom</th>
-                                            <th class="respText" scope="col-md-2">C.A</th>
                                             <th class="respText" scope="col-md-1">place</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="equipe in ClassementB" v-bind:key="equipe">
                                             <td class="respText" scope="col-md-2">{{ equipe.Matricule }}</td>
-                                            <td class="respText" scope="col-md-2">{{ equipe.Nom+equipe.Prenom }}</td>
-                                            <td class="respText" scope="col-md-2">{{ equipe.CA }} Ar</td>
+                                            <td class="respText" scope="col-md-2">{{ equipe.Nom}}</td>
                                             <td class="respText" scope="col-md-1">
-                                                <button class="btn btn-danger" v-on:click="remove(equipe.Matricule)">
-                                                <div class="d-none d-lg-block">
-                                                    supprimer
-                                                </diV>
-                                                <div class="d-block d-lg-none">
-                                                    X
-                                                </div>
-                                                </button>
+                                                <input type="number" v-model="equipe.placeTemp" v-on:change="changeClassement(ClassementB,equipe.place,equipe.placeTemp)"/>
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">             
+                                    <h1><a v-on:click="toogleDetail('B')">Detail</a></h1>
+                                </div>
+                                <div class="card-body" v-if="showDetailB==true">
+                                    <div v-for="Classement in ClassementDetailB" v-bind:key="Classement">
+                                        <h1>{{ Classement.nom }}</h1>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                                                <thead >
+                                                    <tr class="bg-secondary" style="color:white">
+                                                        <th class="respText" >matricule</th>
+                                                        <th class="respText" >nom et prenom</th>
+                                                        <th class="respText" >CA</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="equipe in Classement.classement" v-bind:key="equipe">
+                                                        <td class="respText" >{{ equipe.Matricule }}</td>
+                                                        <td class="respText" >{{ equipe.Nom }}</td>
+                                                        <td class="respText" >{{ equipe.CA }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -270,8 +327,13 @@ export default {
                 commerciaux : []
             },
 
+            showDetailA: false,
+            showDetailB: false,
             ClassementA: [],
             ClassementB: [],
+
+            ClassementDetailA: [],
+            ClassementDetailB: [],
 
             buttonTeamA: "btn btn-secondary btn-border",
             buttonTeamB: "btn btn-secondary"
@@ -299,6 +361,25 @@ export default {
         this.loadLocalData();
     },
     methods: {
+        toogleDetail(equipe){
+            if(equipe=="A"){
+                if(this.showDetailA){
+                    this.showDetailA=false;
+                }
+                else{
+                    this.showDetailA=true;
+                }
+            }
+            else{
+                if(this.showDetailB){
+                    this.showDetailB=false;
+                }
+                else{
+                    this.showDetailB=true;
+                }
+            }
+            
+        },
         changeIdMission(){
             this.EquipeA= {
                 coachs : [],
@@ -330,6 +411,12 @@ export default {
                 this.classementReel = JSON.parse(localStorage.classementReel);
                 this.classements= JSON.parse(localStorage.classements);
                 this.showClassements = true;
+            }
+            if(localStorage.getItem('EquipeA')){
+                this.EquipeA = JSON.parse(localStorage.EquipeA);
+            }
+            if(localStorage.getItem('EquipeB')){
+                this.EquipeB = JSON.parse(localStorage.EquipeB);
             }
         },
         toogleAdvancedSearch(){
@@ -446,6 +533,7 @@ export default {
             let matriculeA = this.getMatriculeFromArray(this.EquipeA.commerciaux);
             let matriculeB = this.getMatriculeFromArray(this.EquipeB.commerciaux);
             this.classements.splice(0,this.classements.length);
+            this.savePersonnelOnlocalStorage();
             axios.get('/api/personnels/getClassement',
                 {
                     params: {
@@ -456,40 +544,51 @@ export default {
                 }).then(response => {
                 //alert(this.EquipeA.commerciaux);
                 if(response.data.resultatEquipeA!=null){
-                    this.ClassementA = response.data.resultatEquipeA;
+                    this.ClassementA = response.data.resultatEquipeA.classementReel;
+                    this.ClassementDetailA = response.data.resultatEquipeA.classementDetail;
+                    this.fillPlaceTemp(response.data.resultatEquipeA.classementReel);
                 }
                 if(response.data.resultatEquipeB!=null){
-                    this.ClassementA = response.data.resultatEquipeA;
+                    this.ClassementB = response.data.resultatEquipeB.classementReel;
+                    this.ClassementDetailB = response.data.resultatEquipeB.classementDetail;
+                    this.fillPlaceTemp(response.data.resultatEquipeB.classementReel);
                 }
                 if((response.data.resultatEquipeB!=null)||((response.data.resultatEquipeB!=null))){
                     this.toogleClassementsView();
                 }
             });
         },
-        recalculPlace(){
+        savePersonnelOnlocalStorage(){
+            if(this.EquipeA){
+                localStorage.EquipeA = JSON.stringify(this.EquipeA);
+            }
+            if(this.EquipeB){
+                localStorage.EquipeB = JSON.stringify(this.EquipeB);
+            }
+        },
+        recalculPlace(Classement){
             let newClassement = [];
-            for(let i=0;i<this.classements.length;i++){
-                newClassement.push(this.classements[i]);
+            for(let i=0;i<Classement.length;i++){
+                newClassement.push(Classement[i]);
                 newClassement[i].placeTemp = i+1;
                 newClassement[i].place = i+1;
             }
-            for(let i=0;i<this.classements.length;i++){
-                this.classements.splice(i,1,newClassement[i]);
+            for(let i=0;i<Classement.length;i++){
+                Classement.splice(i,1,newClassement[i]);
             }
         },
-        changeClassement(place,placeTemp){
-            if((placeTemp<1)||(placeTemp>this.classements.length)){
+        changeClassement(Classement,place,placeTemp){
+            if((placeTemp<1)||(placeTemp>Classement.length)){
                 alert("changement de place impossible");
-                this.classements[place-1].placeTemp = place;
+                Classement[place-1].placeTemp = place;
             }                        
             else{
-                let elementTemp = this.classements[place-1];
-                this.classements.splice(place-1,1);
-                this.classements.splice(placeTemp-1, 0, elementTemp);
-                this.recalculPlace();
-                localStorage.sclassements = JSON.stringify(this.classements);
-                localStorage.classementReel = JSON.stringify(this.classementReel);
+                let elementTemp = Classement[place-1];
+                Classement.splice(place-1,1);
+                Classement.splice(placeTemp-1, 0, elementTemp);
+                this.recalculPlace(Classement);
             }
+            alert(JSON.stringify(Classement));
         },
         // search perso
         loadFonctions(){

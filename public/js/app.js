@@ -17662,8 +17662,12 @@ __webpack_require__.r(__webpack_exports__);
         coachs: [],
         commerciaux: []
       },
+      showDetailA: false,
+      showDetailB: false,
       ClassementA: [],
       ClassementB: [],
+      ClassementDetailA: [],
+      ClassementDetailB: [],
       buttonTeamA: "btn btn-secondary btn-border",
       buttonTeamB: "btn btn-secondary"
     };
@@ -17690,6 +17694,21 @@ __webpack_require__.r(__webpack_exports__);
     this.loadLocalData();
   },
   methods: {
+    toogleDetail: function toogleDetail(equipe) {
+      if (equipe == "A") {
+        if (this.showDetailA) {
+          this.showDetailA = false;
+        } else {
+          this.showDetailA = true;
+        }
+      } else {
+        if (this.showDetailB) {
+          this.showDetailB = false;
+        } else {
+          this.showDetailB = true;
+        }
+      }
+    },
     changeIdMission: function changeIdMission() {
       this.EquipeA = {
         coachs: [],
@@ -17720,6 +17739,14 @@ __webpack_require__.r(__webpack_exports__);
         this.classementReel = JSON.parse(localStorage.classementReel);
         this.classements = JSON.parse(localStorage.classements);
         this.showClassements = true;
+      }
+
+      if (localStorage.getItem('EquipeA')) {
+        this.EquipeA = JSON.parse(localStorage.EquipeA);
+      }
+
+      if (localStorage.getItem('EquipeB')) {
+        this.EquipeB = JSON.parse(localStorage.EquipeB);
       }
     },
     toogleAdvancedSearch: function toogleAdvancedSearch() {
@@ -17857,6 +17884,7 @@ __webpack_require__.r(__webpack_exports__);
       var matriculeA = this.getMatriculeFromArray(this.EquipeA.commerciaux);
       var matriculeB = this.getMatriculeFromArray(this.EquipeB.commerciaux);
       this.classements.splice(0, this.classements.length);
+      this.savePersonnelOnlocalStorage();
       axios.get('/api/personnels/getClassement', {
         params: {
           matriculeA: matriculeA,
@@ -17866,11 +17894,17 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (response) {
         //alert(this.EquipeA.commerciaux);
         if (response.data.resultatEquipeA != null) {
-          _this3.ClassementA = response.data.resultatEquipeA;
+          _this3.ClassementA = response.data.resultatEquipeA.classementReel;
+          _this3.ClassementDetailA = response.data.resultatEquipeA.classementDetail;
+
+          _this3.fillPlaceTemp(response.data.resultatEquipeA.classementReel);
         }
 
         if (response.data.resultatEquipeB != null) {
-          _this3.ClassementA = response.data.resultatEquipeA;
+          _this3.ClassementB = response.data.resultatEquipeB.classementReel;
+          _this3.ClassementDetailB = response.data.resultatEquipeB.classementDetail;
+
+          _this3.fillPlaceTemp(response.data.resultatEquipeB.classementReel);
         }
 
         if (response.data.resultatEquipeB != null || response.data.resultatEquipeB != null) {
@@ -17878,31 +17912,40 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    recalculPlace: function recalculPlace() {
+    savePersonnelOnlocalStorage: function savePersonnelOnlocalStorage() {
+      if (this.EquipeA) {
+        localStorage.EquipeA = JSON.stringify(this.EquipeA);
+      }
+
+      if (this.EquipeB) {
+        localStorage.EquipeB = JSON.stringify(this.EquipeB);
+      }
+    },
+    recalculPlace: function recalculPlace(Classement) {
       var newClassement = [];
 
-      for (var i = 0; i < this.classements.length; i++) {
-        newClassement.push(this.classements[i]);
+      for (var i = 0; i < Classement.length; i++) {
+        newClassement.push(Classement[i]);
         newClassement[i].placeTemp = i + 1;
         newClassement[i].place = i + 1;
       }
 
-      for (var _i = 0; _i < this.classements.length; _i++) {
-        this.classements.splice(_i, 1, newClassement[_i]);
+      for (var _i = 0; _i < Classement.length; _i++) {
+        Classement.splice(_i, 1, newClassement[_i]);
       }
     },
-    changeClassement: function changeClassement(place, placeTemp) {
-      if (placeTemp < 1 || placeTemp > this.classements.length) {
+    changeClassement: function changeClassement(Classement, place, placeTemp) {
+      if (placeTemp < 1 || placeTemp > Classement.length) {
         alert("changement de place impossible");
-        this.classements[place - 1].placeTemp = place;
+        Classement[place - 1].placeTemp = place;
       } else {
-        var elementTemp = this.classements[place - 1];
-        this.classements.splice(place - 1, 1);
-        this.classements.splice(placeTemp - 1, 0, elementTemp);
-        this.recalculPlace();
-        localStorage.sclassements = JSON.stringify(this.classements);
-        localStorage.classementReel = JSON.stringify(this.classementReel);
+        var elementTemp = Classement[place - 1];
+        Classement.splice(place - 1, 1);
+        Classement.splice(placeTemp - 1, 0, elementTemp);
+        this.recalculPlace(Classement);
       }
+
+      alert(JSON.stringify(Classement));
     },
     // search perso
     loadFonctions: function loadFonctions() {
@@ -21409,88 +21452,131 @@ var _hoisted_56 = {
   "class": "row"
 };
 var _hoisted_57 = {
-  "class": "col-md-6"
+  "class": "col-6 d-flex justify-content-start"
 };
-var _hoisted_58 = {
-  "class": "card"
-};
-var _hoisted_59 = {
-  "class": "card-body"
-};
+
+var _hoisted_58 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, "retour", -1
+/* HOISTED */
+);
+
+var _hoisted_59 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
+  "class": "col-6 d-flex justify-content-end"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+  style: {
+    "margin": "20px"
+  },
+  "class": "btn-round btn btn-secondary d-flex justify-content-end"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, "valider")])], -1
+/* HOISTED */
+);
+
 var _hoisted_60 = {
-  "class": "table-responsive"
+  "class": "row"
 };
 var _hoisted_61 = {
-  "class": "table table-bordered table-head-bg-secondary table-bordered-bd-secondary"
+  "class": "col-sm-6"
 };
-
-var _hoisted_62 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
-  "class": "bg-secondary",
-  style: {
-    "color": "white"
-  }
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText",
-  scope: "col-md-2"
-}, "matricule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText",
-  scope: "col-md-2 d-none"
-}, "nom et prenom"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText",
-  scope: "col-md-2"
-}, "C.A"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText",
-  scope: "col-md-1"
-}, "place")])], -1
-/* HOISTED */
-);
-
-var _hoisted_63 = {
-  "class": "respText",
-  scope: "col-md-2"
-};
-var _hoisted_64 = {
-  "class": "respText",
-  scope: "col-md-2"
-};
-var _hoisted_65 = {
-  "class": "respText",
-  scope: "col-md-2"
-};
-var _hoisted_66 = {
-  "class": "respText",
-  scope: "col-md-1"
-};
-
-var _hoisted_67 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
-  "class": "d-none d-lg-block"
-}, " supprimer ", -1
-/* HOISTED */
-);
-
-var _hoisted_68 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
-  "class": "d-block d-lg-none"
-}, " X ", -1
-/* HOISTED */
-);
-
-var _hoisted_69 = {
-  "class": "col-md-6"
-};
-var _hoisted_70 = {
+var _hoisted_62 = {
   "class": "card"
 };
-var _hoisted_71 = {
+var _hoisted_63 = {
+  "class": "card-header"
+};
+var _hoisted_64 = {
   "class": "card-body"
 };
-var _hoisted_72 = {
+var _hoisted_65 = {
   "class": "table-responsive"
 };
-var _hoisted_73 = {
+var _hoisted_66 = {
   "class": "table table-bordered table-head-bg-secondary table-bordered-bd-secondary"
 };
 
-var _hoisted_74 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
+var _hoisted_67 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
+  "class": "bg-secondary",
+  style: {
+    "color": "white"
+  }
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  "class": "respText"
+}, "matricule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  "class": "respText"
+}, "nom et prenom"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  "class": "respText"
+}, "place")])], -1
+/* HOISTED */
+);
+
+var _hoisted_68 = {
+  "class": "respText"
+};
+var _hoisted_69 = {
+  "class": "respText"
+};
+var _hoisted_70 = {
+  "class": "respText"
+};
+var _hoisted_71 = {
+  "class": "card"
+};
+var _hoisted_72 = {
+  "class": "card-header"
+};
+var _hoisted_73 = {
+  key: 0,
+  "class": "card-body"
+};
+var _hoisted_74 = {
+  "class": "table-responsive"
+};
+var _hoisted_75 = {
+  "class": "table table-bordered table-head-bg-secondary table-bordered-bd-secondary"
+};
+
+var _hoisted_76 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
+  "class": "bg-secondary",
+  style: {
+    "color": "white"
+  }
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  "class": "respText"
+}, "matricule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  "class": "respText"
+}, "nom et prenom"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  "class": "respText"
+}, "CA")])], -1
+/* HOISTED */
+);
+
+var _hoisted_77 = {
+  "class": "respText"
+};
+var _hoisted_78 = {
+  "class": "respText"
+};
+var _hoisted_79 = {
+  "class": "respText"
+};
+var _hoisted_80 = {
+  "class": "col-sm-6"
+};
+var _hoisted_81 = {
+  "class": "card"
+};
+var _hoisted_82 = {
+  "class": "card-header"
+};
+var _hoisted_83 = {
+  "class": "card-body"
+};
+var _hoisted_84 = {
+  "class": "table-responsive"
+};
+var _hoisted_85 = {
+  "class": "table table-bordered table-head-bg-secondary table-bordered-bd-secondary"
+};
+
+var _hoisted_86 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
   "class": "bg-secondary",
   style: {
     "color": "white"
@@ -21503,43 +21589,64 @@ var _hoisted_74 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(
   scope: "col-md-2 d-none"
 }, "nom et prenom"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
   "class": "respText",
-  scope: "col-md-2"
-}, "C.A"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
-  "class": "respText",
   scope: "col-md-1"
 }, "place")])], -1
 /* HOISTED */
 );
 
-var _hoisted_75 = {
+var _hoisted_87 = {
   "class": "respText",
   scope: "col-md-2"
 };
-var _hoisted_76 = {
+var _hoisted_88 = {
   "class": "respText",
   scope: "col-md-2"
 };
-var _hoisted_77 = {
-  "class": "respText",
-  scope: "col-md-2"
-};
-var _hoisted_78 = {
+var _hoisted_89 = {
   "class": "respText",
   scope: "col-md-1"
 };
+var _hoisted_90 = {
+  "class": "card"
+};
+var _hoisted_91 = {
+  "class": "card-header"
+};
+var _hoisted_92 = {
+  key: 0,
+  "class": "card-body"
+};
+var _hoisted_93 = {
+  "class": "table-responsive"
+};
+var _hoisted_94 = {
+  "class": "table table-bordered table-head-bg-secondary table-bordered-bd-secondary"
+};
 
-var _hoisted_79 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
-  "class": "d-none d-lg-block"
-}, " supprimer ", -1
+var _hoisted_95 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
+  "class": "bg-secondary",
+  style: {
+    "color": "white"
+  }
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  "class": "respText"
+}, "matricule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  "class": "respText"
+}, "nom et prenom"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  "class": "respText"
+}, "CA")])], -1
 /* HOISTED */
 );
 
-var _hoisted_80 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
-  "class": "d-block d-lg-none"
-}, " X ", -1
-/* HOISTED */
-);
-
+var _hoisted_96 = {
+  "class": "respText"
+};
+var _hoisted_97 = {
+  "class": "respText"
+};
+var _hoisted_98 = {
+  "class": "respText"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_SearchProduit = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("SearchProduit");
 
@@ -21703,45 +21810,107 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[19] || (_cache[19] = function () {
       return $options.getClassement && $options.getClassement.apply($options, arguments);
     })
-  }, "lancer le classement")])])])])]))])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showClassements ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_53, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_59, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_61, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.ClassementA, function (equipe) {
+  }, "lancer le classement")])])])])]))])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showClassements ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_53, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    style: {
+      "margin": "20px"
+    },
+    "class": "btn-round btn btn-secondary ",
+    onClick: _cache[20] || (_cache[20] = function () {
+      return $options.retourClassement && $options.retourClassement.apply($options, arguments);
+    })
+  }, [_hoisted_58])]), _hoisted_59]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_62, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_63, " Classement Proposé pour l'équipe A du coach " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.EquipeA.coachs[0].Matricule), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_66, [_hoisted_67, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.ClassementA, function (equipe) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", {
       key: equipe
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Matricule), 1
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_68, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Matricule), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_64, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Nom + equipe.Prenom), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Nom), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.CA) + " Ar", 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_66, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
-      "class": "btn btn-danger",
-      onClick: function onClick($event) {
-        return _ctx.remove(equipe.Matricule);
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_70, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+      type: "number",
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return equipe.placeTemp = $event;
+      },
+      onChange: function onChange($event) {
+        return $options.changeClassement($data.ClassementA, equipe.place, equipe.placeTemp);
       }
-    }, [_hoisted_67, _hoisted_68], 8
-    /* PROPS */
-    , ["onClick"])])]);
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
+    , ["onUpdate:modelValue", "onChange"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, equipe.placeTemp]])])]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_69, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_70, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_73, [_hoisted_74, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.ClassementB, function (equipe) {
+  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("h1", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
+    onClick: _cache[21] || (_cache[21] = function ($event) {
+      return $options.toogleDetail('A');
+    })
+  }, "Detail")])]), $data.showDetailA == true ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_73, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.ClassementDetailA, function (Classement) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
+      key: Classement
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("h1", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(Classement.nom), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_74, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_75, [_hoisted_76, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(Classement.classement, function (equipe) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", {
+        key: equipe
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_77, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Matricule), 1
+      /* TEXT */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_78, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Nom), 1
+      /* TEXT */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_79, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.CA), 1
+      /* TEXT */
+      )]);
+    }), 128
+    /* KEYED_FRAGMENT */
+    ))])])])]);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_80, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_81, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_82, " Classement Proposé pour l'équipe B du coach " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.EquipeB.coachs[0].Matricule), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_83, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_84, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_85, [_hoisted_86, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.ClassementB, function (equipe) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", {
       key: equipe
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_75, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Matricule), 1
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_87, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Matricule), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_76, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Nom + equipe.Prenom), 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_88, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Nom), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_77, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.CA) + " Ar", 1
-    /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_78, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
-      "class": "btn btn-danger",
-      onClick: function onClick($event) {
-        return _ctx.remove(equipe.Matricule);
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_89, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+      type: "number",
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return equipe.placeTemp = $event;
+      },
+      onChange: function onChange($event) {
+        return $options.changeClassement($data.ClassementB, equipe.place, equipe.placeTemp);
       }
-    }, [_hoisted_79, _hoisted_80], 8
-    /* PROPS */
-    , ["onClick"])])]);
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
+    , ["onUpdate:modelValue", "onChange"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, equipe.placeTemp]])])]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])])])])])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
+  ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_90, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_91, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("h1", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
+    onClick: _cache[22] || (_cache[22] = function ($event) {
+      return $options.toogleDetail('B');
+    })
+  }, "Detail")])]), $data.showDetailB == true ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_92, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.ClassementDetailB, function (Classement) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
+      key: Classement
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("h1", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(Classement.nom), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_93, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_94, [_hoisted_95, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(Classement.classement, function (equipe) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", {
+        key: equipe
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_96, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Matricule), 1
+      /* TEXT */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_97, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Nom), 1
+      /* TEXT */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_98, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.CA), 1
+      /* TEXT */
+      )]);
+    }), 128
+    /* KEYED_FRAGMENT */
+    ))])])])]);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])])])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
   /* STABLE_FRAGMENT */
   );
 }
