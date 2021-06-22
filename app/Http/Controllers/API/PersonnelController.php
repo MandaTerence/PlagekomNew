@@ -90,7 +90,7 @@ class PersonnelController extends Controller
         return ($pa->CA > $pb->CA) ? -1 : 1;
     }
 
-    public function getClassement(Request $request){
+    public function getClassementOld(Request $request){
         $personnels = [];
         if(isset($request->Matricules)){
             $personnels = PersonnelService::getPersonnelFromMatricule($request->Matricules);
@@ -132,37 +132,53 @@ class PersonnelController extends Controller
         return $response;
     }
 
-    public function getClassementOld(Request $request){
-        $classementGlobal = [];
-        $classementLocal = [];
-        $classementMission = [];
-        $classementProduits = [];
-        if(isset($request->Matricules)){
-            $classementGlobal = ClassementService::getClassementGlobal($request->Matricules);
-            $classementLocal = ClassementService::getClassementLocal($request->Matricules);
-            $classementMission = ClassementService::getClassementMission($request->Matricules);
+    public function getClassement(Request $request){
+        $equipeA = [];
+        $equipeB = [];
+        if((isset($request->matriculeA))&&(isset($request->matriculeB))){
+            $equipeA = PersonnelService::getPersonnelFromMatricule($request->matriculeA);
+            $equipeB = PersonnelService::getPersonnelFromMatricule($request->matriculeB);
         }
-
-        if(isset($request->Produits)){
-            foreach($request->Produits as $produit){
-                $classementProduits[] =
-                [
-                    "produit" => $produit,
-                    "classement" => ClassementService::getClassementProduit($request->Matricules,$produit)
-                ];
+        foreach($equipeA as $personnel){
+            if(isset($request->Produits)){
+                $personnel->getAllCA($request->Produits);
+            }
+            else{
+                $personnel->getAllCA();
             }
         }
+        foreach($equipeB as $personnel){
+            if(isset($request->Produits)){
+                $personnel->getAllCA($request->Produits);
+            }
+            else{
+                $personnel->getAllCA();
+            }
+        }
+        $resultatEquipeA = [
+            'classementTotal' => ClassementService::getClassementTotal($equipeA,self::DEFAULT_COEF),
+            'classementGlobal' => ClassementService::getClassementGlobal($equipeA),
+            'classementLocal' => ClassementService::getClassementLocal($equipeA),
+            'classementMission' => ClassementService::getClassementMission($equipeA),
+            'classementProduitMoinsCher' => ClassementService::getClassementProduitMoinsCher($equipeA),
+            'classementProduitPlusCher' => ClassementService::getClassementProduitPlusCher($equipeA),
+        ];
+        $resultatEquipeB = [
+            'classementTotal' => ClassementService::getClassementTotal($equipeB,self::DEFAULT_COEF),
+            'classementGlobal' => ClassementService::getClassementGlobal($equipeB),
+            'classementLocal' => ClassementService::getClassementLocal($equipeB),
+            'classementMission' => ClassementService::getClassementMission($equipeB),
+            'classementProduitMoinsCher' => ClassementService::getClassementProduitMoinsCher($equipeB),
+            'classementProduitPlusCher' => ClassementService::getClassementProduitPlusCher($equipeB),
+        ];
 
         $success = true;
         $message = 'resultat trouvé';
 
         $response = [
             'success' => $success,
-            'message' => $message,
-            'classementGlobal' =>$classementGlobal,
-            'classementLocal' =>$classementLocal,
-            'classementMission' =>$classementMission,
-            'classementProduit' =>$classementProduits
+            'resultatEquipeA' => $resultatEquipeA,
+            'resultatEquipeB' => $resultatEquipeB,
         ];
         
         return $response;
