@@ -16,8 +16,10 @@ class ClassementController extends Controller
         $coach = $request->input('matriculeCoach');
         $commerciaux = $request->input('matriculeCommerciaux');
         $idMission = $request->input('idMission');
+        
         $success = Classement::saveFromCommerciaux($idMission,$commerciaux); 
         PersonnelService::saveEquipeTemp($commerciaux,$coach,$idMission);
+
         if($success){
             $test = AccompagnementService::generatePlanning($idMission,$coach,$commerciaux);
         }
@@ -26,6 +28,7 @@ class ClassementController extends Controller
             'test' => $test
         ];
         return $response;
+        
     }
 
     public function getPlanning(Request $request){

@@ -6,7 +6,7 @@
 </div>
 <div class="page-inner">
     <div class="row">
-        <div class="card col-md-4" >
+        <div class="card col-12" >
             <div class="card-body">
                 <div class="form-group">
                     <label for="inputMission">Mission</label>
@@ -19,43 +19,46 @@
     </div>
     <div>
         <div v-for="planningCoach in plannings" v-bind:key="planningCoach">
+            <h2 class="text-center"><span style="background-color:#f9fbfd">Planning du coach  {{ planningCoach.coach.Coach  }}</span></h2>
+            <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="row">
-                <div class="card col-md-4">
-                    <div class="form-group">
-                        <div class="card-body">   
-                            <label for="equipeList">
-                                <a v-on:click="toogleDisplayEquipe()">
-                                    <div v-if="planningCoach.accompagnement.length>0" v-on:click="displayPlanning(planningCoach.coach )">Equipe du coach : {{ planningCoach.coach.Coach  }}</div>
-                                </a>
-                            </label>
-                            <div  id="equipeList" v-if="equipeDisplay">
-                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                    <thead>
-                                        <tr>
-                                            <th> personnel </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
-                                            <td>{{ commercial.Commercial }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                <div class="card col-12">
+                    <div class="card-body">
+                        <div class="row">
+                            <button>
+                            </button>
+                        </div>
+                        <div class="row">
+                            <div class="card-body">   
+                                <label for="equipeList">
+                                    <a v-on:click="toogleDisplayEquipe()">
+                                        <div v-if="planningCoach.accompagnement.length>0" v-on:click="displayPlanning(planningCoach.coach )">
+                                            <span>
+                                                Equipe du coach : {{ planningCoach.coach.Coach  }}
+                                            </span>
+                                        </div>
+                                    </a>
+                                </label>
+                                <div  id="equipeList" v-if="equipeDisplay">
+                                    <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                                        <thead>
+                                            <tr>
+                                                <th> personnel </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
+                                                <td>{{ commercial.Commercial }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <h2 class="text-center"><span style="background-color:#f9fbfd">Planning d accompagnement</span></h2>
-                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-            <div class="row">
-                <div class="card col-md-12">
-                    <div class="card-body">
                         <div class="row" style="margin-top:20px">
                             <table class="table table-hover d-flex justify-content-center" id="listePlanning"> 
                                 <tbody>
-                                    <div v-for="planning in planningCoach.a
-                                    +ccompagnement" v-bind:key="planning">
+                                    <div v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
                                         <tr class="d-flex"  style="text-align:center">
                                             <td class="col-12">
                                                 <div v-on:click="toogleVisibility(planning['jour'])" >

@@ -338,6 +338,11 @@
                         </a>
                         <div v-if="displaySideBar[1]['display']==true">
                             <ul class="nav nav-collapse">
+                                <li>
+                                    <router-link to="/Evaluation" class="nav-item nav-link sub-category">
+                                        <span class="sub-item">Evaluation des commerciaux</span>
+                                    </router-link>   
+                                </li>
                                 <li class="active">
                                     <router-link to="/creationEquipe" class="nav-item nav-link sub-category">
                                         <span class="sub-item">Génerer planning d accompagnement</span>

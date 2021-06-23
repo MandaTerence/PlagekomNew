@@ -13,6 +13,7 @@ import Classements from '../pages/Classements';
 import ClassificationCommerciaux from '../pages/ClassificationCommerciaux';
 import Fiche from '../pages/Fiche';
 import Salaire from '../pages/Salaire';
+import Evaluation from '../pages/Evaluation';
 
 import Books from '../components/Books';
 import AddBook from '../components/AddBook';
@@ -23,6 +24,11 @@ export const routes = [
         name: 'creationEquipe',
         path: '/creationEquipe',
         component: CreationEquipe
+    },
+    {
+        name: 'Evaluation',
+        path: '/Evaluation',
+        component: Evaluation
     },
     {
         name: 'home',

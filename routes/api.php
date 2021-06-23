@@ -33,6 +33,7 @@ Route::group(['prefix' => 'fonctions', 'middleware' => 'auth:sanctum'], function
 
 Route::group(['prefix' => 'missions', 'middleware' => 'auth:sanctum'], function () {
     Route::get('/', [MissionController::class, 'index']);
+    Route::get('/getTaux', [MissionController::class, 'getTaux']);
 });
 
 

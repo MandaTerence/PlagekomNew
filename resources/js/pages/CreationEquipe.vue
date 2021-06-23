@@ -60,6 +60,11 @@
                             <ProduitTab v-model:produits="produits"/>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-12">
+                            
+                        </div>
+                    </div>
                 </div>
             </div>
             <h2 class="text-center"><span style="background-color:#f9fbfd">Resultat</span></h2>
@@ -154,11 +159,10 @@
                     </button>
                 </div>
                 <div class="col-6 d-flex justify-content-end">
-                    <button style="margin:20px" class="btn-round btn btn-secondary d-flex justify-content-end" >
+                    <button style="margin:20px" class="btn-round btn btn-secondary d-flex justify-content-end" v-on:click="validateAllEquipe">
                         <span>valider</span>
                     </button>
                 </div>
-                
             </div>
             <div class="row">
                 <div class="col-sm-6">
@@ -308,7 +312,7 @@ export default {
             produits: [],
 
             idFonction: null,
-            idMission: "n",
+            idMission: "%%",
 
             idProduit: null,
 
@@ -472,7 +476,30 @@ export default {
                 }
             }    
         },
-        validateEquipe(){
+        validateEquipe(coach,equipe){
+            //alert(JSON.stringify(this.getMatriculeAndPlaceFromArray(equipe)));
+            if(coach.length<this.maxCoach){
+                alert("il manque "+(this.maxCoach-coach.length)+" coach");
+            }
+            else if(equipe.length<this.maxCommerciaux){
+                alert("il manque "+(this.maxCommerciaux-equipe.length)+" commerciaux");
+            }
+            else{
+                axios.post('/api/classements/',{matriculeCoach: coach[0].Matricule,matriculeCommerciaux: this.getMatriculeAndPlaceFromArray(equipe),idMission:this.idMission}).then(response => {
+                    if(response.data.success){
+                        this.showModal = false;
+                        //this.$router.push({ name: 'planning', query: { idMission: this.idMission ,coach: this.coach} });
+                    }
+                    else if(!response.data.success){
+                        alert('insertion echoué');
+                    }
+                });
+            }
+        },
+        validateAllEquipe(){
+            this.validateEquipe(this.EquipeA.coachs,this.ClassementA);
+            this.validateEquipe(this.EquipeB.coachs,this.ClassementB);
+            /*
             if(this.coachs.length<this.maxCoach){
                 alert("il manque "+(this.maxCoach-this.coachs.length)+" coach");
             }
@@ -489,7 +516,7 @@ export default {
                         alert('insertion echoué');
                     }
                 });
-            }
+            }*/
         },
         getMatriculeAndPlaceFromArray(personnels){
             let matricules = [];

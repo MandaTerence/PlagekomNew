@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Mission extends Model
 {
@@ -35,6 +36,32 @@ class Mission extends Model
     public static function getFirst($conditions=[]){
         return self::where($conditions)
         ->first();
+    }
+
+    public static function getTaux($idMission){
+        $type=self::selectRaw("Type_de_mission as type")
+        ->where("Id_de_la_mission",$idMission)
+        ->first()->type;
+        $montant = 0;
+        if($type=="PROVINCE"){
+            $montant = DB::table("malus_detail")
+            ->whereRaw("Id_malus = 3")
+            ->orderBy("montant_vente","ASC")
+            ->first()->montant_vente;
+        }
+        else if($type=="MISSION"){
+            $montant = DB::table("malus_detail")
+            ->whereRaw("Id_malus = 1")
+            ->orderBy("montant_vente","ASC")
+            ->first()->montant_vente;
+        }
+        else{
+            $montant = DB::table("malus_detail")
+            ->whereRaw("Id_malus = 2")
+            ->orderBy("montant_vente","ASC")
+            ->first()->montant_vente;
+        }
+        return $montant;
     }
     
 }
