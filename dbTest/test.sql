@@ -5,6 +5,21 @@
 
 --first day of the month
 
+
+
+SELECT
+    sum(detailvente.Quantite * prix.Prix_detail)
+FROM facture
+join detailvente on detailvente.Facture = facture.id
+join prix on detailvente.ID_prix = prix.Id
+where facture.Matricule_personnel = 'VP00080'
+and facture.date between '2021-05-1' and '2021-06-18'
+group by date
+;
+
+
+
+
 $ventes = DB::table('facture')
         ->where('facture.Matricule_personnel',$this->Matricule)
         ->whereRaw("MONTH(CURRENT_DATE()) = MONTH(date)")

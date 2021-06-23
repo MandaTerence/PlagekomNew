@@ -132,12 +132,87 @@ class PersonnelController extends Controller
         return $response;
     }
 
+    public function getEvaluation(Request $request){
+        $equipeA = [];
+        $interval = getDateInterval(30);
+        $dateXclu = $request->listeDateExclu;
+        if(!isset($dateXclu)){
+            $dateXclu = [];
+        }
+        if((isset($request->Matricules))){
+            $equipeA = PersonnelService::getPersonnelFromMatricule($request->Matricules);
+        }
+        if((isset($request->dateDebut))&&(isset($request->dateFin))){
+            $interval = (object) [
+                "lastDate" => $request->dateFin,
+                "firstDate" => $request->dateDebut
+            ];
+        }
+        foreach($equipeA as $personnel){
+            if(isset($request->Produits)){
+                $personnel->getAllCA($interval,$dateXclu,$request->Produits);
+            }
+            else{
+                $personnel->getAllCA($interval,$dateXclu);
+            }
+        }
+        $resultatEquipeA = [
+            'classementReel' => ClassementService::getClassementTotal($equipeA,self::DEFAULT_COEF),
+            'classementDetail' =>[
+                [
+                    'nom' =>'classementGlobal',
+                    'classement' => ClassementService::getClassementGlobal($equipeA)
+                ]
+                ,
+                [
+                    'nom' => 'classementLocal',
+                    'classement' => ClassementService::getClassementLocal($equipeA)
+                ]
+                ,
+                [
+                    'nom' =>'classementMission',
+                    'classement' => ClassementService::getClassementMission($equipeA)
+                ]
+            ]
+        ];
+        if(isset($request->Produits)){
+            $resultatEquipeA->classementDetail[] = 
+            [
+                'nom' => 'classementProduitPlusCher',
+                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
+            ];
+            $resultatEquipeA->classementDetail[] = 
+            [
+                'nom' => 'classementProduitPlusCher',
+                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
+            ];
+        };
+
+        $success = true;
+        $message = 'resultat trouvé';
+
+        $response = [
+            'success' => $success,
+            'resultat' => $resultatEquipeA,
+            
+        ];
+        
+        return $response;
+    }
+
     public function getClassement(Request $request){
         $equipeA = [];
         $equipeB = [];
+        $interval = getDateInterval(30);
         if((isset($request->matriculeA))&&(isset($request->matriculeB))){
             $equipeA = PersonnelService::getPersonnelFromMatricule($request->matriculeA);
             $equipeB = PersonnelService::getPersonnelFromMatricule($request->matriculeB);
+        }
+        if((isset($request->dateDebut))&&(isset($request->dateFin))){
+            $interval = [
+                "lastDate" => $request->dateDebut,
+                "firstDate" => $request->dateFin
+            ];
         }
         foreach($equipeA as $personnel){
             if(isset($request->Produits)){
@@ -165,7 +240,7 @@ class PersonnelController extends Controller
                 ,
                 [
                     'nom' => 'classementLocal',
-                    'classement' => ClassementService::getClassementLocal($equipeB)
+                    'classement' => ClassementService::getClassementLocal($equipeA)
                 ]
                 ,
                 [
@@ -276,20 +351,10 @@ class PersonnelController extends Controller
             }
         }
         $personnel = Personnel::getFirstWithCA($conditions);
-        $testCA = 0;
-        $testCAB = 0;
-        if(isset($personnel)){
-            $testCA = $personnel->getCAselonProduit('SYSTEMA TOOTHPASTE CHARCOAL');
-            $testCAB = $personnel->getCAMission();
-            $testCAC = $personnel->getCALocal();
-        }
         if($personnel){
             $response = [
                 'success' => true,
                 'message' => 'resultat trouvé',
-                'CA produit' => $testCA,
-                'CA Mission' => $testCAB,
-                'CA local' => $testCAC,
                 'personnel' => $personnel,
             ];
             return response()->json($response);

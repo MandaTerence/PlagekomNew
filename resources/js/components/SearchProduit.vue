@@ -1,5 +1,5 @@
 <template>
-    <div class="form-row">
+    <div class="row">
         <div class="form-group col-6">
             <label for="inputProduit">Produit</label>
             <input type="text" placeholder="what are you looking for?" v-model="produitDesignation" class="form-control" v-on:keyup="autoComplete" v-on:click="autoComplete">
@@ -11,8 +11,11 @@
                 </ul>
             </div>
         </div>
+
         <div class="form-group col-6">
-            <button class="btn btn-secondary " style="margin:30px" v-on:click="addProduit">Ajouter</button>
+            <button class="btn btn-secondary form-control" v-on:click="addProduit" style="margin-top:30px">
+                Ajouter
+            </button>
         </div>
     </div>
 </template>

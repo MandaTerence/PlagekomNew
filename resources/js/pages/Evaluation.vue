@@ -50,21 +50,23 @@
                         </div>
                         <div v-if="showAdvancedSearch">
                             <hr/>
-                            <h3>Recherche avance</h3>
+                                <h3>Recherche avance</h3>
                             <div>
                                 <hr/>
-                                    <h4>Recherche par Produit</h4>
-                                <div class="col-12">
-                                    <SearchProduit v-model:produits="produits"/>
-                                </div>
-                                <div class="col-12">
-                                    <ProduitTab v-model:produits="produits"/>
+                                    <h4 v-on:click="toogleAdvancedView(0)" >Recherche par Produit</h4>
+                                <div class="row" v-if="advancedSearchDisplay[0]">
+                                    <div class="col-12">
+                                        <SearchProduit v-model:produits="produits"/>
+                                    </div>
+                                    <div class="col-12">
+                                        <ProduitTab v-model:produits="produits"/>
+                                    </div>
                                 </div>
                             </div>
                             <div>
                                 <hr/>
-                                    <h4>Intervale de date</h4>
-                                <div class="row">
+                                    <h4 v-on:click="toogleAdvancedView(1)">Intervale de date</h4>
+                                <div class="row" v-if="advancedSearchDisplay[1]">
                                     <div class="form-group col-sm-6">
                                         <label for="inputDateDebut">date de debut</label>
                                         <input class="form-control"  type="Date" placeholder="date debut" v-model="dateDebut">
@@ -77,8 +79,41 @@
                             </div>
                             <div>
                                 <hr/>
-                                    <h4>Taux de vente</h4>
-                                <div class="row">
+                                    <h4 v-on:click="toogleAdvancedView(2)">Date a exclure</h4>
+                                <div class="row" v-if="advancedSearchDisplay[2]">
+                                    <div class="form-group col-6">
+                                        <label for="inputDateDebut">date a exclure</label>
+                                        <input class="form-control"  type="Date" placeholder="date debut" v-model="dateExclu">    
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <button v-on:click="addDateExclu()" class="btn btn-secondary form-control" style="margin-top:30px">
+                                            Ajouter
+                                        </button>
+                                    </div>
+                                    <div class="col-12 table-responsive">
+                                        <table class="table table-hover">
+                                            <thead >
+                                                <tr v-if="listeDateExclu.length>0" class="bg-secondary" style="color:white">
+                                                    <th scope="col-2">date</th>
+                                                    <th scope="col-2"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="date in listeDateExclu" v-bind:key="date">
+                                                    <td scope="col-md-2">{{ date }}</td>
+                                                    <td scope="col-md-2">
+                                                        <button class="btn btn-danger" v-on:click="removeDateExclu(date)">supprimer</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>    
+                            <div>
+                                <hr/>
+                                    <h4 v-on:click="toogleAdvancedView(3)">Taux de vente</h4>
+                                <div class="row" v-if="advancedSearchDisplay[3]">
                                     <div class="form-group col-sm-6">
                                         <label for="tauxDeVente">minimum de vente</label>
                                         <input class="form-control"  type="number" v-model="minimumVente" v-on:Change="changeMinimumVente">
@@ -248,8 +283,14 @@ export default {
             buttonTeamA: "btn btn-secondary btn-border",
             buttonTeamB: "btn btn-secondary",
             
+            advancedSearchDisplay:
+            [false,false,false,false],
+
             dateDebut: '',
             dateFin: '',
+
+            dateExclu: '',
+            listeDateExclu: [],
 
             pourcentage: '30',
             minimumVente: 0
@@ -276,9 +317,31 @@ export default {
         this.loadFonctions();
         this.loadLocalData();
         this.loadAdvencedSearchData();
-        
     },
     methods: {
+        toogleAdvancedView(place){
+            this.advancedSearchDisplay[place]=!this.advancedSearchDisplay[place];
+        },
+        addDateExclu(){
+            if(this.dateExclu==""){
+                alert("veuillez inserer une date valide")
+            }
+            else if(this.listeDateExclu.includes(this.dateExclu)){
+                alert("la date "+this.dateExclu+" est deja exclu");
+            }
+            else{
+                this.listeDateExclu.push(this.dateExclu);
+                this.dateExclu = "";
+            }
+            
+        },
+        removeDateExclu(date){
+            for(let i=0;i<this.listeDateExclu.length;i++){
+                if(this.listeDateExclu[i] == date){
+                    this.listeDateExclu.splice(i, 1);
+                }
+            }
+        },
         changeMinimumVente(){
             if(this.minimumVente<0){
                 alert("valeur de vente incorrect");
@@ -337,10 +400,8 @@ export default {
             var today = new Date();
             var datePassee = new Date();
             datePassee.setDate(datePassee.getDate() - 30);
-            
             this.dateDebut = this.dateToString(datePassee);
             this.dateFin = this.dateToString(today);
-        
         },
         loadLocalData(){
             if(localStorage.getItem('classementReel') !== null){
@@ -448,7 +509,19 @@ export default {
             let matricules = this.getMatriculeFromArray(this.commerciaux);
             let produits =  this.getCodeProduitFromArray(this.produits);
             this.classements.splice(0,this.classements.length);
-            axios.get('/api/personnels/getClassement',{params: {Matricules: matricules,Produits: produits}}).then(response => { 
+            axios.get('/api/personnels/getEvaluation',{params: {
+                Matricules: matricules,
+                Produits: produits,
+                
+                dateDebut: this.dateDebut,
+                dateFin: this.dateFin,
+
+                listeDateExclu: this.listeDateExclu,
+
+                pourcentage: this.pourcentage,
+                minimumVente: this.minimumVente
+
+            }}).then(response => { 
                 if(response.data.personnels!=null){
                     this.classements = response.data.classements;
                     localStorage.classements = JSON.stringify(this.classements);
