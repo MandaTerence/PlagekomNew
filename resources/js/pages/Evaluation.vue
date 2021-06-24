@@ -16,12 +16,6 @@
                         <h3>Recherche de personnel</h3>
                         <hr/>
                         <div class="row" id="rechercheNormal">
-                            <div class="form-group col-12 col-md-3">
-                                <label for="inputMission">Mission</label>
-                                <select class="form-control " id="inputMission" v-model="idMission" v-on:change="changeIdMission">
-                                    <option v-bind:key="mission.Id_de_la_mission" v-bind:value="mission.Id_de_la_mission" v-for="mission in missions">{{ mission.Id_de_la_mission }}</option>
-                                </select>
-                            </div>
                             <div class="form-group col-6 col-md-3">
                                 <label for="inputFonction">Fonction</label>
                                 <select class="form-control " id="inputFonction" v-model="idFonction" v-on:change="changeCustomId">
@@ -131,11 +125,6 @@
                 <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
                 <div class="card">
                     <div class="card-body">
-                        <div class="row d-flex justify-content-center" id="resultCoach" >
-                            <div class="table-responsive col-12" style="margin-left:25px">
-                                <EquipeTab  v-model:equipes="coachs" titre="Coachs"/>
-                            </div>
-                        </div>
                         <div class="row d-flex justify-content-center" id="resultCommerciaux" >
                             <div class="table-responsive col-12" style="margin-left:25px">
                                 <EquipeTab  v-model:equipes="commerciaux" titre="Commerciaux"/>
@@ -158,85 +147,37 @@
             </div>
         </div>
         <div class="page-inner"> 
-            <ClassementTab v-model:classements="classements" v-model:classementReel="classementReel"/>
-            <button class="btn btn-secondary" v-on:click="retourClassement">retour </button>
-            <button class="btn btn-secondary" v-on:click="validateEquipe">Valider</button>
-            <div name="modal" v-if="showModal" @close="showModal = false">
-                <div class="modal-mask">
-                    <div class="modal-wrapper">
-                        <div class="modal-container">
-                            <div class="modal-body">
-                                <table class="table table-hover">
-                                    <thead >
-                                        <tr class="bg-secondary" style="color:white">
-                                            <th scope="col-md-2">matricule</th>
-                                            <th scope="col-md-2">nom et prenom</th>
-                                            <th scope="col-md-2">C.A</th>
-                                            <th scope="col-md-1"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="coach in coachs" v-bind:key="coach">
-                                            <td scope="col-md-2">{{ coach.Matricule }}</td>
-                                            <td scope="col-md-2">{{ coach.Nom+" "+coach.Prenom }}</td>
-                                            <td scope="col-md-2">{{ coach.CA }}</td>
-                                            <td scope="col-md-1">
-                                                <button class="btn btn-danger" v-on:click="remove(coachs,coach.Matricule)">
-                                                <div class="d-none d-lg-block">
-                                                    supprimer
-                                                </diV>
-                                                <div class="d-block d-lg-none">
-                                                    X
-                                                </div>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <table class="table table-hover">
-                                    <thead >
-                                        <tr class="bg-secondary" style="color:white">
-                                            <th scope="col-md-2">matricule</th>
-                                            <th scope="col-md-2 d-none">nom et prenom</th>
-                                            <th scope="col-md-2">C.A</th>
-                                            <th scope="col-md-2">place</th>
-                                            <th scope="col-md-1"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="classement in classements" v-bind:key="classement">
-                                            <td scope="col-md-2" v-if="classement.place == classement.placeOriginal">{{ classement.Matricule }}</td>
-                                            <td scope="col-md-2" style="color:red" v-else-if="classement.place > classement.placeOriginal">{{ classement.Matricule }} ({{  classement.placeOriginal - classement.place }} place)</td>
-                                            <td scope="col-md-2" style="color:green" v-else>{{ classement.Matricule }} (+{{  classement.placeOriginal - classement.place }} place)</td>
-                                            <td scope="col-md-2">{{ classement.Nom+classement.Prenom }}</td>
-                                            <td scope="col-md-2">{{ classement.CA }}</td>
-                                            <th scope="col-md-2">
-                                                <input type="number" v-model="classement.placeTemp" v-on:change="changeClassement(classement.place,classement.placeTemp)"/>
-                                            </th>
-                                            <td scope="col-md-1">
-                                                <button class="btn btn-danger" v-on:click="remove(classement,classement.Matricule)">
-                                                <div class="d-none d-lg-block">
-                                                    supprimer
-                                                </diV>
-                                                <div class="d-block d-lg-none">
-                                                    X
-                                                </div>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="modal-footer">
-                                <slot name="footer">
-                                    <button class="btn btn-secondary" v-on:click="validateEquipe">Valider</button>
-                                    <button class="btn btn-secondary" v-on:click="showModal = false">retour</button>
-                                </slot>
-                            </div>
-                        </div>
+            <!-- v-model:classements="classements" v-model:classementReel="classementReel"/> -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                            <thead >
+                                <tr class="bg-secondary" style="color:white">
+                                    <th class="respText" >Matricule</th>
+                                    <th class="respText" >Nom et Prenom</th>
+                                    <th class="respText" >Place</th>
+                                    <th class="respText" >etat</th>
+                                    <th class="respText" >CA Global</th>
+                                    <th class="respText" >taux de Vente</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="personnel in classements" v-bind:key="personnel">
+                                    <td class="respText" >{{ personnel.Matricule }}</td>
+                                    <td class="respText" >{{ personnel.Nom+" "+personnel.Prenom }}</td>
+                                    <td class="respText" >{{ personnel.place }}</td>
+                                    <td class="respText" >{{ personnel.etatVente }}</td>
+                                    <td class="respText" >{{ personnel.CAGlobal }}</td>
+                                    <td class="respText" >{{ personnel.pourcentageObjectif }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+            <button class="btn btn-secondary" v-on:click="retourClassement">retour </button>
+            <button class="btn btn-secondary" v-on:click="validateEquipe">Valider</button>
         </div>
     </div>
 </template>
@@ -522,14 +463,20 @@ export default {
                 minimumVente: this.minimumVente
 
             }}).then(response => { 
+                
+                this.showClassements = true;
+                this.classements = response.data.classements;
+                localStorage.classements = JSON.stringify(this.classements);
+                this.fillPlaceTemp(response.data.classements);
+                /*
                 if(response.data.personnels!=null){
                     this.classements = response.data.classements;
                     localStorage.classements = JSON.stringify(this.classements);
                     this.fillPlaceTemp(response.data.classementsReel);
                     this.classementReel = response.data.classementsReel;
                     localStorage.classementReel = JSON.stringify(this.classementReel);
-                    this.toogleClassementsView();
-                }
+                    
+                }*/
             });
         },
         recalculPlace(){

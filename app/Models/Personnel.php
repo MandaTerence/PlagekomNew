@@ -73,6 +73,56 @@ class Personnel extends Model
         "mission"=>"MISSION"
     ];
 
+    public function getPourcentageObjectif($jourDeTravail){
+        if(isset($this->nbrJourObjectif)){
+            $this->pourcentageObjectif = (($this->nbrJourObjectif)*100)/$jourDeTravail;
+        }
+    }
+
+    public static function getObjectif(){
+        return DB::table('Objectif')
+        ->get();
+    }
+
+    public function getNbrJourObjectifAtteint($interval="",$objectif=0,$dateXclu=[]){
+        $nbrObjectifAtteint = 0;
+        $nbrJour=self::$DAY_INTERVAL;
+
+        $objectifs = self::getObjectif();
+
+        if($interval==""){
+            $interval = getDateInterval($nbrJour);
+        }
+
+        $ventes = DB::table('facture')
+        ->where('facture.Matricule_personnel',$this->Matricule)
+        ->whereRaw("facture.Date >= '".$interval->firstDate."'")
+        ->whereRaw("facture.Date <= '".$interval->lastDate."'")
+        ->selectRaw("COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA,date,Id_zone")
+        ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
+        ->join('prix', 'detailvente.ID_prix', '=', 'prix.Id')
+        ->groupBy('date','Id_zone')
+        ->get();
+        foreach($ventes as $vente){
+            $exist = false;
+            foreach($dateXclu as $date){
+                if($vente->date==$date){
+                    $exist = true;
+                    break;
+                }
+            }
+            if((!$exist)){
+                foreach($objectifs as $obj){
+                    if(($vente->Id_zone==$obj->Id_zone)&&($vente->CA>=$obj->Montant)){
+                        $nbrObjectifAtteint+=1;
+                        break;
+                    }
+                }
+            }
+        }
+        $this->nbrJourObjectif = $nbrObjectifAtteint;
+        return $nbrObjectifAtteint;
+    }
 
     public function getMalusVente(){
         $malus = DB::table('malus_detail')
@@ -227,7 +277,7 @@ class Personnel extends Model
     public function getJourMission(){
         $this->jourMission = (int)DB::table("mission")
         ->selectRaw("Sum(DATEDIFF(Date_de_fin, Date_depart)+1-FLOOR(DATEDIFF(Date_de_fin,Date_depart)/7)) as jourMission")
-        ->whereRaw("Id_de_la_mission in (select distinct Id_de_la_mission from facture where Matricule_personnel like '".$this->Matricule."')")
+        ->whereRaw("Id_de_la_mission in (select distinct Id_de_la_mission from facture where Matricule_personnel = '".$this->Matricule."')")
         ->first()->jourMission;
         return $this->jourMission;
     }
@@ -248,7 +298,7 @@ class Personnel extends Model
         $type = DB::table("detailmission")
         ->select("Date_d_activation","Type_de_mission")
         ->join("mission","mission.Id_de_la_mission","=","detailmission.Id_de_la_mission")
-        ->where("detailmission.personnel","like",$this->Matricule)
+        ->where("detailmission.personnel","=",$this->Matricule)
         ->orderBy("Date_d_activation","desc")
         ->first()->Type_de_mission;
         $this->type = $type;
@@ -322,7 +372,7 @@ class Personnel extends Model
     public function getDetailSanction($jour='%'){
         $this->sanctions = SanctionPersonnel::select("sanction.code_sanction","sanction.titre","sanction.valeur","sanction.unite")
         ->where("sanction_personnel.matricule_personnel",$this->Matricule)
-        ->whereRaw("DATE(sanction_personnel.date) like '".$jour."'")
+        ->whereRaw("DATE(sanction_personnel.date) = '".$jour."'")
         ->join("sanction","sanction.id","=","sanction_personnel.id_sanction")
         ->get();
         if(isset($this->sanctions)){
@@ -334,7 +384,7 @@ class Personnel extends Model
     public function getDetailControl($jour='%'){
         $this->controles = Controle::selectRaw("sim,debut,fin,TIMEDIFF(fin,debut) as duree")
         ->where("commercial",$this->Matricule)
-        ->whereRaw("DATE(debut) like '".$jour."'")
+        ->whereRaw("DATE(debut) = '".$jour."'")
         ->get();
         if(isset($this->controles)){
             return true;
@@ -366,9 +416,9 @@ class Personnel extends Model
         if(!isset($this->pointAnnuel)){
             $annee = date('Y');
             $pointAnnuel = DB::Table("pointressource")
-            ->join("facture","facture.Id_facture","like","pointressource.Id_facture")
-            ->where("pointressource.Matricule","like",$this->Matricule)
-            ->whereRaw("YEAR(facture.Date) like ".$annee."")
+            ->join("facture","facture.Id_facture","=","pointressource.Id_facture")
+            ->where("pointressource.Matricule","=",$this->Matricule)
+            ->whereRaw("YEAR(facture.Date) = ".$annee."")
             ->selectRaw(DB::raw('COALESCE(SUM(Eng+Pospect+Client_fidel),0) as pointAn'))
             ->first()->pointAn;
             $this->pointAnnuel = $pointAnnuel;
@@ -387,9 +437,9 @@ class Personnel extends Model
             }
             $moisBis = self::$tabBis[$moisActuel]['moisBis'];
             $pointMensuel = DB::Table("pointressource")
-            ->join("facture","facture.Id_facture","like","pointressource.Id_facture")
-            ->where("pointressource.Matricule","like",$this->Matricule)
-            ->whereRaw("YEAR(facture.Date) like ".$annee."")
+            ->join("facture","facture.Id_facture","=","pointressource.Id_facture")
+            ->where("pointressource.Matricule","=",$this->Matricule)
+            ->whereRaw("YEAR(facture.Date) = ".$annee."")
             ->WhereRaw("MONTH(facture.Date) in (".$moisBis[0].",".$moisBis[1].")")
             ->selectRaw(DB::raw('COALESCE(SUM(Eng+Pospect+Client_fidel),0) as pointBis'))
             ->first()->pointBis;
@@ -444,7 +494,7 @@ class Personnel extends Model
 
     public function getNomFromMAtricule(){
         $result = self::select('Nom','Prenom')
-        ->where('Matricule','like',$this->Matricule)
+        ->where('Matricule','=',$this->Matricule)
         ->first();
         $this->Nom = $result->Nom;
         $this->Prenom = $result->Prenom;
@@ -487,8 +537,9 @@ class Personnel extends Model
             $interval = getDateInterval($nbrJour);
         }
         $facture = DB::table('facture')
-        ->where('facture.Matricule_personnel','like',$this->Matricule)
-        ->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate])
+        ->where('facture.Matricule_personnel',$this->Matricule)
+        ->whereRaw("facture.Date >= '".$interval->firstDate."'")
+        ->whereRaw("facture.Date <= '".$interval->lastDate."'")
         ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA'))
         ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
         ->join('prix', 'detailvente.ID_prix', '=', 'prix.Id');
@@ -518,8 +569,8 @@ class Personnel extends Model
             $interval = getDateInterval($nbrJour);
         }
         $facture = $this->getCABase($interval,$dateXclu)
-        ->join('mission','mission.Id_de_la_mission','like','facture.Id_de_la_mission')
-        ->where('mission.Type_de_mission','like',self::$COLUMN_TYPE_MISSION['mission'])
+        ->join('mission','mission.Id_de_la_mission','=','facture.Id_de_la_mission')
+        ->where('mission.Type_de_mission','=',self::$COLUMN_TYPE_MISSION['mission'])
         ->first();
         $CAMission = 0;
         if($facture->CA){
@@ -545,14 +596,15 @@ class Personnel extends Model
                 $interval = getDateInterval($nbrJour);
             }
             $facture = DB::table('facture')
-            ->where('facture.Matricule_personnel','like',$this->Matricule)
-            ->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate])
+            ->where('facture.Matricule_personnel','=',$this->Matricule)
+            ->whereRaw("facture.Date >= '".$interval->firstDate."'")
+        ->whereRaw("facture.Date <= '".$interval->lastDate."'")
             ->where('Produit.Code_produit','=',$Produit)
             ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA'))
             ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
             ->join('prix', 'detailvente.ID_prix', '=', 'prix.Id')
             ->join('produit', 'produit.Code_produit', '=', 'prix.Code_produit')
-            ->join('mission','mission.Id_de_la_mission','like','facture.Id_de_la_mission')
+            ->join('mission','mission.Id_de_la_mission','=','facture.Id_de_la_mission')
             ->first();
             $CAMission = 0;
             if($facture->CA){
@@ -571,8 +623,8 @@ class Personnel extends Model
             $interval = getDateInterval($nbrJour);
         }
         $facture = $this->getCABase($interval,$dateXclu)
-        ->where('mission.Type_de_mission','like',self::$COLUMN_TYPE_MISSION['local'])
-        ->join('mission','mission.Id_de_la_mission','like','facture.Id_de_la_mission')
+        ->where('mission.Type_de_mission','=',self::$COLUMN_TYPE_MISSION['local'])
+        ->join('mission','mission.Id_de_la_mission','=','facture.Id_de_la_mission')
         ->first();
         $CAMission = 0;
         if($facture->CA){
@@ -594,7 +646,8 @@ class Personnel extends Model
             //$interval = getDateInterval(self::$DAY_INTERVAL);
             $facture = DB::table('facture')
             ->where('facture.Matricule_personnel',$personnel->Matricule)
-            ->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate])
+            ->whereRaw("facture.Date >= '".$interval->firstDate."'")
+        ->whereRaw("facture.Date <= '".$interval->lastDate."'")
             ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA'))
             ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
             ->join('prix', 'detailvente.ID_prix', '=', 'prix.Id')
@@ -626,7 +679,7 @@ class Personnel extends Model
         if(isset($request->criteres)){
             $donnee = json_decode($request->criteres);
             foreach($donnee as $column => $value){
-                $conditions[] = [$column,'like',$value];
+                $conditions[] = [$column,'=',$value];
             }
         }
         $personnel = Personnel::where($conditions)

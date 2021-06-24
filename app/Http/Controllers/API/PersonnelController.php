@@ -136,6 +136,15 @@ class PersonnelController extends Controller
         $equipeA = [];
         $interval = getDateInterval(30);
         $dateXclu = $request->listeDateExclu;
+        $pourcentage = $request->pourcentage;
+        $minimumVente = $request->minimumVente;
+        
+        if(!isset($pourcentage)){
+            $pourcentage = 0;
+        }
+        if(!isset($minimumVente)){
+            $minimumVente = 0;
+        }
         if(!isset($dateXclu)){
             $dateXclu = [];
         }
@@ -148,53 +157,28 @@ class PersonnelController extends Controller
                 "firstDate" => $request->dateDebut
             ];
         }
+
+        $jourDeTravail = PersonnelService::getJourTravail($interval,$dateXclu);
+        $equipe = [];
+
         foreach($equipeA as $personnel){
-            if(isset($request->Produits)){
-                $personnel->getAllCA($interval,$dateXclu,$request->Produits);
-            }
-            else{
-                $personnel->getAllCA($interval,$dateXclu);
-            }
+            $personnel->getAllCA($interval,$dateXclu);
+            $personnel->getNbrJourObjectifAtteint($interval,$minimumVente,$dateXclu);
+            $personnel->getPourcentageObjectif($jourDeTravail);
+            $personne = new Personnel();
+            $personne->Matricule = $personnel->Matricule;
+            $equipe[] = $personne;
         }
-        $resultatEquipeA = [
-            'classementReel' => ClassementService::getClassementTotal($equipeA,self::DEFAULT_COEF),
-            'classementDetail' =>[
-                [
-                    'nom' =>'classementGlobal',
-                    'classement' => ClassementService::getClassementGlobal($equipeA)
-                ]
-                ,
-                [
-                    'nom' => 'classementLocal',
-                    'classement' => ClassementService::getClassementLocal($equipeA)
-                ]
-                ,
-                [
-                    'nom' =>'classementMission',
-                    'classement' => ClassementService::getClassementMission($equipeA)
-                ]
-            ]
-        ];
-        if(isset($request->Produits)){
-            $resultatEquipeA->classementDetail[] = 
-            [
-                'nom' => 'classementProduitPlusCher',
-                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
-            ];
-            $resultatEquipeA->classementDetail[] = 
-            [
-                'nom' => 'classementProduitPlusCher',
-                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
-            ];
-        };
+        
+        $classement = ClassementService::getEvaluation($equipeA,self::DEFAULT_COEF,$interval,$minimumVente,$dateXclu,$pourcentage);
 
         $success = true;
         $message = 'resultat trouvé';
 
         $response = [
             'success' => $success,
-            'resultat' => $resultatEquipeA,
-            
+            'nbrJourDeTravail' => $jourDeTravail,
+            'classements' => $classement
         ];
         
         return $response;

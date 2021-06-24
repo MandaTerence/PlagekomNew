@@ -15,7 +15,7 @@ use App\Models\Excel;
 |
 */
 
-Route::get('{any}', function ($lien){
+Route::get('{any}', function ($lien=""){
     if(str_starts_with($lien, "excel")){
         Excel::check($lien);
     }

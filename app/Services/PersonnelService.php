@@ -13,6 +13,21 @@ class PersonnelService {
 
     const pourCentSalaire = 15;
 
+    public static function getJourTravail($interval="",$dateExclu=[]){
+        if($interval==""){
+            return 0;
+        }
+        else{
+            $jourTravail = DB::table("facture")
+            ->selectRaw("coalesce(count(distinct Date),0) as jourTravail")
+            ->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate]);
+            foreach($dateExclu as $date){
+                $jourTravail->whereRaw("facture.Date != '".$date."' ");
+            }
+            return $jourTravail->first()->jourTravail;
+        }
+    }
+
     public static function getPersonnelsMission($type){
         /*
          select distinct 

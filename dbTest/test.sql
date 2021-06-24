@@ -1,11 +1,34 @@
 
+
+
 -- annuel: 12,13,14,15,17
 
 -- indemnite: 7,2,6,4
 
 --first day of the month
+And facture.Date between '2021-05-25' and '2021-06-24'
+
+select
+    COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA,date,Id_zone
+from facture
+join detailvente on detailvente.Facture = facture.id
+join prix on detailvente.ID_prix = prix.Id
+And facture.Date between '2021-05-25' and '2021-06-24'
+
+where facture.Matricule_personnel = 'VP00080'
+
+group By facture.date,Id_zone
+;
 
 
+
+$ventes = DB::table('facture')
+->where('facture.Matricule_personnel',$this->Matricule)
+->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate])
+->selectRaw("COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA,date,Id_zone")
+->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
+->join('prix', 'detailvente.ID_prix', '=', 'prix.Id')
+->groupBy('date','Id_zone')
 
 SELECT
     sum(detailvente.Quantite * prix.Prix_detail)

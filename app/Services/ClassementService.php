@@ -66,6 +66,32 @@ class ClassementService {
         return ($pa->CAProduit > $pb->CAProduit) ? -1 : 1;
     }
 
+    public static function getEvaluation($personnels,$coef=self::DEFAULT_COEF,$interval="",$minimumVente=0,$dateXclu=[],$taux=0){
+        foreach($personnels as $personnel){
+            $personnel->getCATotal($coef);
+        }
+        usort($personnels,'static::compareCATotal');
+        $personnelsFinal = [];
+        $personnelsNonQualifier = [];
+        for($i=0;$i<count($personnels);$i++){
+            if($personnels[$i]->pourcentageObjectif>=$taux){
+                $personnels[$i]->place = $i+1;
+                $personnels[$i]->etatVente = "Qualifier";
+                $personnelsFinal[] = $personnels[$i];
+            }
+            else{
+                $personnelsNonQualifier[] = $personnels[$i];
+            }
+        }
+        $placeActuelle = count($personnelsFinal)+1;
+        for($i=0;$i<count($personnelsNonQualifier);$i++,$placeActuelle++){
+            $personnelsNonQualifier[$i]->etatVente = "Non qualifier";
+            $personnelsNonQualifier[$i]->place = $placeActuelle;
+            $personnelsFinal[] = $personnelsNonQualifier[$i];
+        }
+        return $personnelsFinal;
+    }
+
     public static function getClassementTotal($p,$coef=self::DEFAULT_COEF){
         $personnels = $p;
         foreach($personnels as $personnel){
