@@ -159,15 +159,18 @@ class PersonnelController extends Controller
         }
 
         $jourDeTravail = PersonnelService::getJourTravail($interval,$dateXclu);
-        $equipe = [];
+        //$equipe = [];
 
         foreach($equipeA as $personnel){
             $personnel->getAllCA($interval,$dateXclu);
             $personnel->getNbrJourObjectifAtteint($interval,$minimumVente,$dateXclu);
             $personnel->getPourcentageObjectif($jourDeTravail);
+            $personnel->getNbrProduit($interval);
+            $personnel->getStatutbimestriel();
+            $personnel->getAssuidite();
             $personne = new Personnel();
             $personne->Matricule = $personnel->Matricule;
-            $equipe[] = $personne;
+            //$equipe[] = $personne;
         }
         
         $classement = ClassementService::getEvaluation($equipeA,self::DEFAULT_COEF,$interval,$minimumVente,$dateXclu,$pourcentage);

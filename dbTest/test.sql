@@ -9,13 +9,21 @@
 And facture.Date between '2021-05-25' and '2021-06-24'
 
 select
+    facture.Date
+from facture
+where facture.Matricule_personnel = 'VT00005'
+;
+
+where facture.Date between '2021-05-25' and '2021-06-24'
+
+select
     COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA,date,Id_zone
 from facture
 join detailvente on detailvente.Facture = facture.id
 join prix on detailvente.ID_prix = prix.Id
-And facture.Date between '2021-05-25' and '2021-06-24'
+And facture.Date between '2021-05-26' and '2021-06-25'
 
-where facture.Matricule_personnel = 'VP00080'
+where facture.Matricule_personnel = 'VP21317'
 
 group By facture.date,Id_zone
 ;

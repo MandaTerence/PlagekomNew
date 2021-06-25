@@ -44,7 +44,23 @@
                         </div>
                         <div v-if="showAdvancedSearch">
                             <hr/>
-                                <h3>Recherche avance</h3>
+                            <h3>Recherche avance</h3>
+                            <!--<div class="row">
+                                <button class=" col-3 col-xs-6 btn btn-secondary btn-round">
+                                    recherche par produit
+                                </button>
+                                <button class=" col-3 col-xs-6 btn btn-secondary btn-round">
+                                    intervale de date
+                                </button>
+                                <button class=" col-3 col-xs-6 btn btn-secondary btn-round">
+                                    Date a exclure
+                                </button>
+                                <button class=" col-3 col-xs-6 btn btn-secondary btn-round">
+                                    Taux de vente
+                                </button>
+                            </div>
+                            -->
+
                             <div>
                                 <hr/>
                                     <h4 v-on:click="toogleAdvancedView(0)" >Recherche par Produit</h4>
@@ -109,10 +125,6 @@
                                     <h4 v-on:click="toogleAdvancedView(3)">Taux de vente</h4>
                                 <div class="row" v-if="advancedSearchDisplay[3]">
                                     <div class="form-group col-sm-6">
-                                        <label for="tauxDeVente">minimum de vente</label>
-                                        <input class="form-control"  type="number" v-model="minimumVente" v-on:Change="changeMinimumVente">
-                                    </div>  
-                                    <div class="form-group col-sm-6">
                                         <label for="pourcentage">pourcentage</label>
                                         <input class="form-control"  type="number" v-model="pourcentage" v-on:change="changePourcentage">
                                     </div> 
@@ -127,7 +139,31 @@
                     <div class="card-body">
                         <div class="row d-flex justify-content-center" id="resultCommerciaux" >
                             <div class="table-responsive col-12" style="margin-left:25px">
-                                <EquipeTab  v-model:equipes="commerciaux" titre="Commerciaux"/>
+                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
+                                    <thead >
+                                        <tr class="bg-secondary" style="color:white">
+                                            <th class="respText" scope="col-md-2">matricule</th>
+                                            <th class="respText" scope="col-md-2 d-none">nom et prenom</th>
+                                            <th class="respText" scope="col-md-1"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="equipe in commerciaux" v-bind:key="equipe">
+                                            <td class="respText" scope="col-md-2">{{ equipe.Matricule }}</td>
+                                            <td class="respText" scope="col-md-2">{{ equipe.Nom+equipe.Prenom }}</td>
+                                            <td class="respText" scope="col-md-1">
+                                                <button class="btn btn-danger" v-on:click="remove(equipe.Matricule)">
+                                                <div class="d-none d-lg-block">
+                                                    supprimer
+                                                </diV>
+                                                <div class="d-block d-lg-none">
+                                                    X
+                                                </div>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div> 
                         </div>
                         <div class="row" >
@@ -154,30 +190,43 @@
                         <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
                             <thead >
                                 <tr class="bg-secondary" style="color:white">
+                                    <th class="respText" >Place</th>
                                     <th class="respText" >Matricule</th>
                                     <th class="respText" >Nom et Prenom</th>
-                                    <th class="respText" >Place</th>
-                                    <th class="respText" >etat</th>
-                                    <th class="respText" >CA Global</th>
-                                    <th class="respText" >taux de Vente</th>
+                                    <th class="respText" >CA Mission (en Ar)</th>
+                                    <th class="respText" >CA Local (en Ar)</th>
+                                    <th class="respText" >CA Total (en Ar)</th>
+                                    <th class="respText" >ratio de vente</th>
+                                    <th class="respText" >assuidite</th>
+                                    <th class="respText" >statut</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="personnel in classements" v-bind:key="personnel">
+                                    <td class="respText" >{{ personnel.place }}</td>
                                     <td class="respText" >{{ personnel.Matricule }}</td>
                                     <td class="respText" >{{ personnel.Nom+" "+personnel.Prenom }}</td>
-                                    <td class="respText" >{{ personnel.place }}</td>
-                                    <td class="respText" >{{ personnel.etatVente }}</td>
+                                    <td class="respText" >{{ personnel.CAMission }}</td>
+                                    <td class="respText" >{{ personnel.CALocal }}</td>
                                     <td class="respText" >{{ personnel.CAGlobal }}</td>
-                                    <td class="respText" >{{ personnel.pourcentageObjectif }}</td>
+                                    <td class="respText" >{{ personnel.pourcentageObjectif.toFixed(2) }}%</td>
+                                    <td class="respText" >{{ personnel.assuidite.toFixed(2) }}%</td>
+                                    <td class="respText" style="color:green" v-if="personnel.etatVente=='Qualifier'" >{{ personnel.etatVente }}</td>
+                                    <td class="respText" style="color:red" v-else="" >{{ personnel.etatVente }}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <button class="btn btn-secondary" v-on:click="retourClassement">retour </button>
-            <button class="btn btn-secondary" v-on:click="validateEquipe">Valider</button>
+            <div class="row">
+                <div class="col-6 d-flex justify-content-start">
+                    <button class="btn btn-secondary btn-round" v-on:click="retourClassement">retour </button>
+                </div>
+                <div class="col-6 d-flex justify-content-end">
+                     <button class="btn btn-secondary btn-round" v-on:click="validateEquipe">Valider</button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -260,6 +309,14 @@ export default {
         this.loadAdvencedSearchData();
     },
     methods: {
+        remove(matricule){
+            for( var i = 0; i < this.commerciaux.length; i++){ 
+                if ( this.commerciaux[i].Matricule ==  matricule) { 
+                    this.commerciaux.splice(i, 1);
+                    i--; 
+                }
+            }
+        },
         toogleAdvancedView(place){
             this.advancedSearchDisplay[place]=!this.advancedSearchDisplay[place];
         },
@@ -406,24 +463,57 @@ export default {
             }    
         },
         validateEquipe(){
-            if(this.coachs.length<this.maxCoach){
-                alert("il manque "+(this.maxCoach-this.coachs.length)+" coach");
-            }
-            else if(this.commerciaux.length<this.maxCommerciaux){
-                alert("il manque "+(this.maxCommerciaux-this.commerciaux.length)+" commerciaux");
-            }
-            else{
-                axios.post('/api/classements/',{matriculeCoach: this.coachs[0].Matricule,matriculeCommerciaux: this.getMatriculeAndPlaceFromArray(this.classementReel),idMission:this.idMission}).then(response => {
-                    if(response.data.success){
-                        this.showModal = false;
-                        //this.$router.push({ name: 'planning', query: { idMission: this.idMission ,coach: this.coach} });
-                    }
-                    else if(!response.data.success){
-                        alert('insertion echoué');
-                    }
-                });
-            }
+            let matricules = this.getMatriculeFromArray(this.commerciaux);
+            let produits =  this.getCodeProduitFromArray(this.produits);
+            let data = {
+                "excel":"evaluation",
+                "Matricules":matricules,
+                "Produits": produits,
+                
+                "dateDebut": this.dateDebut,
+                "dateFin": this.dateFin,
+
+                "listeDateExclu": this.listeDateExclu,
+
+                "pourcentage": this.pourcentage,
+                "minimumVente": this.minimumVente
+            };
+            data = JSON.stringify(data);
+            data ='/excel'+data
+            axios.get(data,{
+                responseType: 'blob',
+                /*
+                Matricules: matricules,
+                Produits: produits,
+                
+                dateDebut: this.dateDebut,
+                dateFin: this.dateFin,
+
+                listeDateExclu: this.listeDateExclu,
+
+                pourcentage: this.pourcentage,
+                minimumVente: this.minimumVente
+                */
+            }).then(response => {
+                
+                this.download(response);
+            });
         },
+        
+        download(data) {
+            if(!data){
+                return
+            }
+            var blob = new Blob([data.data], {type: 'application/vnd.ms-excel;charset=utf-8'})
+            var url = window.URL.createObjectURL(blob);
+            var aLink = document.createElement("a");
+            aLink.style.display = "none";
+            aLink.href = url;
+            //aLink.setAttribute("Data Template", "Data Template.xls");
+            document.body.appendChild(aLink)
+            aLink.click()
+        },
+
         getMatriculeAndPlaceFromArray(personnels){
             let matricules = [];
             for(let i=0;i<personnels.length;i++){
@@ -451,6 +541,7 @@ export default {
             let produits =  this.getCodeProduitFromArray(this.produits);
             this.classements.splice(0,this.classements.length);
             axios.get('/api/personnels/getEvaluation',{params: {
+                
                 Matricules: matricules,
                 Produits: produits,
                 
@@ -557,18 +648,10 @@ export default {
                     axios.get('/api/personnels/getFirstWhere',{params: {criteres: {Fonction_actuelle: this.idFonction,Matricule: this.matricule}}}).then(response => {
                         if(response.data.success){
                             if(response.data.personnel.Fonction_actuelle == 2){
-                                if(this.coachs.length > (this.maxCoach-1)){
-                                    alert("il existe deja un coach");
-                                }else{
-                                    this.addToCoachEquipe(response.data.personnel)
-                                    this.addEquipeFromCoach(response.data.personnel);
-                                }
+                                //this.addToCoachEquipe(response.data.personnel);
+                                this.addEquipeFromCoach(response.data.personnel);
                             }else{
-                                if(this.commerciaux.length > (this.maxCommerciaux-1)){
-                                    alert("la limite de commerciaux :"+this.maxCommerciaux+" est deja atteinte");
-                                }else{
-                                    this.addToEquipe(response.data.personnel);
-                                }
+                                this.addToEquipe(response.data.personnel);
                             }
                         }
                         else{
@@ -581,18 +664,10 @@ export default {
                     axios.get('/api/personnels/getFirstWhere',{params: {criteres: {Fonction_actuelle: element,Matricule: this.matricule}}}).then(response => {
                         if(response.data.success){
                             if(response.data.personnel.Fonction_actuelle == 2){
-                                if(this.coachs.length > (this.maxCoach-1)){
-                                    alert("il existe deja un coach");
-                                }else{
-                                    this.addToCoachEquipe(response.data.personnel)
-                                    this.addEquipeFromCoach(response.data.personnel);
-                                }
+                                //this.addToCoachEquipe(response.data.personnel)
+                                this.addEquipeFromCoach(response.data.personnel);
                             }else{
-                                if(this.commerciaux.length > (this.maxCommerciaux-1)){
-                                    alert("la limite de commerciaux :"+this.maxCommerciaux+" est deja atteinte");
-                                }else{
-                                    this.addToEquipe(response.data.personnel);
-                                }
+                                this.addToEquipe(response.data.personnel);
                             }
                         }
                     });  

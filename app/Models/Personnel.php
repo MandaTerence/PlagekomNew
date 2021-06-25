@@ -171,24 +171,35 @@ class Personnel extends Model
         $this->getNbrProduit();
     }
 
-    public function getNbrProduit(){
+    public function getNbrProduit($interval="",$dateXclu=[]){
+        $nbrJour=self::$DAY_INTERVAL;
+        if($interval==""){
+            $interval = getDateInterval($nbrJour);
+        }
         $nbrFb = DB::table("facture")
         ->selectRaw("coalesce(sum(detailvente.Quantite),0) as nbr")
         ->join("detailvente","detailvente.Facture","facture.Id")
         ->join("prix","detailvente.Id_prix","prix.Id")
-        ->whereRaw("MONTH(CURRENT_DATE()) = MONTH(Date)")
-        ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(Date)")
-        ->whereRaw("Facture.Matricule_personnel = '".$this->Matricule."' ")
-        ->first()->nbr;
+        ->whereRaw("facture.Date >= '".$interval->firstDate."'")
+        ->whereRaw("facture.Date <= '".$interval->lastDate."'")
+        ->whereRaw("Facture.Matricule_personnel = '".$this->Matricule."' ");
+        foreach($dateXclu as $dateX){
+            $nbrFb->whereRaw("facture.Date != '".$dateX."' ");
+        }
+        $nbrFb = $nbrFb->first()->nbr;
         // ->orWhereRaw("Facture.Ress_sec_oplg = '".$this->Matricule."'")
         $nbrTerrain = DB::table("facture")
         ->selectRaw("coalesce(sum(detailvente.Quantite),0) as nbr")
         ->join("detailvente","detailvente.Facture","facture.Id")
         ->join("prix","detailvente.Id_prix","prix.Id")
-        ->whereRaw("MONTH(CURRENT_DATE()) = MONTH(Date)")
-        ->whereRaw("YEAR(CURRENT_DATE()) = YEAR(Date)")
-        ->whereRaw("Facture.Ress_sec_oplg = '".$this->Matricule."'")
-        ->first()->nbr;
+        ->whereRaw("facture.Date >= '".$interval->firstDate."'")
+        ->whereRaw("facture.Date <= '".$interval->lastDate."'")
+        ->whereRaw("Facture.Ress_sec_oplg = '".$this->Matricule."'");
+        foreach($dateXclu as $dateX){
+            $nbrTerrain->whereRaw("facture.Date != '".$dateX."' ");
+        }
+        $nbrTerrain = $nbrTerrain->first()->nbr;
+
         $this->nbrProduitFb = (int)$nbrFb;
         $this->nbrProduitTerrain = (int)$nbrTerrain;
         $this->nbrProduit = $nbrTerrain + $nbrFb;
@@ -239,25 +250,30 @@ class Personnel extends Model
         ->selectRaw("DATE_SUB(Date, INTERVAL 1 DAY) as Date")
         ->where("Matricule_personnel",$this->Matricule)
         ->orderBy("Date","ASC")
-        ->first()->Date;
-        $dateFin = DB::table("facture")
-        ->selectRaw("DATE_ADD(Date, INTERVAL 1 DAY) as Date")
-        ->where("Matricule_personnel",$this->Matricule)
-        ->orderBy("Date","DESC")
-        ->first()->Date;
-        $nbrJour = (int)DB::table("facture")
-        ->selectRaw("count(distinct Date) as nbrJour")
-        ->where("Matricule_personnel",$this->Matricule)
-        ->whereRaw("'".$dateDebut."' < Date")
-        ->whereRaw("'".$dateFin."' > Date")
-        ->first()->nbrJour;
-        $nbrTravail = (int)DB::table("facture")
-        ->selectRaw("count(distinct Date) as nbrJour")
-        ->whereRaw("'".$dateDebut."' < Date")
-        ->whereRaw("'".$dateFin."' > Date")
-        ->first()->nbrJour;
-        $this->assuidite = ($nbrJour*100)/$nbrTravail;
-
+        ->first();
+        if($dateDebut){
+            $dateDebut = $dateDebut->Date;
+            $dateFin = DB::table("facture")
+            ->selectRaw("DATE_ADD(Date, INTERVAL 1 DAY) as Date")
+            ->where("Matricule_personnel",$this->Matricule)
+            ->orderBy("Date","DESC")
+            ->first()->Date;
+            $nbrJour = (int)DB::table("facture")
+            ->selectRaw("count(distinct Date) as nbrJour")
+            ->where("Matricule_personnel",$this->Matricule)
+            ->whereRaw("'".$dateDebut."' < Date")
+            ->whereRaw("'".$dateFin."' > Date")
+            ->first()->nbrJour;
+            $nbrTravail = (int)DB::table("facture")
+            ->selectRaw("count(distinct Date) as nbrJour")
+            ->whereRaw("'".$dateDebut."' < Date")
+            ->whereRaw("'".$dateFin."' > Date")
+            ->first()->nbrJour;
+            $this->assuidite = ($nbrJour*100)/$nbrTravail;
+        }
+        else{
+            $this->assuidite = 0;
+        }
         /*
         $jj = DB::table("facture")
         ->selectRaw("distinct Date")

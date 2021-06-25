@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\ClassementController;
 use App\Models\Excel;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,12 +19,9 @@ use App\Models\Excel;
 Route::get('{any}', function ($lien=""){
     if(str_starts_with($lien, "excel")){
         Excel::check($lien);
+        //var_dump($request->all());
     }
     else{
         return view('app');
     }
 })->where('any', '.*');
-
-
-Route::get('/excel', [ClassementController::class, 'create'])->name("excel");
-
