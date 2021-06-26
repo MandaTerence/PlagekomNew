@@ -1,4 +1,5 @@
-<template> 
+<template>
+
     <div v-if="!showClassements">
         <div class="panel-header bg-secondary-gradient">
             <div class="page-inner py-4">
@@ -145,25 +146,14 @@
             </div>
         </div>
     </div>
+
     <div v-if="showClassements">
         <div class="panel-header bg-secondary-gradient">
             <div class="page-inner py-4">
-                <h2 class="text-white pb-2 fw-bold">Creation d'equipe</h2>
+                <h2 class="text-white pb-2 fw-bold">Classement pour la mission {{ idMission }}</h2>
             </div>
         </div>
         <div class="page-inner">
-            <div class="row">
-                <div class="col-6 d-flex justify-content-start">
-                    <button style="margin:20px" class="btn-round btn btn-secondary " v-on:click="retourClassement">
-                        <span>retour</span>
-                    </button>
-                </div>
-                <div class="col-6 d-flex justify-content-end">
-                    <button style="margin:20px" class="btn-round btn btn-secondary d-flex justify-content-end" v-on:click="validateAllEquipe">
-                        <span>valider</span>
-                    </button>
-                </div>
-            </div>
             <div class="row">
                 <div class="col-sm-6">
                     <div class="card">
@@ -280,8 +270,21 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-6 d-flex justify-content-start">
+                    <button style="margin:20px" class="btn-round btn btn-secondary " v-on:click="retourClassement">
+                        <span>retour</span>
+                    </button>
+                </div>
+                <div class="col-6 d-flex justify-content-end">
+                    <button style="margin:20px" class="btn-round btn btn-secondary d-flex justify-content-end" v-on:click="validateAllEquipe">
+                        <span>valider</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
+
 </template>
 
 <script>

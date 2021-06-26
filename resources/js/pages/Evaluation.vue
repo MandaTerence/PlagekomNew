@@ -12,8 +12,10 @@
                 </h2>
                 <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
                 <div class="card">
+                    
                     <div class="card-body">
-                        <h3>Recherche de personnel</h3>
+                        
+                        <h3 class="text-center">Recherche de personnel</h3>
                         <hr/>
                         <div class="row" id="rechercheNormal">
                             <div class="form-group col-6 col-md-3">
@@ -44,7 +46,7 @@
                         </div>
                         <div v-if="showAdvancedSearch">
                             <hr/>
-                            <h3>Recherche avance</h3>
+                            <h3 class="text-center">Recherche avance</h3>
                             <!--<div class="row">
                                 <button class=" col-3 col-xs-6 btn btn-secondary btn-round">
                                     recherche par produit
@@ -63,7 +65,7 @@
 
                             <div>
                                 <hr/>
-                                    <h4 v-on:click="toogleAdvancedView(0)" >Recherche par Produit</h4>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(0)" >Recherche par Produit</h4>
                                 <div class="row" v-if="advancedSearchDisplay[0]">
                                     <div class="col-12">
                                         <SearchProduit v-model:produits="produits"/>
@@ -75,7 +77,7 @@
                             </div>
                             <div>
                                 <hr/>
-                                    <h4 v-on:click="toogleAdvancedView(1)">Intervale de date</h4>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(1)">Intervale de date</h4>
                                 <div class="row" v-if="advancedSearchDisplay[1]">
                                     <div class="form-group col-sm-6">
                                         <label for="inputDateDebut">date de debut</label>
@@ -89,7 +91,7 @@
                             </div>
                             <div>
                                 <hr/>
-                                    <h4 v-on:click="toogleAdvancedView(2)">Date a exclure</h4>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(2)">Date a exclure</h4>
                                 <div class="row" v-if="advancedSearchDisplay[2]">
                                     <div class="form-group col-6">
                                         <label for="inputDateDebut">date a exclure</label>
@@ -122,7 +124,7 @@
                             </div>    
                             <div>
                                 <hr/>
-                                    <h4 v-on:click="toogleAdvancedView(3)">Taux de vente</h4>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(3)">Taux de vente</h4>
                                 <div class="row" v-if="advancedSearchDisplay[3]">
                                     <div class="form-group col-sm-6">
                                         <label for="pourcentage">pourcentage</label>
@@ -186,6 +188,11 @@
             <!-- v-model:classements="classements" v-model:classementReel="classementReel"/> -->
             <div class="card">
                 <div class="card-body">
+                    <div class="row">
+                        <h4 class="col-12">
+                            total : {{ classements.length }}
+                        </h4>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
                             <thead >

@@ -5,6 +5,7 @@
     </div>
 </div>
 <div class="wrapper" v-if="isLoggedIn">
+
     <div class="main-header">
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="purple">
@@ -304,7 +305,9 @@
                     <li class="nav-item">
                         <a data-toggle="collapse" href="#dashboard" class="collapsed" aria-expanded="false">
                             <i class="fas fa-home"></i>
-                            <p>Acceuil</p>
+                            <router-link to="/">
+                                <p class="sub-item">Acceuil</p>
+                            </router-link>
                         </a>
                     </li>
                     <li v-bind:class="displaySideBar[0]['navClass']">
@@ -410,6 +413,7 @@
             </div>
         </footer>
     </div>
+
 </div>
 </template>
 
