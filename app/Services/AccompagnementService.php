@@ -122,7 +122,7 @@ class AccompagnementService {
         $Date_de_fin = $mission->Date_de_fin;
         $periods = self::date_range($Date_depart,$Date_de_fin);
         $accArray = [];
-        for($i=0;$i<count($periods);$i++){
+        /*for($i=0;$i<count($periods);$i++){
             $p = str_replace('/', '-', $periods[$i]);
             $jour = date('w', strtotime($p));
             $dateInserer = date(self::DATE_FORMAT, strtotime($p));
@@ -141,7 +141,31 @@ class AccompagnementService {
                     $accArray[] = $acc;
                 }
             }
+        }*/
+        for($i=0;$i<count($periods);$i++){
+            $p = str_replace('/', '-', $periods[$i]);
+            //$jour = date('w', strtotime($p));
+            $dateInserer = date(self::DATE_FORMAT, strtotime($p));
+            $date = date('N', strtotime($p));
+            if($date!=7){
+                foreach(self::JOUR_ACCOMPAGNEMENT as $plan){
+                    if((($i%6)+1) == $plan['Date']){
+                        $com = $classement[$plan['place']-1];
+                        $acc = [
+                            'Id_de_la_mission'=>$idMission, 
+                            'Commercial'=>$com->Commercial,
+                            'Coach'=>$coach,
+                            'Date'=>$dateInserer,
+                            'Heure_debut'=>$plan['Heure_debut'],
+                            'Heure_fin'=>$plan['Heure_fin'],
+                            'Ordre'=>$plan['Ordre']
+                        ];
+                        $accArray[] = $acc;
+                    }
+                }
+            }
         }
+
         Accompagnement::insert($accArray);
         return true;
     }
@@ -170,7 +194,7 @@ class AccompagnementService {
             $jour = date('w', strtotime($p));
             $dateInserer = date(self::DATE_FORMAT, strtotime($p));
             foreach(self::JOUR_ACCOMPAGNEMENT as $plan){
-                if($jour == $plan['Date']){
+                if(($jour == $plan['Date'])){
                     $com = $classement[$plan['place']-1];
                     $acc = [
                         'Id_de_la_mission'=>$idMission,

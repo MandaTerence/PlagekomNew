@@ -22,53 +22,57 @@
                 <h2 class="text-center"><span style="background-color:#f9fbfd">Planning du coach  {{ planningCoach.coach.Coach  }}</span></h2>
                 <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
                 <div class="row">
-                    <div class=" col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <a v-on:click="toogleDisplayEquipe()">
-                                    <div v-if="planningCoach.accompagnement.length>0" v-on:click="displayPlanning(planningCoach.coach )">
-                                        <h5>Equipe</h5>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="card-body" id="equipeList" v-if="equipeDisplay">
-                                <table class="table table-hover">
-                                    <tbody>
-                                        <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
-                                            <td class="text-center">{{ commercial.Commercial }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Planning</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row" style="margin-top:20px">
-                                    <table class="table table-hover d-flex justify-content-center" id="listePlanning"> 
+                    <div class="card col-12">
+                        <div class="card-body">
+                            <div class="card">
+                                <div class="card-header">
+                                    <a v-on:click="toogleDisplayEquipe(planningCoach.coach.Coach)">
+                                        <div style="color:#4192b5" class="d-flex justify-content-center" v-if="planningCoach.accompagnement.length>0">
+                                            <i style="margin-right: 20px;font-size: 20px;" class="fas fa-user-friends"></i>
+                                            <span>Equipe</span>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="card-body" id="equipeList" v-if="planningCoach.equipeVisibility">
+                                    <table class="table table-hover">
                                         <tbody>
-                                            <div v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
-                                                <tr class="d-flex"  style="text-align:center">
-                                                    <td class="col-12">
-                                                        <div v-on:click="toogleVisibility(planning['jour'])" >
-                                                            <h3>
+                                            <tr v-for="commercial in planningCoach.Commerciaux" v-bind:key="commercial">
+                                                <td class="text-center">{{ commercial.Commercial }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <a v-on:click="toogleDisplayPlanning(planningCoach.coach.Coach)">
+                                        <div style="color:#4192b5" class="d-flex justify-content-center" v-if="planningCoach.accompagnement.length>0">
+                                            <i style="margin-right: 20px;font-size: 20px;" class="far fa-calendar-alt"></i>
+                                            <span>Planning</span>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="card-body" v-if="planningCoach.planningVisibility">
+                                    <div class="row" style="margin-top:20px">
+                                        <table class="table table-hover d-flex justify-content-center" id="listePlanning"> 
+                                            <tbody>
+                                                <div v-for="planning in planningCoach.accompagnement" v-bind:key="planning">
+                                                    <tr class="d-flex"  style="text-align:center">
+                                                        <td class="col-12">
+                                                            <div v-on:click="toogleVisibility(planningCoach.coach.Coach,planning['jour'])" >
                                                                 <a >
                                                                     {{ getJourSemaine(planning['jour']) }}
                                                                 </a>
-                                                            </h3>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr v-if="planning.visibility==true">
-                                                    <td>
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <h3>
-                                                                    Matin
-                                                                </h3>
-                                                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary align-items-center">
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="planning.visibility==true">
+                                                        <td>
+                                                            <div class="row">
+                                                                <div class="col-12">
+                                                                    <span>Matin</span>
+                                                                </div>
+                                                                <table class="col-12">
                                                                     <thead>
                                                                         <tr>
                                                                             <th> HEURE </th>
@@ -86,10 +90,10 @@
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <h3>Apres Midi</h3>
-                                                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary align-items-center">
+                                                                <div class="col-12">
+                                                                    <span>Matin</span>
+                                                                </div>
+                                                                <table class="col-12">
                                                                     <thead>
                                                                         <tr>
                                                                             <th> HEURE </th>
@@ -108,12 +112,12 @@
                                                                     </tbody>
                                                                 </table>
                                                             </div>
-                                                        </div>
-                                                    </td>
-                                                </tr> 
-                                            </div>
-                                        </tbody>
-                                    </table>
+                                                        </td>
+                                                    </tr>
+                                                </div>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -122,7 +126,7 @@
             </div>
         </div>
         <div class="row d-flex justify-content-center">
-            <button class="col-4 btn btn-success btn-rounded" v-on:click="exporter">exporter XLS</button>
+            <button class="col-4 btn btn-success btn-rounded" v-on:click="getExcelData">exporter XLS</button>
         </div>
     </div>
 </template>
@@ -163,6 +167,32 @@ export default {
         this.loadPlanning();
     },
     methods: {
+        getExcelData(){
+            let data = {
+                "excel":"Planning",
+                "idMission":this.idMission
+            };
+            data = JSON.stringify(data);
+            data ='/excel'+data
+            axios.get(data,{
+                responseType: 'blob',
+            }).then(response => {
+                this.download(response);
+            });
+        },
+        download(data) {
+            if(!data){
+                return
+            }
+            var blob = new Blob([data.data], {type: 'application/vnd.ms-excel;charset=utf-8'})
+            var url = window.URL.createObjectURL(blob);
+            var aLink = document.createElement("a");
+            aLink.style.display = "none";
+            aLink.href = url;
+            //aLink.setAttribute("Data Template", "Data Template.xls");
+            document.body.appendChild(aLink)
+            aLink.click()
+        },
         validateEquipe(){
             let matricules = this.getMatriculeFromArray(this.commerciaux);
             let produits =  this.getCodeProduitFromArray(this.produits);
@@ -195,22 +225,41 @@ export default {
         goToPlanning(matricule){
             this.$router.push({ path: 'controleTelephonique', query: { matricule: matricule } });
         },
-        toogleVisibility(jour){
+        toogleVisibility(coach,jour){
             if(this.plannings.length>0){
-                for(let i = 0;i<this.plannings[0].accompagnement.length;i++){
-                    if(this.plannings[0].accompagnement[i]['jour'] == jour){
-                        if(this.plannings[0].accompagnement[i].visibility == true){
-                            this.plannings[0].accompagnement[i].visibility = false;
+                for(let i=0;i<this.plannings.length;i++){
+                    if(this.plannings[i].coach.Coach==coach){
+                        for(let j = 0;j<this.plannings[i].accompagnement.length;j++){
+                            if(this.plannings[i].accompagnement[j]['jour'] == jour){
+                                if(this.plannings[i].accompagnement[j].visibility == true){
+                                    this.plannings[i].accompagnement[j].visibility = false;
+                                }
+                                else{
+                                    this.plannings[i].accompagnement[j].visibility = true;
+                                }
+                            }
                         }
-                        else{
-                            this.plannings[0].accompagnement[i].visibility = true;
-                        }
+                        break;
                     }
                 }
             }
         },
-        toogleDisplayEquipe(){
-            (this.equipeDisplay==true)?this.equipeDisplay = false:this.equipeDisplay = true;
+        toogleDisplayEquipe(coach){
+            for(let i=0;i<this.plannings.length;i++){
+                if(this.plannings[i].coach.Coach==coach){
+                    (this.plannings[i].equipeVisibility==true)?this.plannings[i].equipeVisibility = false:this.plannings[i].equipeVisibility = true;
+                    break;
+                }
+            }
+        },
+        toogleDisplayPlanning(coach){
+            for(let i=0;i<this.plannings.length;i++){
+                if(this.plannings[i].coach.Coach==coach){
+                    this.plannings[i].planningVisibility;
+                    (this.plannings[i].planningVisibility==true)?this.plannings[i].planningVisibility = false:this.plannings[i].planningVisibility = true;
+                    break;
+                }
+            }
         },
         loadURLdata(){
             let urlParams = new URLSearchParams(window.location.search);
@@ -242,13 +291,6 @@ export default {
                 console.error(error);
             });
         },
-        displayPlanning(coach){
-            for(let i=0;i<this.plannings.length;i++){
-                if(this.plannings[i].coach==coach){
-                    this.plannings[i].visibility? this.plannings[i].visibility=false:this.plannings[i].visibility=true;
-                }
-            }
-        },
         loadPlanning(){
             if((this.idMission!=null)&&(this.idMission!='')&&(this.coach!=null)&&(this.coach!='')){
                 localStorage.coach = this.coach;
@@ -256,8 +298,12 @@ export default {
                 axios.get('/api/classements/planning',{params: {idMission : this.idMission,coach : this.coach}}).then(response => {
                     this.plannings = response.data.plannings;
                     if(this.plannings.length>0){
-                        for(let i=0;i<this.plannings[0].accompagnement.length;i++){
-                            this.plannings[0].accompagnement[i].visibility = false;
+                        for(let i=0;i<this.plannings.length;i++){
+                            this.plannings[i].equipeVisibility = false;
+                            this.plannings[i].planningVisibility = false;//equipeVisibility
+                            for(let j=0;j<this.plannings[i].accompagnement.length;j++){
+                                this.plannings[i].accompagnement[j].visibility = false;
+                            }
                         }
                     }
                 });  

@@ -40,32 +40,22 @@
                                 </div>
                             </div>
                             <div class="form-group col-6 col-md-3">
-                                <button class="btn btn-secondary btn-sm justify-content-center" style="margin-top:30px; margin-right:5px" v-on:click="addPersonnel">Ajouter</button>
-                                <button class="btn btn-secondary btn-sm justify-content-center" style="margin-top:30px" v-on:click="toogleAdvancedSearch"><i class="fas fa-bars" style="color:white"></i></button>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button class="btn btn-secondary justify-content-center" style="margin-top:30px; margin-right:5px" v-on:click="addPersonnel">Ajouter</button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button class="btn btn-secondary justify-content-center" style="margin-top:30px" v-on:click="toogleAdvancedSearch">Option <i class="fas fa-bars" style="color:white;margin-left:10px"></i></button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div v-if="showAdvancedSearch">
                             <hr/>
                             <h3 class="text-center">Recherche avance</h3>
-                            <!--<div class="row">
-                                <button class=" col-3 col-xs-6 btn btn-secondary btn-round">
-                                    recherche par produit
-                                </button>
-                                <button class=" col-3 col-xs-6 btn btn-secondary btn-round">
-                                    intervale de date
-                                </button>
-                                <button class=" col-3 col-xs-6 btn btn-secondary btn-round">
-                                    Date a exclure
-                                </button>
-                                <button class=" col-3 col-xs-6 btn btn-secondary btn-round">
-                                    Taux de vente
-                                </button>
-                            </div>
-                            -->
-
                             <div>
                                 <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(0)" >Recherche par Produit</h4>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(0)" ><i class="fas fa-dolly-flatbed " style="margin-right:10px"></i>Recherche par Produit</h4>
                                 <div class="row" v-if="advancedSearchDisplay[0]">
                                     <div class="col-12">
                                         <SearchProduit v-model:produits="produits"/>
@@ -77,7 +67,7 @@
                             </div>
                             <div>
                                 <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(1)">Intervale de date</h4>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(1)"><i class="far fa-calendar-alt " style="margin-right:10px"></i>Intervale de date</h4>
                                 <div class="row" v-if="advancedSearchDisplay[1]">
                                     <div class="form-group col-sm-6">
                                         <label for="inputDateDebut">date de debut</label>
@@ -91,7 +81,7 @@
                             </div>
                             <div>
                                 <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(2)">Date a exclure</h4>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(2)"><i class="far fa-calendar-times " style="margin-right:10px"></i>Date a exclure</h4>
                                 <div class="row" v-if="advancedSearchDisplay[2]">
                                     <div class="form-group col-6">
                                         <label for="inputDateDebut">date a exclure</label>
@@ -124,12 +114,12 @@
                             </div>    
                             <div>
                                 <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(3)">Taux de vente</h4>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(3)"><i class="far fas fa-chart-bar " style="margin-right:10px"></i> Taux de vente</h4>
                                 <div class="row" v-if="advancedSearchDisplay[3]">
                                     <div class="form-group col-sm-6">
                                         <label for="pourcentage">pourcentage</label>
                                         <input class="form-control"  type="number" v-model="pourcentage" v-on:change="changePourcentage">
-                                    </div> 
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -185,7 +175,6 @@
             </div>
         </div>
         <div class="page-inner"> 
-            <!-- v-model:classements="classements" v-model:classementReel="classementReel"/> -->
             <div class="card">
                 <div class="card-body">
                     <div class="row">
