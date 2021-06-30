@@ -261,6 +261,45 @@ class AccompagnementService {
         return $jours;
     }
 
+    public static function completeSunday($accompagnements){
+        $final = [];
+        foreach ($accompagnements as $accs) {
+            $final[] = $accs;
+            if(date('w', strtotime($accs["jour"]))==6){
+                $dimanche = [
+                    'Coach'=>$accs["Coach"],
+                    'jour'=>date('Y-m-d', strtotime("+1 day", strtotime($accs["jour"]))),
+                    'matin'=>[
+                        [
+                            'Commercial'=>"-",
+                            'Heure_debut'=>$accs["matin"][0]["Heure_debut"],
+                            'Heure_fin'=>$accs["matin"][0]["Heure_fin"]
+                        ],
+                        [
+                            'Commercial'=>"-",
+                            'Heure_debut'=>$accs["matin"][1]["Heure_debut"],
+                            'Heure_fin'=>$accs["matin"][1]["Heure_fin"]
+                        ]    
+                    ],
+                    'apresMidi'=>[
+                        [
+                            'Commercial'=>"-",
+                            'Heure_debut'=>$accs["apresMidi"][0]["Heure_debut"],
+                            'Heure_fin'=>$accs["apresMidi"][0]["Heure_fin"]
+                        ],
+                        [
+                            'Commercial'=>"-",
+                            'Heure_debut'=>$accs["apresMidi"][1]["Heure_debut"],
+                            'Heure_fin'=>$accs["apresMidi"][1]["Heure_fin"]
+                        ]
+                    ]
+                ];
+                $final[] = $dimanche;
+            }
+        }
+        return $final;
+    }
+
     public static function toFormatParJourAcc($acc){
         $jour=[
             'Coach'=>$accs[$i]->Coach,

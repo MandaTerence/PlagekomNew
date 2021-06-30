@@ -39,9 +39,11 @@ class ClassementController extends Controller
             if(isset($coachs)){
                 foreach($coachs as $coach){
                     $acc = Accompagnement::getFromMissionAndCoach($idMission,$coach->Coach);
+                    $acc = AccompagnementService::toFormatParJour($acc);
+                    $acc = AccompagnementService::completeSunday($acc);
                     $accParJour[] = [
                         "coach"=>$coach,
-                        "accompagnement"=>AccompagnementService::toFormatParJour($acc),
+                        "accompagnement"=>$acc,
                         "Commerciaux"=>Accompagnement::getCommerciaux($idMission,$coach->Coach)
                     ];
                 }

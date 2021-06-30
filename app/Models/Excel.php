@@ -28,14 +28,13 @@ class Excel extends Model
         'produit' => []
     ];
     const DATE_JOUR = [
-        'Lundi',
+        'Dimanche',
         'Lundi',
         'Mardi',
         'Mercredi',
         'Jeudi',
         'Vendredi',
         'Samedi',
-        'Dimanche'
     ];
 
     public static function check($lien)
@@ -71,13 +70,14 @@ class Excel extends Model
         if(isset($coachs)){
             foreach($coachs as $coach){
                 $acc = Accompagnement::getFromMissionAndCoach($idMission,$coach->Coach);
+                $acc = AccompagnementService::toFormatParJour($acc);
+                $acc = AccompagnementService::completeSunday($acc);
                 $accParJour[] = [
                     "coach"=>$coach,
-                    "accompagnement"=>AccompagnementService::toFormatParJour($acc)
+                    "accompagnement"=>$acc
                 ];
             }
         }
-        $accParJour;
         $excel = "\t\t PLANNING D'ACCOMPAGNEMENT ".$idMission."\n\n";
         $excel .= "ACCOMPAGNEMENT - MATIN\t\tHeure de debut\t08:30:00\t10:30:00\t08:30:00\t10:30:00\n";
         $excel .= "\t\tHeure de fin\t10:00:00\t12:00:00\t10:00:00\t12:00:00\n";
@@ -85,8 +85,89 @@ class Excel extends Model
         $excel .= "\t\tHeure de fin\t16:00:00\t18:00:00\t16:00:00\t18:00:00\n\n";
         $excel .= "DATE DE LA MISSION\t\tDate de depart\t".$depart."\t".$depart."\t".$depart."\t".$depart."\n";
         $excel .= "\t\tDate de fin\t".$fin."\t".$fin."\t".$fin."\t".$fin."\n\n";
+
         foreach($accParJour as $acc){
-            $excel .= "Coach\t\t".$acc["coach"]->Coach."\n";
+            $excel .= "Coach\t\t".$acc["coach"]->Coach."\t\t\t\t\n";
+            foreach($acc["accompagnement"] as $plan){
+                $d = date('w', strtotime($plan["jour"]));
+                $date = self::getDate($d);
+                $mat1 = $plan["matin"][0]["Commercial"];
+                $mat2 = $plan["matin"][1]["Commercial"];
+                $ap1 = $plan["apresMidi"][0]["Commercial"];
+                $ap2 = $plan["apresMidi"][1]["Commercial"];
+                $excel .= $date."\t".$plan["jour"]."\t".$idMission."\t".$mat1."\t".$mat2."\t".$ap1."\t".$ap2."\n";
+            }
+        }
+
+        header("Content-disposition: attachment; filename=plannings.xls");
+        print $excel;
+    }
+
+    public static function getPlanningOld($data){
+        $idMission = $data->idMission;
+        $coachs = Accompagnement::getCoachsFromMission($idMission);
+        $accParJour = [];
+        $mission = Mission::getFirst([["Id_de_la_mission",$idMission]]);
+        $depart = $mission->Date_depart;
+        $fin = $mission->Date_de_fin;
+        if(isset($coachs)){
+            foreach($coachs as $coach){
+                $acc = Accompagnement::getFromMissionAndCoach($idMission,$coach->Coach);
+                $acc = AccompagnementService::toFormatParJour($acc);
+                $acc = AccompagnementService::completeSunday($acc);
+                $accParJour[] = [
+                    "coach"=>$coach,
+                    "accompagnement"=>$acc
+                ];
+            }
+        }
+        $excel = "\t\t PLANNING D'ACCOMPAGNEMENT ".$idMission."\n\n";
+        $excel .= "ACCOMPAGNEMENT - MATIN\t\tHeure de debut\t08:30:00\t10:30:00\t08:30:00\t10:30:00\n";
+        $excel .= "\t\tHeure de fin\t10:00:00\t12:00:00\t10:00:00\t12:00:00\n";
+        $excel .= "ACCOMPAGNEMENT - APRES MIDI\t\tHeure de debut\t14:30:00\t16:30:00\t14:30:00\t16:30:00\n";
+        $excel .= "\t\tHeure de fin\t16:00:00\t18:00:00\t16:00:00\t18:00:00\n\n";
+        $excel .= "DATE DE LA MISSION\t\tDate de depart\t".$depart."\t".$depart."\t".$depart."\t".$depart."\n";
+        $excel .= "\t\tDate de fin\t".$fin."\t".$fin."\t".$fin."\t".$fin."\n\n";
+        $excelRow = [
+            "date" => "aucun",
+            "row" => "Coach\t\t"
+        ];
+
+        foreach($accParJour as $acc){
+            $excelRow[0]["row"] .=$acc["coach"]->Coach."\t\t\t\t";
+        }
+        $excelRow[0]["row"] .="\n";
+
+        foreach($accParJour[0]["accompagnement"] as $acc){
+            $excelRow[] = $plan["jour"];
+            $d = date('w', strtotime($plan["jour"]));
+            $date = self::getDate($d);
+            $excelRow[] = [
+                "date" => $plan["jour"],
+                "row" =>$date."\t".$plan["jour"]."\t"
+            ];
+        }
+        foreach($excelRow as $row){
+            foreach($accParJour as $acc){
+                foreach($acc["accompagnement"] as $plan){
+                    if($plan["jour"]==$row["date"]){
+
+                        $d = date('w', strtotime($plan["jour"]));
+                        $date = self::getDate($d);
+                        $mat1 = $plan["matin"][0]["Commercial"];
+                        $mat2 = $plan["matin"][1]["Commercial"];
+                        $ap1 = $plan["apresMidi"][0]["Commercial"];
+                        $ap2 = $plan["apresMidi"][1]["Commercial"];
+
+                        $row["row"] .="\t".$idMission."\t".$mat1."\t".$mat2."\t".$ap1."\t".$ap2."\n";
+
+                        break;
+                    }
+                }
+            }
+        }
+        foreach($accParJour as $acc){
+            $excel .= "Coach\t\t".$acc["coach"]->Coach."\t\t\t\t\n";
             foreach($acc["accompagnement"] as $plan){
                 $d = date('w', strtotime($plan["jour"]));
                 $date = self::getDate($d);

@@ -8,7 +8,7 @@
         <div class="card">
             <div class="card-header">
                 <div class="row">
-                    <div class="input-group col-12">
+                    <div class="input-group col-6">
                         <input type="text" class="form-control" v-model="matricule" >
                         <div class="input-group-prepend">
                             <button type="submit" class="btn btn-secondary" v-on:click="reloadPersonnel">
@@ -17,11 +17,11 @@
                             </button>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        {{ hideZero }}
-                        <input type="checkbox" class="checkbox" v-model="hideZero" v-on:click="reloadPersonnel">
+                    <div class="col-3">
+                        <input type="date" v-model="mois">
+                    </div>
+                    <div class="col-3">
+                        <input type="date" v-model="mois">
                     </div>
                 </div>
             </div>
@@ -63,6 +63,7 @@ export default {
             matricule: '',
             personnels:[],
             personnelsSave:[],
+            mois: "",
             hideZero: false
         }
     },

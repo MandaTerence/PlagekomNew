@@ -177,7 +177,6 @@ class PersonnelController extends Controller
 
         $success = true;
         $message = 'resultat trouvé';
-
         $response = [
             'success' => $success,
             'nbrJourDeTravail' => $jourDeTravail,
