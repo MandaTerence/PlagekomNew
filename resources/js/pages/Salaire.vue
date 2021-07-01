@@ -7,21 +7,19 @@
     <div class="page-inner">
         <div class="card">
             <div class="card-header">
-                <div class="row">
+                <div class="row d-flex justify-content-end">
+                    <div class="col-6">
+                        <label>Mois</label>
+                        <month-picker-input v-bind:default-month="dateNow.getMonth()" v-bind:default-year="dateNow.getFullYear()" style="z-index:10" class="col-6" @change="showDate" @input="true"></month-picker-input>
+                    </div>
                     <div class="input-group col-6">
-                        <input type="text" class="form-control" v-model="matricule" >
+                        <input type="text" class="form-control" v-model="matricule" placeholder="matricule">
                         <div class="input-group-prepend">
                             <button type="submit" class="btn btn-secondary" v-on:click="reloadPersonnel">
                                 <span class="resptext">rechercher</span>
                                 <i style="margin-left:5px;font-size:15px" class="fas fa-search"></i>
                             </button>
                         </div>
-                    </div>
-                    <div class="col-3">
-                        <input type="date" v-model="mois">
-                    </div>
-                    <div class="col-3">
-                        <input type="date" v-model="mois">
                     </div>
                 </div>
             </div>
@@ -56,14 +54,17 @@
 </template>
 
 <script>
+import { MonthPickerInput } from 'vue-month-picker'
+
 export default {
     name: "Salaire",
     data() {
         return {
+            dateNow: new Date(),
+            mois: '',
             matricule: '',
             personnels:[],
             personnelsSave:[],
-            mois: "",
             hideZero: false
         }
     },
@@ -74,18 +75,42 @@ export default {
         next();
     },
     created() {
+        alert(this.dateNow.getMonth()+" "+this.dateNow.getFullYear());
         this.loadAllSalaire();
         this.reloadPersonnel();
     },
     methods: {
-        test(){
-            alert("test");
-        },
+        showDate (date) {
+            var mon = date.month;
+            var year = date.year;
+            var dat = this.getMonthDays(mon+" "+year);
+            this.mois = dat;
+		},
         loadAllSalaire(){
             axios.get('/api/personnels/getAllSalaire').then(response => {
                 this.personnels = response.data.personnels;
                 this.personnelsSave = response.data.personnels;
             });
+        },
+        getMonthDays(MonthYear) {
+            var months = [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December'
+            ];
+
+            var Value=MonthYear.split(" ");      
+            var month = (months.indexOf(Value[0]) + 1);      
+            return new Date(Value[1], month, 1).toISOString().slice(0, 10);
         },
         reloadPersonnel(){
             if(this.matricule.length>1){
@@ -104,6 +129,10 @@ export default {
                 this.personnels = this.personnelsSave;
             }
         }
-    }
+    },
+    components: {
+		MonthPickerInput
+	}
 }
+
 </script>

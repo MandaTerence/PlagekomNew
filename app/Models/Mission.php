@@ -26,6 +26,11 @@ class Mission extends Model
         'Statut',
     ];
 
+    public static function getAllTypes(){
+        return DB::table("type_mission")
+        ->get();
+    }
+
     public static function getAllId($conditions=[],$resultNumber=self::DEFAULT_MAX_RESULT){
         return self::select('Id_de_la_mission')
         ->where($conditions)

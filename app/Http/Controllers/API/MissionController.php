@@ -50,4 +50,25 @@ class MissionController extends Controller
             return $response;
         }
     }
+
+    public function getAllTypesMission(){
+        try{
+            $typeMissions = Mission::getAllTypes();
+            $response = 
+            [
+                'success'=> true,
+                'message'=> count($typeMissions).' results founds',
+                'missions'=> $typeMissions,
+            ];
+            return $response;
+        } 
+        catch (\Illuminate\Database\QueryException $exception) {
+            $response = 
+            [
+                'success'=> false,
+                'message'=> $exception->errorInfo
+            ];
+            return $response;
+        }
+    }
 }

@@ -12,9 +12,96 @@
                 </h2>
                 <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
                 <div class="card">
-                    
                     <div class="card-body">
-                        
+                        <div v-if="showAdvancedSearch">
+                            <hr/>
+                            <h3 class="text-center">Recherche avance</h3>
+                            <div>
+                                <hr/>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(0)" ><i class="fas fa-dolly-flatbed " style="margin-right:10px"></i>Parametre de la mission</h4>
+                                <div id="choixMission" class="row">
+                                    <div class="form-group col-4">
+                                        <label for="inputMission">Type de mission</label>
+                                        <select class="form-control " id="inputMission" v-model="idMission" v-on:change="changeIdMission">
+                                            <option v-bind:key="mission.Id" v-bind:value="mission.Id" v-for="mission in missions">{{ mission.designation }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <hr/>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(0)" ><i class="fas fa-dolly-flatbed " style="margin-right:10px"></i>Produit utilisé durant la mission</h4>
+                                <div class="row" v-if="advancedSearchDisplay[0]">
+                                    <div class="col-12">
+                                        <SearchProduit v-model:produits="produits"/>
+                                    </div>
+                                    <div class="col-12">
+                                        <ProduitTab v-model:produits="produits"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <hr/>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(1)"><i class="far fa-calendar-alt " style="margin-right:10px"></i>Intervale de date a analyser</h4>
+                                <div class="row" v-if="advancedSearchDisplay[1]">
+                                    <div class="form-group col-sm-4">
+                                        <label for="inputDateDebut">date de debut</label>
+                                        <input class="form-control"  type="Date" placeholder="date debut" v-model="dateDebut">
+                                    </div>
+                                    <div class="form-group col-sm-4">
+                                        <label for="inputDateFin">date de fin</label>
+                                        <input class="form-control"  type="Date" placeholder="date fin" v-model="dateFin">
+                                    </div> 
+                                    <div class="form-group col-sm-4">
+                                        <label for="totalJour">Nbr de jours a analyser</label>
+                                        <span class="form-control" id="totalJour">{{ nbrDeJourIntervale }} jours d'intervale</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <hr/>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(2)"><i class="far fa-calendar-times " style="margin-right:10px"></i>Date a exclure de l'analyse</h4>
+                                <div class="row" v-if="advancedSearchDisplay[2]">
+                                    <div class="form-group col-6">
+                                        <label for="inputDateDebut">date a exclure</label>
+                                        <input class="form-control"  type="Date" placeholder="date debut" v-model="dateExclu">    
+                                    </div>
+                                    <div class="form-group col-6">
+                                        <button v-on:click="addDateExclu()" class="btn btn-secondary form-control" style="margin-top:30px">
+                                            Ajouter
+                                        </button>
+                                    </div>
+                                    <div class="col-12 table-responsive">
+                                        <table class="table table-hover">
+                                            <thead >
+                                                <tr v-if="listeDateExclu.length>0" class="bg-secondary" style="color:white">
+                                                    <th scope="col-2">date</th>
+                                                    <th scope="col-2"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="date in listeDateExclu" v-bind:key="date">
+                                                    <td scope="col-md-2">{{ date }}</td>
+                                                    <td scope="col-md-2">
+                                                        <button class="btn btn-danger" v-on:click="removeDateExclu(date)">supprimer</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>    
+                            <div>
+                                <hr/>
+                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(3)"><i class="far fas fa-chart-bar " style="margin-right:10px"></i>Critères de vente</h4>
+                                <div class="row" v-if="advancedSearchDisplay[3]">
+                                    <div class="form-group col-sm-6">
+                                        <label for="pourcentage">pourcentage minimale de vente par jour</label>
+                                        <input class="form-control"  type="number" v-model="pourcentage" v-on:change="changePourcentage">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <h3 class="text-center">Recherche de personnel</h3>
                         <hr/>
                         <div class="row" id="rechercheNormal">
@@ -50,77 +137,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-if="showAdvancedSearch">
-                            <hr/>
-                            <h3 class="text-center">Recherche avance</h3>
-                            <div>
-                                <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(0)" ><i class="fas fa-dolly-flatbed " style="margin-right:10px"></i>Recherche par Produit</h4>
-                                <div class="row" v-if="advancedSearchDisplay[0]">
-                                    <div class="col-12">
-                                        <SearchProduit v-model:produits="produits"/>
-                                    </div>
-                                    <div class="col-12">
-                                        <ProduitTab v-model:produits="produits"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(1)"><i class="far fa-calendar-alt " style="margin-right:10px"></i>Intervale de date</h4>
-                                <div class="row" v-if="advancedSearchDisplay[1]">
-                                    <div class="form-group col-sm-6">
-                                        <label for="inputDateDebut">date de debut</label>
-                                        <input class="form-control"  type="Date" placeholder="date debut" v-model="dateDebut">
-                                    </div>
-                                    <div class="form-group col-sm-6">
-                                        <label for="inputDateFin">date de fin</label>
-                                        <input class="form-control"  type="Date" placeholder="date fin" v-model="dateFin">
-                                    </div>  
-                                </div>
-                            </div>
-                            <div>
-                                <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(2)"><i class="far fa-calendar-times " style="margin-right:10px"></i>Date a exclure</h4>
-                                <div class="row" v-if="advancedSearchDisplay[2]">
-                                    <div class="form-group col-6">
-                                        <label for="inputDateDebut">date a exclure</label>
-                                        <input class="form-control"  type="Date" placeholder="date debut" v-model="dateExclu">    
-                                    </div>
-                                    <div class="form-group col-6">
-                                        <button v-on:click="addDateExclu()" class="btn btn-secondary form-control" style="margin-top:30px">
-                                            Ajouter
-                                        </button>
-                                    </div>
-                                    <div class="col-12 table-responsive">
-                                        <table class="table table-hover">
-                                            <thead >
-                                                <tr v-if="listeDateExclu.length>0" class="bg-secondary" style="color:white">
-                                                    <th scope="col-2">date</th>
-                                                    <th scope="col-2"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="date in listeDateExclu" v-bind:key="date">
-                                                    <td scope="col-md-2">{{ date }}</td>
-                                                    <td scope="col-md-2">
-                                                        <button class="btn btn-danger" v-on:click="removeDateExclu(date)">supprimer</button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>    
-                            <div>
-                                <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(3)"><i class="far fas fa-chart-bar " style="margin-right:10px"></i> Taux de vente</h4>
-                                <div class="row" v-if="advancedSearchDisplay[3]">
-                                    <div class="form-group col-sm-6">
-                                        <label for="pourcentage">pourcentage</label>
-                                        <input class="form-control"  type="number" v-model="pourcentage" v-on:change="changePourcentage">
-                                    </div>
-                                </div>
+                        <div class="row" >
+                            <div class="col-12 text-center">
+                                <button class="btn btn-primary btn-rounded" v-on:click="getClassement">Proposer</button>
                             </div>
                         </div>
                     </div>
@@ -129,6 +148,7 @@
                 <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
                 <div class="card">
                     <div class="card-body">
+                        <!--
                         <div class="row d-flex justify-content-center" id="resultCommerciaux" >
                             <div class="table-responsive col-12" style="margin-left:25px">
                                 <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
@@ -157,7 +177,7 @@
                                     </tbody>
                                 </table>
                             </div> 
-                        </div>
+                        </div>-->
                         <div class="row" >
                             <div class="col-12 text-right">
                                 <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
@@ -240,7 +260,7 @@ export default {
         return {
             isSearchingAutoComplete: false,
             showClassements: false,
-            showAdvancedSearch: false,
+            showAdvancedSearch: true,
             maxCoach:1,
             maxCommerciaux:8,
             showModal: false,
@@ -296,6 +316,11 @@ export default {
             else{
                 return "B";
             }
+        },
+        nbrDeJourIntervale: function() {
+            var Difference_In_Time = new Date(this.dateFin).getTime() - new Date(this.dateDebut).getTime();
+            var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+            return Difference_In_Days;
         }
     },
     created() {
@@ -408,12 +433,12 @@ export default {
             (this.showAdvancedSearch)?this.showAdvancedSearch = false: this.showAdvancedSearch = true;
         },
         loadMissions(){
-            this.$axios.get('/api/missions',{params: {criteres: {Statut: 'En_cours'}}}) 
+            this.$axios.get('/api/missions/getAllTypesMission') 
             .then(response => {
                 if(response.data.success){
                     this.missions = response.data.missions;
-                    this.idMission = this.missions[0].Id_de_la_mission;
-                    this.loadTauxVente();
+                    this.idMission = this.missions[0].Id;
+                    //this.loadTauxVente();
                 }
                 else{
                     console.log(response.data.message);
