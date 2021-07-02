@@ -37,7 +37,6 @@ Route::group(['prefix' => 'missions', 'middleware' => 'auth:sanctum'], function 
     Route::get('/getAllTypesMission', [MissionController::class, 'getAllTypesMission']);
 });
 
-
 Route::group(['prefix' => 'personnels', 'middleware' => 'auth:sanctum'], function () {
     Route::get('/', [PersonnelController::class, 'index']);
     Route::get('/getFirstWhere', [PersonnelController::class, 'getFirstWhere']);
@@ -52,6 +51,7 @@ Route::group(['prefix' => 'personnels', 'middleware' => 'auth:sanctum'], functio
     Route::get('/getPersonnelEnMission', [PersonnelController::class, 'getPersonnelEnMission']);
     Route::get('/getPersonnelLocaux', [PersonnelController::class, 'getPersonnelLocaux']);
     Route::get('/getAllSalaire', [PersonnelController::class, 'getAllSalaire']);
+    Route::get('/getProposition', [PersonnelController::class, 'getProposition']);
 });
 
 Route::group(['prefix' => 'equipe', 'middleware' => 'auth:sanctum'], function () {

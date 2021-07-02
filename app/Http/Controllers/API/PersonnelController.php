@@ -132,6 +132,30 @@ class PersonnelController extends Controller
         return $response;
     }
 
+    public function getProposition(Request $request){
+        $interval = getDateInterval(30);
+        $idType = $request->idType;
+        $pourcentage = $request->pourcentage;
+        $dateExclus = [];
+        if($request->listeDateExclu){
+            $dateExclus = $request->listeDateExclu;
+        }
+        if((isset($request->dateDebut))&&(isset($request->dateFin))){
+            $interval = (object) [
+                "lastDate" => $request->dateFin,
+                "firstDate" => $request->dateDebut
+            ];
+        }
+        $jourTravail = PersonnelService::getJourTravail($interval,$dateExclus);
+        return [
+            "mission" => Personnel::getProposition($idType,$interval,$pourcentage,$dateExclus),
+            "interval" => $interval,
+            "idType" => $idType,
+            "dateExclu" => $dateExclus,
+            "jourTravail" => $jourTravail
+        ];
+    }
+
     public function getEvaluation(Request $request){
         $equipeA = [];
         $interval = getDateInterval(30);
@@ -163,7 +187,7 @@ class PersonnelController extends Controller
 
         foreach($equipeA as $personnel){
             $personnel->getAllCA($interval,$dateXclu);
-            $personnel->getNbrJourObjectifAtteint($interval,$minimumVente,$dateXclu);
+            $personnel->getNbrJourObjectifAtteint($interval,$dateXclu);
             $personnel->getPourcentageObjectif($jourDeTravail);
             $personnel->getNbrProduit($interval);
             $personnel->getStatutbimestriel();
@@ -173,7 +197,7 @@ class PersonnelController extends Controller
             //$equipe[] = $personne;
         }
         
-        $classement = ClassementService::getEvaluation($equipeA,self::DEFAULT_COEF,$interval,$minimumVente,$dateXclu,$pourcentage);
+        $classement = ClassementService::getEvaluation($equipeA,self::DEFAULT_COEF,$interval,$dateXclu,$pourcentage);
 
         $success = true;
         $message = 'resultat trouvé';

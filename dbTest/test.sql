@@ -1,4 +1,36 @@
 
+select
+*
+from
+    detailmission
+limit
+20;
+
+select 
+    MISSION.Date_de_fin
+from 
+    detailmission
+JOIN MISSION on MISSION.Id_de_la_mission = detailmission.Id_de_la_mission
+where
+    personnel like 'VP21216'
+ORDER BY MISSION.Date_de_fin ASC
+limit 1;
+
+
+select
+    Date_depart,Date_de_fin
+from mission
+where (
+    Date_depart >= '2020-06-17' AND
+    Date_depart <= '2020-07-31'
+)
+OR(
+    Date_de_fin >= '2020-06-17' AND
+    Date_de_fin <= '2020-07-31'
+)
+;
+
+
 
 
 -- annuel: 12,13,14,15,17

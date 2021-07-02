@@ -139,7 +139,7 @@
                         </div>
                         <div class="row" >
                             <div class="col-12 text-center">
-                                <button class="btn btn-primary btn-rounded" v-on:click="getClassement">Proposer</button>
+                                <button class="btn btn-primary btn-rounded" v-on:click="getProposition">Proposer</button>
                             </div>
                         </div>
                     </div>
@@ -374,15 +374,16 @@ export default {
             }
         },
         loadTauxVente(){
+            /*
             if(this.idMission){
                 axios.get('/api/missions/getTaux',{params: {idMission: this.idMission}}).then(response => {
                     this.minimumVente = response.data.taux;
                 });
-            }
+            }*/
         },
         changeIdMission(){
-            alert("Vous avez choisit la mission : "+this.idMission);
-            this.loadTauxVente();
+            //alert("Vous avez choisit la mission : "+this.idMission);
+            //this.loadTauxVente();
         },
         toogleAvtiveTeamButton(team){
             if(team==1){
@@ -557,15 +558,28 @@ export default {
             }
             return codeProduits;
         },
+        getProposition(){
+            axios.get('/api/personnels/getProposition',{params: {
+
+                idType: this.idMission,
+                dateDebut: this.dateDebut,
+                dateFin: this.dateFin,
+
+                listeDateExclu: this.listeDateExclu,
+
+            }}).then(response => { 
+                
+            });
+        },
         getClassement(){
             let matricules = this.getMatriculeFromArray(this.commerciaux);
             let produits =  this.getCodeProduitFromArray(this.produits);
             this.classements.splice(0,this.classements.length);
             axios.get('/api/personnels/getEvaluation',{params: {
-                
+
                 Matricules: matricules,
                 Produits: produits,
-                
+
                 dateDebut: this.dateDebut,
                 dateFin: this.dateFin,
 

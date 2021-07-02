@@ -10,8 +10,11 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\Facture;
 use App\Models\Produit;
+use App\Models\Mission;
 use App\Models\Accompagnement;
 use App\Models\Controle;
+use App\Services\ClassementService;
+use App\Services\PersonnelService;
 
 class Personnel extends Model
 {
@@ -24,6 +27,15 @@ class Personnel extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
+    const DEFAULT_COEF = [
+        'global' => 5,
+        'local' => 2,
+        'mission' => 1,
+        'produitPlusCher' => 1,
+        'produitMoinsCher' => 1,
+        'produit' => []
+    ];
+
     public static $tabBis = [
         ['moisBis'=>[11,12]],
         ['moisBis'=>[11,12]],
@@ -73,6 +85,117 @@ class Personnel extends Model
         "mission"=>"MISSION"
     ];
 
+    public static function getPersonnelEnMission(){
+        $personnelEnMission = [];
+        $missionEncours = Mission::where('Statut','En_cours')
+        ->get();
+        foreach($missionEncours as $mission){
+            $personnels = $mission->selectPersonnelFromMission()->get();
+            foreach($personnels as $personnel){
+                if((!in_array($personnel,$personnelEnMission))&&(!str_starts_with($personnel->personnel, 'COTN'))&&(!str_starts_with($personnel->personnel, 'COTN'))){
+                    $p = new Personnel;
+                    $p->Matricule = $personnel->personnel;
+                    $personnelEnMission[] = $p;
+                }
+            }
+        }
+        return $personnelEnMission;
+    }
+
+    public function checkIfEnMission(){
+        $dernierJour = DB::table("detailmission")
+        ->join('MISSION','MISSION.Id_de_la_mission','=','detailmission.Id_de_la_mission')
+        ->selectRaw('MISSION.Date_de_fin as fin')
+        ->where('personnel',$this->Matricule)
+        ->orderBy('MISSION.Date_de_fin','DESC')
+        ->limit(1)
+        ->first()->fin;
+        $this->auRepos = (strtotime($dernierJour) < strtotime('now'));
+        $this->dernierJourTravail = $dernierJour;
+        return $this->auRepos;
+    }
+
+    public static function getProposition($idtypeMission,$interval,$taux,$dateExclus=[]){
+        
+        $ClassementFinal = [];
+
+        $PersonnelSurMissionDansInterval = [];
+        $personnelEnMission = self::getPersonnelEnMission();
+
+        $missionDansInterval =  MISSION::getMissionTypeBetween($idtypeMission,$interval);
+        $jourDeTravail = PersonnelService::getJourTravail($interval,$dateExclus);
+        
+        foreach($missionDansInterval as $mission){
+            $personnels = $mission->selectPersonnelFromMission()->get();
+            foreach($personnels as $personnel){
+                $p = new Personnel;
+                $p->Matricule = $personnel->personnel;
+                if((!in_array($p,$personnelEnMission))&&(!in_array($p, $PersonnelSurMissionDansInterval))&&(!str_starts_with($personnel->personnel, 'COTN'))&&(!str_starts_with($personnel->personnel, 'cotn'))){
+                    //$p->getSelonTypeMission($idtypeMission,$interval,$dateExclus);
+                    //$p->getNbrJourObjectifAtteint($interval,$dateExclus);
+                    $PersonnelSurMissionDansInterval[] = $p;
+                }
+            }
+        }
+
+        $personnelPrimaire = $PersonnelSurMissionDansInterval;
+        $personnelSecondaire = self::getPersonnelSurInterval($interval,$PersonnelSurMissionDansInterval,$personnelEnMission,$dateExclus);
+
+        foreach($personnelSecondaire as $p){
+            $p->test="secondaire";
+        }
+        foreach($personnelPrimaire as $p){
+            $p->test="primaire";
+        }
+        return $personnelPrimaire;
+        /*
+        $ClassementFinal = self::ajouterDansClassements($interval,$dateExclus,$personnelPrimaire,$ClassementFinal,$taux);
+        $ClassementFinal = self::ajouterDansClassements($interval,$dateExclus,$personnelSecondaire,$ClassementFinal,$taux);
+        
+        return [
+            "Evaluation" => $ClassementFinal,
+            "PersonnelEnMission" => $personnelEnMission,
+        ];
+        */
+    }
+
+    public static function ajouterDansClassements($interval,$dateXclu,$personnels,$classementFinal,$pourcentage=70){
+        $classTemp = $classementFinal;
+        foreach($personnels as $personnel){
+            $personnel->getAllCA($interval,$dateXclu);
+            $personnel->getNbrJourObjectifAtteint($interval,$dateXclu);
+        }
+        $classements = ClassementService::getEvaluation($personnels,self::DEFAULT_COEF,$interval,$dateXclu,$pourcentage);
+        foreach($classements as $classement){
+            $classTemp[] = $classement;
+        }
+        return $classTemp;
+    }
+
+    public static function getPersonnelSurInterval($interval,$personnelDejaPresent=[],$personnelEnMission=[],$dateXclu=[]){
+        $personnelResult = [];
+
+        $personnels = DB::table('facture')
+        ->whereRaw("facture.Date >= '".$interval->firstDate."'")
+        ->whereRaw("facture.Date <= '".$interval->lastDate."'")
+        ->selectRaw(" Distinct facture.Matricule_personnel as personnel");
+        foreach($dateXclu as $dateX){
+            $personnels->whereRaw("facture.Date != '".$dateX."' ");
+        }
+        $personnels = $personnels->get();
+        foreach($personnels as $personnel){
+            $p = new Personnel;
+            $p->Matricule = $personnel->personnel;
+            if((!in_array($p,$personnelDejaPresent))&&(!in_array($p,$personnelEnMission))&&(!str_starts_with($personnel->personnel, 'COTN'))&&(!str_starts_with($personnel->personnel, 'cotn'))){
+                //$p->checkIfEnMission();
+                //$p->getSelonTypeMission($idtypeMission,$interval,$dateExclus);
+                //$p->getNbrJourObjectifAtteint($interval,$dateExclus);
+                $personnelResult[] = $p;
+            }
+        }
+        return $personnelResult;
+    }
+
     public function getPourcentageObjectif($jourDeTravail){
         if(isset($this->nbrJourObjectif)){
             $this->pourcentageObjectif = (($this->nbrJourObjectif)*100)/$jourDeTravail;
@@ -84,8 +207,9 @@ class Personnel extends Model
         ->get();
     }
 
-    public function getNbrJourObjectifAtteint($interval="",$objectif=0,$dateXclu=[]){
+    public function getNbrJourObjectifAtteint($interval="",$dateXclu=[]){
         $nbrObjectifAtteint = 0;
+        $nbrJourNonAtteint = 0;
         $nbrJour=self::$DAY_INTERVAL;
 
         $objectifs = self::getObjectif();
@@ -113,14 +237,26 @@ class Personnel extends Model
             }
             if((!$exist)){
                 foreach($objectifs as $obj){
-                    if(($vente->Id_zone==$obj->Id_zone)&&($vente->CA>=$obj->Montant)){
-                        $nbrObjectifAtteint+=1;
+                    if($vente->Id_zone==$obj->Id_zone){
+                        if($vente->CA>=$obj->Montant){
+                            $nbrObjectifAtteint+=1;
+                        }
+                        else{
+                            $nbrJourNonAtteint+=1;
+                        }
                         break;
                     }
                 }
             }
         }
+        $this->nbrJourNonAtteint = $nbrJourNonAtteint;
         $this->nbrJourObjectif = $nbrObjectifAtteint;
+        if($nbrJourNonAtteint+$nbrObjectifAtteint>0){
+            $this->pourcentageObjectif = ($nbrObjectifAtteint*100)/($nbrJourNonAtteint+$nbrObjectifAtteint);
+        }
+        else{
+            $this->pourcentageObjectif = 0;
+        }
         return $nbrObjectifAtteint;
     }
 
@@ -363,6 +499,7 @@ class Personnel extends Model
         ->first()->jourTravail;
         return $this->jourTravail;
     }
+
     public function getJourTravailMensuel(){
         $this->jourTravailMensuel = DB::table("facture")
         ->selectRaw("coalesce(count(distinct Date),0) as jourTravail")
@@ -384,7 +521,7 @@ class Personnel extends Model
         ->first()->jourTravail;
         return $this->jourTravailLocaux;
     }
-   
+
     public function getDetailSanction($jour='%'){
         $this->sanctions = SanctionPersonnel::select("sanction.code_sanction","sanction.titre","sanction.valeur","sanction.unite")
         ->where("sanction_personnel.matricule_personnel",$this->Matricule)
@@ -397,6 +534,7 @@ class Personnel extends Model
             return false;
         }
     }
+
     public function getDetailControl($jour='%'){
         $this->controles = Controle::selectRaw("sim,debut,fin,TIMEDIFF(fin,debut) as duree")
         ->where("commercial",$this->Matricule)
@@ -633,6 +771,25 @@ class Personnel extends Model
         }
     }
 
+    public function getSelonTypeMission($idType="",$interval="",$dateXclu=[]){
+        if($idType=""){
+            if($interval==""){
+                $nbrJour=self::$DAY_INTERVAL;
+                $interval = getDateInterval($nbrJour);
+            }
+            $facture = $this->getCABase($interval,$dateXclu)
+            ->where('Id_type',$idType)
+            ->join('mission','mission.Id_de_la_mission','=','facture.Id_de_la_mission')
+            ->first();
+            $CASelonType = 0;
+            if($facture->CA){
+                $CASelonType = $facture->CA;
+            }
+            $this->CASelonType = $CASelonType;
+            return $CASelonType;
+        }
+    }
+
     public function getCALocal($interval="",$dateXclu=[]){
         if($interval==""){
             $nbrJour=self::$DAY_INTERVAL;
@@ -717,7 +874,7 @@ class Personnel extends Model
             return response()->json($response);
         }
     }
-    
+
     public static function getMatricules($conditions = []){
         $nbrOfResult = self::$DEFAULT_MAX_RESULT;
         if($nbrOfResult == 'all'){

@@ -18340,21 +18340,15 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     loadTauxVente: function loadTauxVente() {
-      var _this = this;
-
-      if (this.idMission) {
-        axios.get('/api/missions/getTaux', {
-          params: {
-            idMission: this.idMission
-          }
-        }).then(function (response) {
-          _this.minimumVente = response.data.taux;
-        });
-      }
+      /*
+      if(this.idMission){
+          axios.get('/api/missions/getTaux',{params: {idMission: this.idMission}}).then(response => {
+              this.minimumVente = response.data.taux;
+          });
+      }*/
     },
-    changeIdMission: function changeIdMission() {
-      alert("Vous avez choisit la mission : " + this.idMission);
-      this.loadTauxVente();
+    changeIdMission: function changeIdMission() {//alert("Vous avez choisit la mission : "+this.idMission);
+      //this.loadTauxVente();
     },
     toogleAvtiveTeamButton: function toogleAvtiveTeamButton(team) {
       if (team == 1) {
@@ -18403,12 +18397,12 @@ __webpack_require__.r(__webpack_exports__);
       this.showAdvancedSearch ? this.showAdvancedSearch = false : this.showAdvancedSearch = true;
     },
     loadMissions: function loadMissions() {
-      var _this2 = this;
+      var _this = this;
 
       this.$axios.get('/api/missions/getAllTypesMission').then(function (response) {
         if (response.data.success) {
-          _this2.missions = response.data.missions;
-          _this2.idMission = _this2.missions[0].Id; //this.loadTauxVente();
+          _this.missions = response.data.missions;
+          _this.idMission = _this.missions[0].Id; //this.loadTauxVente();
         } else {
           console.log(response.data.message);
         }
@@ -18455,7 +18449,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     validateEquipe: function validateEquipe() {
-      var _this3 = this;
+      var _this2 = this;
 
       var matricules = this.getMatriculeFromArray(this.commerciaux);
       var produits = this.getCodeProduitFromArray(this.produits);
@@ -18485,7 +18479,7 @@ __webpack_require__.r(__webpack_exports__);
         */
 
       }).then(function (response) {
-        _this3.download(response);
+        _this2.download(response);
       });
     },
     download: function download(data) {
@@ -18535,8 +18529,18 @@ __webpack_require__.r(__webpack_exports__);
 
       return codeProduits;
     },
+    getProposition: function getProposition() {
+      axios.get('/api/personnels/getProposition', {
+        params: {
+          idType: this.idMission,
+          dateDebut: this.dateDebut,
+          dateFin: this.dateFin,
+          listeDateExclu: this.listeDateExclu
+        }
+      }).then(function (response) {});
+    },
     getClassement: function getClassement() {
-      var _this4 = this;
+      var _this3 = this;
 
       var matricules = this.getMatriculeFromArray(this.commerciaux);
       var produits = this.getCodeProduitFromArray(this.produits);
@@ -18552,11 +18556,11 @@ __webpack_require__.r(__webpack_exports__);
           minimumVente: this.minimumVente
         }
       }).then(function (response) {
-        _this4.showClassements = true;
-        _this4.classements = response.data.classements;
-        localStorage.classements = JSON.stringify(_this4.classements);
+        _this3.showClassements = true;
+        _this3.classements = response.data.classements;
+        localStorage.classements = JSON.stringify(_this3.classements);
 
-        _this4.fillPlaceTemp(response.data.classements);
+        _this3.fillPlaceTemp(response.data.classements);
         /*
         if(response.data.personnels!=null){
             this.classements = response.data.classements;
@@ -18597,13 +18601,13 @@ __webpack_require__.r(__webpack_exports__);
     },
     // search perso
     loadFonctions: function loadFonctions() {
-      var _this5 = this;
+      var _this4 = this;
 
       this.$axios.get('/api/fonctions').then(function (response) {
         if (response.data.success) {
-          _this5.fonctions = response.data.fonctions;
-          _this5.idFonction = _this5.fonctions[0].id;
-          _this5.customId = _this5.fonctions[0].customId;
+          _this4.fonctions = response.data.fonctions;
+          _this4.idFonction = _this4.fonctions[0].id;
+          _this4.customId = _this4.fonctions[0].customId;
         } else {
           console.log(response.data.message);
         }
@@ -18612,7 +18616,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     searchAutoComplete: function searchAutoComplete() {
-      var _this6 = this;
+      var _this5 = this;
 
       this.resultats = [];
 
@@ -18623,10 +18627,10 @@ __webpack_require__.r(__webpack_exports__);
             search: this.matricule
           }
         }).then(function (response) {
-          _this6.isSearchingAutoComplete = false;
+          _this5.isSearchingAutoComplete = false;
 
           if (response.data.success) {
-            _this6.resultats = response.data.personnels;
+            _this5.resultats = response.data.personnels;
           } else {
             alert(response.data.message);
           }
@@ -18636,11 +18640,11 @@ __webpack_require__.r(__webpack_exports__);
           axios.get('/api/personnels/getMatriculeByFonction', {
             params: {
               fonction: element,
-              search: _this6.matricule
+              search: _this5.matricule
             }
           }).then(function (response) {
             if (response.data.success) {
-              _this6.resultats = _this6.resultats.concat(response.data.personnels);
+              _this5.resultats = _this5.resultats.concat(response.data.personnels);
             } else {
               alert(response.data.message);
             }
@@ -18653,7 +18657,7 @@ __webpack_require__.r(__webpack_exports__);
       this.addPersonnelToTable(this.commerciaux, personnel);
     },
     addPersonnel: function addPersonnel() {
-      var _this7 = this;
+      var _this6 = this;
 
       if (this.customId == null) {
         if (this.matricule != null && this.idFonction != null) {
@@ -18668,9 +18672,9 @@ __webpack_require__.r(__webpack_exports__);
             if (response.data.success) {
               if (response.data.personnel.Fonction_actuelle == 2) {
                 //this.addToCoachEquipe(response.data.personnel);
-                _this7.addEquipeFromCoach(response.data.personnel);
+                _this6.addEquipeFromCoach(response.data.personnel);
               } else {
-                _this7.addToEquipe(response.data.personnel);
+                _this6.addToEquipe(response.data.personnel);
               }
             } else {
               alert('aucun resultat trouvé');
@@ -18683,16 +18687,16 @@ __webpack_require__.r(__webpack_exports__);
             params: {
               criteres: {
                 Fonction_actuelle: element,
-                Matricule: _this7.matricule
+                Matricule: _this6.matricule
               }
             }
           }).then(function (response) {
             if (response.data.success) {
               if (response.data.personnel.Fonction_actuelle == 2) {
                 //this.addToCoachEquipe(response.data.personnel)
-                _this7.addEquipeFromCoach(response.data.personnel);
+                _this6.addEquipeFromCoach(response.data.personnel);
               } else {
-                _this7.addToEquipe(response.data.personnel);
+                _this6.addToEquipe(response.data.personnel);
               }
             }
           });
@@ -18715,7 +18719,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     //addEquipeFromCoach(coach){
     addEquipeFromCoach: function addEquipeFromCoach(coach) {
-      var _this8 = this;
+      var _this7 = this;
 
       //this.addPersonnelToTable(this.coachs,coach);
 
@@ -18745,8 +18749,8 @@ __webpack_require__.r(__webpack_exports__);
           }
         }).then(function (response) {
           for (var i = 0; i < response.data.data.length; i++) {
-            if (_this8.EquipeA.commerciaux.length >= _this8.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
-              _this8.addToEquipe(response.data.data[i]);
+            if (_this7.EquipeA.commerciaux.length >= _this7.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
+              _this7.addToEquipe(response.data.data[i]);
             }
           }
         });
@@ -18758,8 +18762,8 @@ __webpack_require__.r(__webpack_exports__);
           }
         }).then(function (response) {
           for (var i = 0; i < response.data.data.length; i++) {
-            if (_this8.EquipeB.commerciaux.length >= _this8.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
-              _this8.addToEquipe(response.data.data[i]);
+            if (_this7.EquipeB.commerciaux.length >= _this7.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
+              _this7.addToEquipe(response.data.data[i]);
             }
           }
         });
@@ -23363,7 +23367,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, [_hoisted_70, _hoisted_71])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_73, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     "class": "btn btn-primary btn-rounded",
     onClick: _cache[23] || (_cache[23] = function () {
-      return $options.getClassement && $options.getClassement.apply($options, arguments);
+      return $options.getProposition && $options.getProposition.apply($options, arguments);
     })
   }, "Proposer")])])])]), _hoisted_74, _hoisted_75, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_76, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_77, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\r\n                        <div class=\"row d-flex justify-content-center\" id=\"resultCommerciaux\" >\r\n                            <div class=\"table-responsive col-12\" style=\"margin-left:25px\">\r\n                                <table class=\"table table-bordered table-head-bg-secondary table-bordered-bd-secondary\">\r\n                                    <thead >\r\n                                        <tr class=\"bg-secondary\" style=\"color:white\">\r\n                                            <th class=\"respText\" scope=\"col-md-2\">matricule</th>\r\n                                            <th class=\"respText\" scope=\"col-md-2 d-none\">nom et prenom</th>\r\n                                            <th class=\"respText\" scope=\"col-md-1\"></th>\r\n                                        </tr>\r\n                                    </thead>\r\n                                    <tbody>\r\n                                        <tr v-for=\"equipe in commerciaux\" v-bind:key=\"equipe\">\r\n                                            <td class=\"respText\" scope=\"col-md-2\">{{ equipe.Matricule }}</td>\r\n                                            <td class=\"respText\" scope=\"col-md-2\">{{ equipe.Nom+equipe.Prenom }}</td>\r\n                                            <td class=\"respText\" scope=\"col-md-1\">\r\n                                                <button class=\"btn btn-danger\" v-on:click=\"remove(equipe.Matricule)\">\r\n                                                <div class=\"d-none d-lg-block\">\r\n                                                    supprimer\r\n                                                </diV>\r\n                                                <div class=\"d-block d-lg-none\">\r\n                                                    X\r\n                                                </div>\r\n                                                </button>\r\n                                            </td>\r\n                                        </tr>\r\n                                    </tbody>\r\n                                </table>\r\n                            </div> \r\n                        </div>"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_78, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_79, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     "class": "btn btn-secondary",

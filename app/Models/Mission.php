@@ -11,6 +11,8 @@ class Mission extends Model
 
     const DEFAULT_MAX_RESULT = 10;
 
+    const DAY_INTERVAL = 30;
+
     use HasFactory;
     protected $table = 'mission';
     protected $primaryKey = 'Id';
@@ -24,10 +26,38 @@ class Mission extends Model
         'Date_de_fin',          
         'Date_depart',                
         'Statut',
+        'Id_type',
     ];
+
+    public function selectPersonnelFromMission(){
+        return DB::table("detailmission")
+        ->select("personnel")
+        ->where("Id_de_la_mission",$this->Id_de_la_mission);
+    }
+
+    public static function getMissionTypeBetween($typeMission,$interval=""){
+        if($interval==""){
+            $nbrJour=self::DAY_INTERVAL;
+            $interval = getDateInterval($nbrJour);
+        }
+        return self::whereRaw("
+            (
+                Date_depart >= '".$interval->firstDate."' AND
+                Date_depart <= '".$interval->lastDate."' AND
+                Id_type = ".$typeMission."
+            )
+            OR(
+                Date_de_fin >= '".$interval->firstDate."' AND
+                Date_de_fin <= '".$interval->lastDate."' AND
+                Id_type = ".$typeMission."
+            )
+        ")
+        ->get();
+    }
 
     public static function getAllTypes(){
         return DB::table("type_mission")
+        ->orderBy("designation","ASC")
         ->get();
     }
 
