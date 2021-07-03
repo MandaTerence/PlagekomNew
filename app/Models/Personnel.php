@@ -33,7 +33,8 @@ class Personnel extends Model
         'mission' => 1,
         'produitPlusCher' => 1,
         'produitMoinsCher' => 1,
-        'produit' => []
+        'produit' => [],
+        'typeMission' => 2
     ];
 
     public static $tabBis = [
@@ -115,8 +116,53 @@ class Personnel extends Model
         return $this->auRepos;
     }
 
-    public static function getProposition($idtypeMission,$interval,$taux,$dateExclus=[]){
+    public static function getProposition($idTypeMission,$interval,$taux,$dateExclus=[],$produits=[]){
         
+        $propositions = [];
+        
+        $personnelEnMission = self::getPersonnelEnMission();
+        $missionDansInterval =  MISSION::getMissionBetween($interval);
+
+        foreach($missionDansInterval as $mission){
+            $personnelsDurantMission = $mission->getPersonnelFromMission();
+            foreach($personnelsDurantMission as $pm){
+                $personnel = new Personnel;
+                $personnel->Matricule = $pm->Matricule;
+                $exist = false;
+                foreach($personnelEnMission as $comp){
+                    if($comp->Matricule==$personnel->Matricule){
+                        $exist = true;
+                        break;
+                    }
+                }
+                if(!$exist){
+                    foreach($propositions as $comp){
+                        if($comp->Matricule==$personnel->Matricule){
+                            $exist = true;
+                            break;
+                        }
+                    }
+                }
+                if(
+                    //(!($personnel->existIn($personnelEnMission)))
+                    //&&(!($personnel->existIn($propositions)))
+                    (!$exist)
+                    &&(!str_starts_with($personnel->Matricule, 'COTN'))
+                    &&(!str_starts_with($personnel->Matricule, 'cotn'))
+                ){
+                    $propositions[] = $personnel;
+                }
+            }
+        }
+
+        foreach($propositions as $proposition){
+            $proposition->getAllCA($interval,$dateExclus,$produits,$idTypeMission);
+        }
+
+        $classements = ClassementService::getEvaluation($propositions,self::DEFAULT_COEF,$interval,$dateExclus,$taux);
+
+        return $classements;
+        /*
         $ClassementFinal = [];
 
         $PersonnelSurMissionDansInterval = [];
@@ -124,39 +170,75 @@ class Personnel extends Model
 
         $missionDansInterval =  MISSION::getMissionTypeBetween($idtypeMission,$interval);
         $jourDeTravail = PersonnelService::getJourTravail($interval,$dateExclus);
-        
+
         foreach($missionDansInterval as $mission){
             $personnels = $mission->selectPersonnelFromMission()->get();
             foreach($personnels as $personnel){
                 $p = new Personnel;
                 $p->Matricule = $personnel->personnel;
-                if((!in_array($p,$personnelEnMission))&&(!in_array($p, $PersonnelSurMissionDansInterval))&&(!str_starts_with($personnel->personnel, 'COTN'))&&(!str_starts_with($personnel->personnel, 'cotn'))){
-                    //$p->getSelonTypeMission($idtypeMission,$interval,$dateExclus);
-                    //$p->getNbrJourObjectifAtteint($interval,$dateExclus);
+                if((!str_starts_with($personnel->personnel, 'COTN'))&&(!str_starts_with($personnel->personnel, 'cotn'))){
                     $PersonnelSurMissionDansInterval[] = $p;
                 }
+            }
+        }
+
+        $personnelPrimaire = [];
+
+        foreach($PersonnelSurMissionDansInterval as $personnel){
+            $exist = false;
+            foreach($personnelEnMission as $pm){
+                if($pm->Matricule==$personnel->Matricule){
+                    $personnelPrimaire
+                }
+            }
+            if(){
+
             }
         }
 
         $personnelPrimaire = $PersonnelSurMissionDansInterval;
         $personnelSecondaire = self::getPersonnelSurInterval($interval,$PersonnelSurMissionDansInterval,$personnelEnMission,$dateExclus);
 
-        foreach($personnelSecondaire as $p){
-            $p->test="secondaire";
+        foreach($personnelPrimaire as $personnel){
+            $personnel->test="primaire";
         }
-        foreach($personnelPrimaire as $p){
-            $p->test="primaire";
+
+        foreach($personnelSecondaire as $personnel){
+            $personnel->test="secondaire";
+            $personnelPrimaire[] = $personnel;
         }
-        return $personnelPrimaire;
+
+        foreach($personnelPrimaire as $personnel){
+            $personnel->getAllCA($interval,$dateExclus,$produits,$idtypeMission);
+            $personnel->getNbrJourObjectifAtteint($interval,$dateExclus);
+        }
+        $classements = ClassementService::getEvaluation($personnelPrimaire,self::DEFAULT_COEF,$interval,$dateExclus,$taux);
+
+        //return $classements;
+
+        return [
+            //"Evaluation" => $classements,
+            "test" => $PersonnelSurMissionDansInterval,
+        ];
+
         /*
         $ClassementFinal = self::ajouterDansClassements($interval,$dateExclus,$personnelPrimaire,$ClassementFinal,$taux);
         $ClassementFinal = self::ajouterDansClassements($interval,$dateExclus,$personnelSecondaire,$ClassementFinal,$taux);
-        
-        return [
-            "Evaluation" => $ClassementFinal,
-            "PersonnelEnMission" => $personnelEnMission,
-        ];
+            return [
+                "Evaluation" => $ClassementFinal,
+                "PersonnelEnMission" => $personnelEnMission,
+            ];
         */
+    }
+
+    public function existIn($comparaisons){
+        foreach($comparaisons as $comparaison){
+            if($this->Matricule==$comparaison->Matricule){
+                return true;
+                break;
+            }
+        }
+        return false;
     }
 
     public static function ajouterDansClassements($interval,$dateXclu,$personnels,$classementFinal,$pourcentage=70){
@@ -183,6 +265,7 @@ class Personnel extends Model
             $personnels->whereRaw("facture.Date != '".$dateX."' ");
         }
         $personnels = $personnels->get();
+        //return $personnels;
         foreach($personnels as $personnel){
             $p = new Personnel;
             $p->Matricule = $personnel->personnel;
@@ -251,6 +334,7 @@ class Personnel extends Model
         }
         $this->nbrJourNonAtteint = $nbrJourNonAtteint;
         $this->nbrJourObjectif = $nbrObjectifAtteint;
+        $this->nbrJourTravailTotal = $this->nbrJourNonAtteint + $this->nbrJourObjectif;
         if($nbrJourNonAtteint+$nbrObjectifAtteint>0){
             $this->pourcentageObjectif = ($nbrObjectifAtteint*100)/($nbrJourNonAtteint+$nbrObjectifAtteint);
         }
@@ -655,34 +739,57 @@ class Personnel extends Model
         return $this->Nom.' '.$this->Prenom;
     }
 
-    public function getAllCA($interval="",$dateXclu=[],$produits = []){
+
+    
+    public function getAllCA($interval="",$dateXclu=[],$produits = [],$idType=""){
         $nbrJour=self::$DAY_INTERVAL; 
         if($interval==""){
             $interval = getDateInterval($nbrJour);
         }
-        $this->CAGlobal=$this->getCAGlobal($interval,$dateXclu);
-        $this->CAMission=$this->getCAMission($interval,$dateXclu);
-        $this->CALocal=$this->getCALocal($interval,$dateXclu);
+        $this->CAGlobal=(int)$this->getCAGlobal($interval,$dateXclu);
+        $this->CAMission=(int)$this->getCAMission($interval,$dateXclu);
+        $this->CALocal=(int)$this->getCALocal($interval,$dateXclu);
+        
+        if($idType!=""){
+            $this->CASelonType = (int)$this->getSelonTypeMission($idType,$interval,$dateXclu);
+        }
+        
         $produitFinaux = [];
+        
         $CAProduitMoinsCher = 0;
         $CAProduitPlusCher = 0;
-        foreach($produits as $produit){
-            $CAProduit = $this->getCAselonProduit($produit,$interval);
-            $produitFinaux[] = [
-                "Code_roduit" =>$produit,
-                "CAProduit" => $CAProduit
-            ];
-            $pr = Produit::getFirstWhere([['produit.Code_produit',$produit]]);
-            if($pr->prix<self::PRIX_CHER){
-                $CAProduitMoinsCher += $CAProduit;
-            }
-            else{
-                $CAProduitPlusCher += $CAProduit;
+        if(isset($produits)){
+            foreach($produits as $produit){
+                $CAProduit = $this->getCAselonProduit($produit,$interval);
+                $produitFinaux[] = [
+                    "Code_roduit" =>$produit,
+                    "CAProduit" => $CAProduit
+                ];
+                $pr = Produit::getFirstWhere([['produit.Code_produit',$produit]]);
+                if($pr->prix<self::PRIX_CHER){
+                    $CAProduitMoinsCher += $CAProduit;
+                }
+                else{
+                    $CAProduitPlusCher += $CAProduit;
+                }
             }
         }
+       
         $this->CAProduitMoinsCher = $CAProduitMoinsCher;
         $this->CAProduitPlusCher = $CAProduitPlusCher;
-        $this->CAProduit= $produitFinaux;
+        $this->CAProduit = $produitFinaux;
+
+        $this->getNbrJourObjectifAtteint($interval,$dateXclu);
+        $this->getCAMoyen();
+    }
+
+    public function getCAMoyen(){
+        if(
+            ($this->CAGlobal)
+            &&($this->nbrJourTravailTotal)
+        ){
+            $this->CAMoyen = $this->CAGlobal/$this->nbrJourTravailTotal;
+        }
     }
 
     public function getCABase($interval="",$dateXclu=[]){
@@ -732,7 +839,7 @@ class Personnel extends Model
         }
         return $CAMission;
     }
-
+ 
     public function getCATotal($coef){
         $this->CATotal = 0
             +($this->CAGlobal*$coef['global'])
@@ -740,6 +847,9 @@ class Personnel extends Model
             +($this->CALocal*$coef['local'])
             +($this->CAProduitPlusCher*$coef['produitPlusCher'])
             +($this->CAProduitMoinsCher*$coef['produitMoinsCher']);
+        if($this->CASelonType){
+            $this->CATotal = $this->CATotal + ($this->CASelonType*$coef['typeMission']);
+        }
         return $this->CATotal;
     }
 
@@ -752,7 +862,7 @@ class Personnel extends Model
             $facture = DB::table('facture')
             ->where('facture.Matricule_personnel','=',$this->Matricule)
             ->whereRaw("facture.Date >= '".$interval->firstDate."'")
-        ->whereRaw("facture.Date <= '".$interval->lastDate."'")
+            ->whereRaw("facture.Date <= '".$interval->lastDate."'")
             ->where('Produit.Code_produit','=',$Produit)
             ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA'))
             ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
@@ -772,7 +882,7 @@ class Personnel extends Model
     }
 
     public function getSelonTypeMission($idType="",$interval="",$dateXclu=[]){
-        if($idType=""){
+        if($idType!=""){
             if($interval==""){
                 $nbrJour=self::$DAY_INTERVAL;
                 $interval = getDateInterval($nbrJour);

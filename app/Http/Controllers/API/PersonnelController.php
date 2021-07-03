@@ -135,6 +135,7 @@ class PersonnelController extends Controller
     public function getProposition(Request $request){
         $interval = getDateInterval(30);
         $idType = $request->idType;
+        $produits = $request->produits;
         $pourcentage = $request->pourcentage;
         $dateExclus = [];
         if($request->listeDateExclu){
@@ -148,7 +149,7 @@ class PersonnelController extends Controller
         }
         $jourTravail = PersonnelService::getJourTravail($interval,$dateExclus);
         return [
-            "mission" => Personnel::getProposition($idType,$interval,$pourcentage,$dateExclus),
+            "mission" => Personnel::getProposition($idType,$interval,$pourcentage,$dateExclus,$produits),
             "interval" => $interval,
             "idType" => $idType,
             "dateExclu" => $dateExclus,
@@ -157,6 +158,7 @@ class PersonnelController extends Controller
     }
 
     public function getEvaluation(Request $request){
+        
         $equipeA = [];
         $interval = getDateInterval(30);
         $dateXclu = $request->listeDateExclu;

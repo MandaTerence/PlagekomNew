@@ -35,6 +35,38 @@ class Mission extends Model
         ->where("Id_de_la_mission",$this->Id_de_la_mission);
     }
 
+    public function getPersonnelFromMission(){
+        $personnels = [];
+        $matricules =  DB::table("detailmission")
+        ->select("personnel")
+        ->where("Id_de_la_mission",$this->Id_de_la_mission)
+        ->get();
+        foreach($matricules as $matricule){
+            $personnel = new Personnel();
+            $personnel->Matricule = $matricule->personnel;
+            $personnels[] = $personnel;
+        }
+        return $personnels;
+    }
+
+    public static function getMissionBetween($interval=""){
+        if($interval==""){
+            $nbrJour=self::DAY_INTERVAL;
+            $interval = getDateInterval($nbrJour);
+        }
+        return self::whereRaw("
+            (
+                Date_depart >= '".$interval->firstDate."' AND
+                Date_depart <= '".$interval->lastDate."' 
+            )
+            OR(
+                Date_de_fin >= '".$interval->firstDate."' AND
+                Date_de_fin <= '".$interval->lastDate."' 
+            )
+        ")
+        ->get();
+    }
+
     public static function getMissionTypeBetween($typeMission,$interval=""){
         if($interval==""){
             $nbrJour=self::DAY_INTERVAL;

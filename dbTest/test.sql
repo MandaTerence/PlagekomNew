@@ -15,8 +15,6 @@ where
     personnel like 'VP21216'
 ORDER BY MISSION.Date_de_fin ASC
 limit 1;
-
-
 select
     Date_depart,Date_de_fin
 from mission

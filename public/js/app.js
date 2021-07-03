@@ -18530,11 +18530,14 @@ __webpack_require__.r(__webpack_exports__);
       return codeProduits;
     },
     getProposition: function getProposition() {
+      var produits = this.getCodeProduitFromArray(this.produits);
+      alert(produits.length);
       axios.get('/api/personnels/getProposition', {
         params: {
           idType: this.idMission,
           dateDebut: this.dateDebut,
           dateFin: this.dateFin,
+          produits: produits,
           listeDateExclu: this.listeDateExclu
         }
       }).then(function (response) {});

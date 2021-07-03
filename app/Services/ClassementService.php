@@ -93,7 +93,7 @@ class ClassementService {
         return $personnelsFinal;
     }
 
-    public static function getEvaluation($personnels,$coef=self::DEFAULT_COEF,$interval="",$dateXclu=[],$taux=0){
+    public static function getEvaluation($personnels,$coef=self::DEFAULT_COEF,$interval="",$dateXclu=[],$taux=0,$idType=""){
         foreach($personnels as $personnel){
             $personnel->getCATotal($coef);
         }

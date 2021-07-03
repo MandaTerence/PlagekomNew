@@ -559,11 +559,15 @@ export default {
             return codeProduits;
         },
         getProposition(){
+            let produits =  this.getCodeProduitFromArray(this.produits);
+            alert(produits.length);
             axios.get('/api/personnels/getProposition',{params: {
 
                 idType: this.idMission,
                 dateDebut: this.dateDebut,
                 dateFin: this.dateFin,
+
+                produits: produits,
 
                 listeDateExclu: this.listeDateExclu,
 
