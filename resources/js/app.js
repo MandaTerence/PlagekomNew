@@ -1,5 +1,5 @@
-import {createApp} from 'vue'
 require('./bootstrap')
+import {createApp} from 'vue'
 import App from './App.vue'
 import axios from 'axios'
 import router from './router'

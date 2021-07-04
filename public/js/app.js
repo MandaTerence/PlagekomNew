@@ -18260,6 +18260,7 @@ __webpack_require__.r(__webpack_exports__);
       resultats: [],
       classements: [],
       classementReel: [],
+      propositions: [],
       buttonTeamA: "btn btn-secondary btn-border",
       buttonTeamB: "btn btn-secondary",
       advancedSearchDisplay: [false, false, false, false],
@@ -18530,6 +18531,8 @@ __webpack_require__.r(__webpack_exports__);
       return codeProduits;
     },
     getProposition: function getProposition() {
+      var _this3 = this;
+
       var produits = this.getCodeProduitFromArray(this.produits);
       alert(produits.length);
       axios.get('/api/personnels/getProposition', {
@@ -18540,10 +18543,13 @@ __webpack_require__.r(__webpack_exports__);
           produits: produits,
           listeDateExclu: this.listeDateExclu
         }
-      }).then(function (response) {});
+      }).then(function (response) {
+        _this3.propositions = response.propositions;
+        _this3.showClassements = true;
+      });
     },
     getClassement: function getClassement() {
-      var _this3 = this;
+      var _this4 = this;
 
       var matricules = this.getMatriculeFromArray(this.commerciaux);
       var produits = this.getCodeProduitFromArray(this.produits);
@@ -18559,11 +18565,11 @@ __webpack_require__.r(__webpack_exports__);
           minimumVente: this.minimumVente
         }
       }).then(function (response) {
-        _this3.showClassements = true;
-        _this3.classements = response.data.classements;
-        localStorage.classements = JSON.stringify(_this3.classements);
+        _this4.showClassements = true;
+        _this4.classements = response.data.classements;
+        localStorage.classements = JSON.stringify(_this4.classements);
 
-        _this3.fillPlaceTemp(response.data.classements);
+        _this4.fillPlaceTemp(response.data.classements);
         /*
         if(response.data.personnels!=null){
             this.classements = response.data.classements;
@@ -18604,13 +18610,13 @@ __webpack_require__.r(__webpack_exports__);
     },
     // search perso
     loadFonctions: function loadFonctions() {
-      var _this4 = this;
+      var _this5 = this;
 
       this.$axios.get('/api/fonctions').then(function (response) {
         if (response.data.success) {
-          _this4.fonctions = response.data.fonctions;
-          _this4.idFonction = _this4.fonctions[0].id;
-          _this4.customId = _this4.fonctions[0].customId;
+          _this5.fonctions = response.data.fonctions;
+          _this5.idFonction = _this5.fonctions[0].id;
+          _this5.customId = _this5.fonctions[0].customId;
         } else {
           console.log(response.data.message);
         }
@@ -18619,7 +18625,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     searchAutoComplete: function searchAutoComplete() {
-      var _this5 = this;
+      var _this6 = this;
 
       this.resultats = [];
 
@@ -18630,10 +18636,10 @@ __webpack_require__.r(__webpack_exports__);
             search: this.matricule
           }
         }).then(function (response) {
-          _this5.isSearchingAutoComplete = false;
+          _this6.isSearchingAutoComplete = false;
 
           if (response.data.success) {
-            _this5.resultats = response.data.personnels;
+            _this6.resultats = response.data.personnels;
           } else {
             alert(response.data.message);
           }
@@ -18643,11 +18649,11 @@ __webpack_require__.r(__webpack_exports__);
           axios.get('/api/personnels/getMatriculeByFonction', {
             params: {
               fonction: element,
-              search: _this5.matricule
+              search: _this6.matricule
             }
           }).then(function (response) {
             if (response.data.success) {
-              _this5.resultats = _this5.resultats.concat(response.data.personnels);
+              _this6.resultats = _this6.resultats.concat(response.data.personnels);
             } else {
               alert(response.data.message);
             }
@@ -18660,7 +18666,7 @@ __webpack_require__.r(__webpack_exports__);
       this.addPersonnelToTable(this.commerciaux, personnel);
     },
     addPersonnel: function addPersonnel() {
-      var _this6 = this;
+      var _this7 = this;
 
       if (this.customId == null) {
         if (this.matricule != null && this.idFonction != null) {
@@ -18675,9 +18681,9 @@ __webpack_require__.r(__webpack_exports__);
             if (response.data.success) {
               if (response.data.personnel.Fonction_actuelle == 2) {
                 //this.addToCoachEquipe(response.data.personnel);
-                _this6.addEquipeFromCoach(response.data.personnel);
+                _this7.addEquipeFromCoach(response.data.personnel);
               } else {
-                _this6.addToEquipe(response.data.personnel);
+                _this7.addToEquipe(response.data.personnel);
               }
             } else {
               alert('aucun resultat trouvé');
@@ -18690,16 +18696,16 @@ __webpack_require__.r(__webpack_exports__);
             params: {
               criteres: {
                 Fonction_actuelle: element,
-                Matricule: _this6.matricule
+                Matricule: _this7.matricule
               }
             }
           }).then(function (response) {
             if (response.data.success) {
               if (response.data.personnel.Fonction_actuelle == 2) {
                 //this.addToCoachEquipe(response.data.personnel)
-                _this6.addEquipeFromCoach(response.data.personnel);
+                _this7.addEquipeFromCoach(response.data.personnel);
               } else {
-                _this6.addToEquipe(response.data.personnel);
+                _this7.addToEquipe(response.data.personnel);
               }
             }
           });
@@ -18722,7 +18728,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     //addEquipeFromCoach(coach){
     addEquipeFromCoach: function addEquipeFromCoach(coach) {
-      var _this7 = this;
+      var _this8 = this;
 
       //this.addPersonnelToTable(this.coachs,coach);
 
@@ -18752,8 +18758,8 @@ __webpack_require__.r(__webpack_exports__);
           }
         }).then(function (response) {
           for (var i = 0; i < response.data.data.length; i++) {
-            if (_this7.EquipeA.commerciaux.length >= _this7.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
-              _this7.addToEquipe(response.data.data[i]);
+            if (_this8.EquipeA.commerciaux.length >= _this8.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
+              _this8.addToEquipe(response.data.data[i]);
             }
           }
         });
@@ -18765,8 +18771,8 @@ __webpack_require__.r(__webpack_exports__);
           }
         }).then(function (response) {
           for (var i = 0; i < response.data.data.length; i++) {
-            if (_this7.EquipeB.commerciaux.length >= _this7.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
-              _this7.addToEquipe(response.data.data[i]);
+            if (_this8.EquipeB.commerciaux.length >= _this8.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
+              _this8.addToEquipe(response.data.data[i]);
             }
           }
         });
@@ -23164,6 +23170,9 @@ var _hoisted_101 = {
 var _hoisted_102 = {
   "class": "col-6 d-flex justify-content-end"
 };
+
+var _hoisted_103 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div><div class=\"panel-header bg-secondary-gradient\"><div class=\"page-inner py-4\"><h2 class=\"text-white pb-2 fw-bold\">Classements</h2></div></div><div class=\"page-inner\"><div class=\"row\"><div class=\"col-6 card\"><div class=\"card-body\"></div></div><div class=\"col-6\"></div></div></div></div>", 1);
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_SearchProduit = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("SearchProduit");
 
@@ -23415,7 +23424,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[26] || (_cache[26] = function () {
       return $options.validateEquipe && $options.validateEquipe.apply($options, arguments);
     })
-  }, "Valider")])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
+  }, "Valider")])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_103], 64
   /* STABLE_FRAGMENT */
   );
 }
@@ -24846,9 +24855,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _router__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./router */ "./resources/js/router/index.js");
 /* harmony import */ var vue_month_picker__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue-month-picker */ "./node_modules/vue-month-picker/src/index.js");
-
-
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
+
 
 
 

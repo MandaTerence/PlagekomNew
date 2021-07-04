@@ -119,6 +119,7 @@ class Personnel extends Model
     public static function getProposition($idTypeMission,$interval,$taux,$dateExclus=[],$produits=[]){
         
         $propositions = [];
+        $test=[];
         
         $personnelEnMission = self::getPersonnelEnMission();
         $missionDansInterval =  MISSION::getMissionBetween($interval);
@@ -137,15 +138,13 @@ class Personnel extends Model
                 }
                 if(!$exist){
                     foreach($propositions as $comp){
-                        if($comp->Matricule==$personnel->Matricule){
+                        if(trim($comp->Matricule)==trim($personnel->Matricule)){
                             $exist = true;
                             break;
                         }
                     }
                 }
                 if(
-                    //(!($personnel->existIn($personnelEnMission)))
-                    //&&(!($personnel->existIn($propositions)))
                     (!$exist)
                     &&(!str_starts_with($personnel->Matricule, 'COTN'))
                     &&(!str_starts_with($personnel->Matricule, 'cotn'))
@@ -154,6 +153,7 @@ class Personnel extends Model
                 }
             }
         }
+
 
         foreach($propositions as $proposition){
             $proposition->getAllCA($interval,$dateExclus,$produits,$idTypeMission);

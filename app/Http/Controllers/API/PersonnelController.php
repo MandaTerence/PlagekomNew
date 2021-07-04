@@ -149,7 +149,7 @@ class PersonnelController extends Controller
         }
         $jourTravail = PersonnelService::getJourTravail($interval,$dateExclus);
         return [
-            "mission" => Personnel::getProposition($idType,$interval,$pourcentage,$dateExclus,$produits),
+            "propositions" => Personnel::getProposition($idType,$interval,$pourcentage,$dateExclus,$produits),
             "interval" => $interval,
             "idType" => $idType,
             "dateExclu" => $dateExclus,

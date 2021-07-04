@@ -245,9 +245,27 @@
             </div>
         </div>
     </div>
+    <div>
+        <div class="panel-header bg-secondary-gradient">
+            <div class="page-inner py-4">
+                <h2 class="text-white pb-2 fw-bold">Classements</h2>
+            </div>
+        </div>
+        <div class="page-inner">
+            <div class="row">
+                <div class="col-6 card">
+                    <div class="card-body">
+                    </div>
+                </div>
+                <div class="col-6">
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
+
 import EquipeTab from "../components/EquipeTab";
 import SearchPersonnel from "../components/SearchPersonnel";
 import SearchProduit from "../components/SearchProduit";
@@ -284,7 +302,8 @@ export default {
             resultats: [],
             classements: [],
             classementReel: [],
-
+            
+            propositions: [],
 
             buttonTeamA: "btn btn-secondary btn-border",
             buttonTeamB: "btn btn-secondary",
@@ -312,9 +331,9 @@ export default {
         selectedTeam: function () {
             if((this.buttonTeamA=="btn btn-secondary")&&(this.buttonTeamA!="btn btn-secondary btn-border")){
                 return "A";
-            }   
+            }    
             else{
-                return "B";
+                return "B"; 
             }
         },
         nbrDeJourIntervale: function() {
@@ -438,8 +457,7 @@ export default {
             .then(response => {
                 if(response.data.success){
                     this.missions = response.data.missions;
-                    this.idMission = this.missions[0].Id;
-                    //this.loadTauxVente();
+                    this.idMission = this.missions[0].Id;   //this.loadTauxVente();
                 }
                 else{
                     console.log(response.data.message);
@@ -562,17 +580,14 @@ export default {
             let produits =  this.getCodeProduitFromArray(this.produits);
             alert(produits.length);
             axios.get('/api/personnels/getProposition',{params: {
-
                 idType: this.idMission,
                 dateDebut: this.dateDebut,
                 dateFin: this.dateFin,
-
                 produits: produits,
-
                 listeDateExclu: this.listeDateExclu,
-
-            }}).then(response => { 
-                
+            }}).then(response => {
+                this.propositions = response.propositions;
+                this.showClassements = true;
             });
         },
         getClassement(){
