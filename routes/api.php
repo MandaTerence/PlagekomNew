@@ -52,6 +52,7 @@ Route::group(['prefix' => 'personnels', 'middleware' => 'auth:sanctum'], functio
     Route::get('/getPersonnelLocaux', [PersonnelController::class, 'getPersonnelLocaux']);
     Route::get('/getAllSalaire', [PersonnelController::class, 'getAllSalaire']);
     Route::get('/getProposition', [PersonnelController::class, 'getProposition']);
+    Route::get('/getMatricule', [PersonnelController::class, 'getMatricule']);
 });
 
 Route::group(['prefix' => 'equipe', 'middleware' => 'auth:sanctum'], function () {

@@ -427,6 +427,20 @@ class PersonnelController extends Controller
         }
     }
 
+    public function getMatricule(Request $request){
+        $conditions = [];
+        if(isset($request->search)){
+            $conditions[] = ['Matricule','like','%'.$request->search.'%'];
+        }
+        $personnels = Personnel::getMatricules($conditions);
+        $response = [
+            'success' => true,
+            'message' => count($personnels).' results founds',
+            'personnels' => $personnels,
+        ];
+        return $response;
+    }
+
     public function searchByFonction(Request $request){
         if(isset($request->fonction)){
             $conditions = [];

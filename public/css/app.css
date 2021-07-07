@@ -10009,3 +10009,17 @@ h3 {
     font-size: 11px !important;
   }
 }
+.logoPk {
+  box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.15);
+  font-size: 40pt;
+  color: white;
+  background-color: rgba(24, 106, 146, 0.98);
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  position: absolute;
+  margin-top: -60px;
+  font-weight: 400;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  font-family: "Kaushan Script", cursive;
+}

@@ -24,9 +24,7 @@
                 </button>
             </div>
         </div>
-        <!-- End Logo Header -->
 
-        <!-- Navbar Header -->
         <nav class="navbar navbar-header navbar-expand-lg" data-background-color="purple">
             <div class="container-fluid">
                 <div class="collapse" id="search-nav">
@@ -34,150 +32,29 @@
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <button type="submit" class="btn btn-search pr-1">
-                                    <i class="fa fa-search search-icon"></i>
+                                    <i class="fa fa-search search-icon" style="background-color: transparent"></i>
                                 </button>
                             </div>
-                            <input type="text" placeholder="Search ..." class="form-control">
+                            <input v-model="matricule" type="text" placeholder="Search ..." class="form-control" v-on:keyup="autoComplete" v-on:click="autoComplete">
+                        </div>
+                        <div class="panel-footer" style="float:top;position: absolute;z-index: 1;width: 380px;" >
+                            <ul class="list-group">
+                                <li class="list-group-item" style="padding-left: 70px;" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
+                                    <div >{{ result.Matricule }}</div>
+                                </li>
+                            </ul>
                         </div>
                     </form>
                 </div>
                 <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
                     <li class="nav-item toggle-nav-search hidden-caret">
                         <a class="nav-link" data-toggle="collapse" href="#search-nav" role="button" aria-expanded="false" aria-controls="search-nav">
-                            <i class="fa fa-search"></i>
+                            <i class="fa fa-search" style="background-color: transparent"></i>
                         </a>
                     </li>
                     <li class="nav-item dropdown hidden-caret">
-                        <a class="nav-link dropdown-toggle" href="#" id="messageDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-envelope"></i>
-                        </a>
-                        <ul class="dropdown-menu messages-notif-box animated fadeIn" aria-labelledby="messageDropdown">
-                            <li>
-                                <div class="dropdown-title d-flex justify-content-between align-items-center">
-                                    Messages 									
-                                    <a href="#" class="small">Mark all as read</a>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="message-notif-scroll scrollbar-outer">
-                                    <div class="notif-center">
-                                        <a href="#">
-                                            <div class="notif-img"> 
-                                                <img src="assets/img/jm_denis.jpg" alt="Img Profile">
-                                            </div>
-                                            <div class="notif-content">
-                                                <span class="subject">Jimmy Denis</span>
-                                                <span class="block">
-                                                    How are you ?
-                                                </span>
-                                                <span class="time">5 minutes ago</span> 
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="notif-img"> 
-                                                <img src="assets/img/chadengle.jpg" alt="Img Profile">
-                                            </div>
-                                            <div class="notif-content">
-                                                <span class="subject">Chad</span>
-                                                <span class="block">
-                                                    Ok, Thanks !
-                                                </span>
-                                                <span class="time">12 minutes ago</span>
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="notif-img"> 
-                                                <img src="assets/img/mlane.jpg" alt="Img Profile">
-                                            </div>
-                                            <div class="notif-content">
-                                                <span class="subject">Jhon Doe</span>
-                                                <span class="block">
-                                                    Ready for the meeting today...
-                                                </span>
-                                                <span class="time">12 minutes ago</span> 
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="notif-img"> 
-                                                <img src="assets/img/talha.jpg" alt="Img Profile">
-                                            </div>
-                                            <div class="notif-content">
-                                                <span class="subject">Talha</span>
-                                                <span class="block">
-                                                    Hi, Apa Kabar ?
-                                                </span>
-                                                <span class="time">17 minutes ago</span> 
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <a class="see-all" href="javascript:void(0);">See all messages<i class="fa fa-angle-right"></i> </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown hidden-caret">
-                        <a class="nav-link dropdown-toggle" href="#" id="notifDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-bell"></i>
-                            <span class="notification">4</span>
-                        </a>
-                        <ul class="dropdown-menu notif-box animated fadeIn" aria-labelledby="notifDropdown">
-                            <li>
-                                <div class="dropdown-title">You have 4 new notification</div>
-                            </li>
-                            <li>
-                                <div class="notif-scroll scrollbar-outer">
-                                    <div class="notif-center">
-                                        <a href="#">
-                                            <div class="notif-icon notif-secondary"> <i class="fa fa-user-plus"></i> </div>
-                                            <div class="notif-content">
-                                                <span class="block">
-                                                    New user registered
-                                                </span>
-                                                <span class="time">5 minutes ago</span> 
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="notif-icon notif-success"> <i class="fa fa-comment"></i> </div>
-                                            <div class="notif-content">
-                                                <span class="block">
-                                                    Rahmad commented on Admin
-                                                </span>
-                                                <span class="time">12 minutes ago</span> 
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="notif-img"> 
-                                                <img src="assets/img/profile2.jpg" alt="Img Profile">
-                                            </div>
-                                            <div class="notif-content">
-                                                <span class="block">
-                                                    Reza send messages to you
-                                                </span>
-                                                <span class="time">12 minutes ago</span> 
-                                            </div>
-                                        </a>
-                                        <a href="#">
-                                            <div class="notif-icon notif-danger"> <i class="fa fa-heart"></i> </div>
-                                            <div class="notif-content">
-                                                <span class="block">
-                                                    Farrah liked Admin
-                                                </span>
-                                                <span class="time">17 minutes ago</span> 
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <a class="see-all" href="javascript:void(0);">See all notifications<i class="fa fa-angle-right"></i> </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown hidden-caret">
-                        <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false">
-                            <i class="fas fa-layer-group"></i>
+                        <a @click="logout" class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false">
+                            <i class="fas fa-power-off"></i>
                         </a>
                         <div class="dropdown-menu quick-actions quick-actions-info animated fadeIn">
                             <div class="quick-actions-header">
@@ -261,7 +138,6 @@
                 </ul>
             </div>
         </nav>
-        <!-- End Navbar -->
     </div>
 
     <div class="sidebar" v-if="isLoggedIn">			
@@ -379,7 +255,6 @@
             </div>
         </div>
     </div>
-
     <div class="main-panel">
         <div class="content" >
             <!-- <div class="page-inner"> -->
@@ -413,7 +288,6 @@
             </div>
         </footer>
     </div>
-
 </div>
 </template>
 
@@ -423,10 +297,15 @@ export default {
     name: "App",
     data() {
         return {
+            
             name: null,
             isLoggedIn: false,
             displayMenu: true,
             sideBarWidth: 0,
+            matricule: "",
+            isSearchingAutoComplete: false,
+            resultats: [],
+
             dropdownListDisplay: ["none","none","none"],
             displaySideBar: [
                 {
@@ -456,6 +335,28 @@ export default {
         }
     },
     methods: {
+        changeMatriculeValue(newMatricule){
+            this.resultats = [];
+            this.matricule = newMatricule;
+        },
+        autoComplete(){
+            if((this.matricule.length > 2)&&(!this.isSearchingAutoComplete)){
+                this.isSearchingAutoComplete = true;
+                setTimeout(this.searchAutoComplete, 1000);
+            }    
+        },
+        searchAutoComplete(){
+            this.resultats = [];
+            axios.get('/api/personnels/getMatricule',{params: {search: this.matricule}}).then(response => {
+                this.isSearchingAutoComplete = false;
+                if(response.data.success){
+                    this.resultats = response.data.personnels;
+                }
+                else{
+                    alert(response.data.message);
+                }
+            });
+        },
         toogleDisplaySideBar(sideItemName){
             for(let i=0;i<this.displaySideBar.length;i++){
                 if(sideItemName == this.displaySideBar[i]["nom"]){

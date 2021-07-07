@@ -522,18 +522,6 @@ export default {
             data ='/excel'+data
             axios.get(data,{
                 responseType: 'blob',
-                /*
-                Matricules: matricules,
-                Produits: produits,
-                
-                dateDebut: this.dateDebut,
-                dateFin: this.dateFin,
-
-                listeDateExclu: this.listeDateExclu,
-
-                pourcentage: this.pourcentage,
-                minimumVente: this.minimumVente
-                */
             }).then(response => {
                 
                 this.download(response);

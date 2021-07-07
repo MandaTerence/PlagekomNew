@@ -3,18 +3,20 @@
     <div class="container">
         <div class="row justify-content-center" style="margin-top:100px">
             <div class="col-md-6">
-                <div class="alert alert-danger" role="alert" v-if="error !== null">
-                    {{ error }}
-                </div>
                 <div class="card" style="border-radius: 10px;">
                     <div class="card-header">
                         <div class="d-flex justify-content-center">
-                            <div id="user_ico" class="d-flex justify-content-center align-items-center" >
+                            <div id="user_ico" class="logoPk d-flex justify-content-center align-items-center" >
                             <span>Pk</span>
                             </div>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="box-shadow: 5px 10px 10px rgba(0, 0, 0, 0.15)">
+                        <div class="row justify-content-center" style="margin-top:10px">
+                            <span style="color: red">
+                                {{ error }}
+                            </span>
+                        </div>
                         <form>
                             <div class="form-group row justify-content-center">
                                 <div class="input-group input-login col-12 justify-content-center">
@@ -57,8 +59,15 @@ export default {
     },
     methods: {
         handleSubmit(e) {
-            e.preventDefault()
-            if (this.password.length > 0) {
+            e.preventDefault();
+            this.error = "";
+            if(this.password.length < 1){
+                this.error = "veuillez saisir le mot de passe"
+            }
+            else if(this.matricule.length < 1){
+                this.error = "veuillez saisir le inserer matricule"
+            }
+            else{
                 this.$axios.get('/sanctum/csrf-cookie').then(response => {
                     this.$axios.post('api/login', {
                         matricule: this.matricule,
@@ -73,6 +82,7 @@ export default {
                         }
                     })
                     .catch(
+                        this.error = "impossible de se connecter"
                     );
                 })
             }
