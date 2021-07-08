@@ -1,7 +1,11 @@
 <template>
 <div class="page-inner">
-    <div>
-        <h1>Bienvenue sur plagekom</h1>
+    <div class="row justify-content-center" >
+        <div class="card col-md-6">
+            <div class="card-body">
+                bienvenu
+            </div>
+        </div>
     </div>
 </div>
 </template>

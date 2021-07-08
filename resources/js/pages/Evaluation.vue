@@ -2,262 +2,139 @@
     <div v-if="!showClassements">
         <div class="panel-header bg-secondary-gradient">
             <div class="page-inner py-4">
-                <h2 class="text-white pb-2 fw-bold">Evaluation du Personnel</h2>
+                <h2 class="text-white pb-2 fw-bold">Evaluation du Commerciale</h2>
             </div>
         </div>
         <div class="page-inner">
-            <div v-if="!showClassements">
-                <h2 class="text-center">
-                    <span style="background-color:#f9fbfd">Recherche</span>
-                </h2>
-                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-                <div class="card">
-                    <div class="card-body">
-                        <div v-if="showAdvancedSearch">
-                            <hr/>
-                            <h3 class="text-center">Recherche avance</h3>
-                            <div>
-                                <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(0)" ><i class="fas fa-dolly-flatbed " style="margin-right:10px"></i>Parametre de la mission</h4>
-                                <div id="choixMission" class="row">
-                                    <div class="form-group col-4">
-                                        <label for="inputMission">Type de mission</label>
-                                        <select class="form-control " id="inputMission" v-model="idMission" v-on:change="changeIdMission">
-                                            <option v-bind:key="mission.Id" v-bind:value="mission.Id" v-for="mission in missions">{{ mission.designation }}</option>
-                                        </select>
-                                    </div>
+            <h2 class="text-center">
+                <span style="background-color:#f9fbfd">Recherche</span>
+            </h2>
+            <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+            <div class="card">
+                <div class="card-header">
+                    Recherche
+                </div>
+                <div class="card-body">
+                    <div class="row" id="parametreMission">
+                        <div class="col-md-6 form-group">
+                            <label for="inputTypeMission">Type mission</label>
+                            <select class="form-control " id="inputTypeMission" v-model="idMission" v-on:change="changeIdMission">
+                                <option v-bind:key="mission.Id" v-bind:value="mission.Id" v-for="mission in missions">{{ mission.designation }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 col-sm-6 form-group">
+                            <label for="inputDateDebut">date de debut</label>
+                            <input class="form-control"  type="Date" id="inputDateDebut" v-model="dateDebut">
+                        </div>
+                        <div class="col-md-3 col-sm-6 form-group">
+                            <label for="inputDateFin">date de fin</label>
+                            <input class="form-control"  type="Date" id="inputDateFin"  v-model="dateFin">
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="row" id="dateAExclure">
+                        <div class="col-6 form-group">
+                            <label>Date a exclure</label>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-6 form-group">
+                                    <input class="form-control" type="Date" id="inputDateFin"  v-model="dateExclu"> 
                                 </div>
-                            </div>
-                            <div>
-                                <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(0)" ><i class="fas fa-dolly-flatbed " style="margin-right:10px"></i>Produit utilisé durant la mission</h4>
-                                <div class="row" v-if="advancedSearchDisplay[0]">
-                                    <div class="col-12">
-                                        <SearchProduit v-model:produits="produits"/>
-                                    </div>
-                                    <div class="col-12">
-                                        <ProduitTab v-model:produits="produits"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(1)"><i class="far fa-calendar-alt " style="margin-right:10px"></i>Intervale de date a analyser</h4>
-                                <div class="row" v-if="advancedSearchDisplay[1]">
-                                    <div class="form-group col-sm-4">
-                                        <label for="inputDateDebut">date de debut</label>
-                                        <input class="form-control"  type="Date" placeholder="date debut" v-model="dateDebut">
-                                    </div>
-                                    <div class="form-group col-sm-4">
-                                        <label for="inputDateFin">date de fin</label>
-                                        <input class="form-control"  type="Date" placeholder="date fin" v-model="dateFin">
-                                    </div> 
-                                    <div class="form-group col-sm-4">
-                                        <label for="totalJour">Nbr de jours a analyser</label>
-                                        <span class="form-control" id="totalJour">{{ nbrDeJourIntervale }} jours d'intervale</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(2)"><i class="far fa-calendar-times " style="margin-right:10px"></i>Date a exclure de l'analyse</h4>
-                                <div class="row" v-if="advancedSearchDisplay[2]">
-                                    <div class="form-group col-6">
-                                        <label for="inputDateDebut">date a exclure</label>
-                                        <input class="form-control"  type="Date" placeholder="date debut" v-model="dateExclu">    
-                                    </div>
-                                    <div class="form-group col-6">
-                                        <button v-on:click="addDateExclu()" class="btn btn-secondary form-control" style="margin-top:30px">
-                                            Ajouter
-                                        </button>
-                                    </div>
-                                    <div class="col-12 table-responsive">
-                                        <table class="table table-hover">
-                                            <thead >
-                                                <tr v-if="listeDateExclu.length>0" class="bg-secondary" style="color:white">
-                                                    <th scope="col-2">date</th>
-                                                    <th scope="col-2"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="date in listeDateExclu" v-bind:key="date">
-                                                    <td scope="col-md-2">{{ date }}</td>
-                                                    <td scope="col-md-2">
-                                                        <button class="btn btn-danger" v-on:click="removeDateExclu(date)">supprimer</button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>    
-                            <div>
-                                <hr/>
-                                    <h4 style="color:#4b79bf" v-on:click="toogleAdvancedView(3)"><i class="far fas fa-chart-bar " style="margin-right:10px"></i>Critères de vente</h4>
-                                <div class="row" v-if="advancedSearchDisplay[3]">
-                                    <div class="form-group col-sm-6">
-                                        <label for="pourcentage">pourcentage minimale de vente par jour</label>
-                                        <input class="form-control"  type="number" v-model="pourcentage" v-on:change="changePourcentage">
-                                    </div>
+                                <div class="col-6 form-group">
+                                    <button v-on:click="addDateExclu()" class="btn btn-secondary form-control col-6">
+                                        Exclure
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        <h3 class="text-center">Recherche de personnel</h3>
-                        <hr/>
-                        <div class="row" id="rechercheNormal">
-                            <div class="form-group col-6 col-md-3">
-                                <label for="inputFonction">Fonction</label>
-                                <select class="form-control " id="inputFonction" v-model="idFonction" v-on:change="changeCustomId">
-                                    <option v-bind:key="fonction.designation" v-bind:value="fonction.id" v-for="fonction in fonctions">{{ fonction.designation }}</option>
-                                </select>
+                    </div>
+                    <div v-if="listeDateExclu.length>0" class="row">
+                        <div class="col-6 form-group">
+                            <label>liste des dates éxclus</label>
+                        </div>
+                    </div>
+                    <div id="listeDateExclu" class="row">
+                        <div v-for="date in listeDateExclu" class="col-3">
+                            <div style="margin-top:5px" class="btn btn-primary btn-border btn-block">
+                                {{ date }}
                             </div>
-                            <div class="form-group col-6 col-md-3">
-                                <label for="inputMatricule">Matricule</label>
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <input class="form-control"  type="text" placeholder="what are you looking for?" v-model="matricule" v-on:keyup="autoComplete" v-on:click="autoComplete">
-                                    </div>
-                                    <div class="panel-footer" style="float:top;position: absolute;z-index: 1;width: -moz-available;" >
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="row" id="tauxDeVente">
+                        <div class="col-6 form-group">
+                            <label>pourcentage minimale de vente par jour</label>
+                        </div>
+                        <div class="col-6 form-group">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">plus de</span>
+                                </div>
+                                <input class="form-control"  type="number" v-model="pourcentage" v-on:change="changePourcentage">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">% des ventes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="row" id="produit">
+                        <div class="col-6 form-group">
+                            <label>Produits utilisés</label>
+                        </div>
+                        <div class="col-6">
+                            <div class="row">
+                                <div class="col-6 form-group">
+                                    <input class="form-control" type="text" id="produitDesignation" v-model="produitDesignation" v-on:keyup="autoCompleteProduit" v-on:click="autoCompleteProduit"> 
+                                    <div class="panel-footer" style="float:top;position: absolute;z-index: 1;">
                                         <ul class="list-group">
-                                            <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
-                                                <div >{{ result.Matricule }}</div>
+                                            <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeProduit(result.Designation)" >
+                                                <div >{{ result.Designation }}</div>
                                             </li>
                                         </ul>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-group col-6 col-md-3">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <button class="btn btn-secondary justify-content-center" style="margin-top:30px; margin-right:5px" v-on:click="addPersonnel">Ajouter</button>
-                                    </div>
-                                    <div class="col-6">
-                                        <button class="btn btn-secondary justify-content-center" style="margin-top:30px" v-on:click="toogleAdvancedSearch">Option <i class="fas fa-bars" style="color:white;margin-left:10px"></i></button>
-                                    </div>
+                                <div class="col-6 form-group">
+                                    <button v-on:click="addProduit()" class="btn btn-secondary form-control col-6">
+                                        ajouter
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="row" >
-                            <div class="col-12 text-center">
-                                <button class="btn btn-primary btn-rounded" v-on:click="getProposition">Proposer</button>
+                    </div>
+                    <div id="listeProduit" class="row">
+                        <div v-for="produit in produits" class="col-3">
+                            <div style="margin-top:5px" class="btn btn-primary btn-border btn-block">
+                                {{ produit.Code_produit }}
                             </div>
                         </div>
                     </div>
-                </div>
-                <h2 class="text-center"><span style="background-color:#f9fbfd">Resultat</span></h2>
-                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-                <div class="card">
-                    <div class="card-body">
-                        <!--
-                        <div class="row d-flex justify-content-center" id="resultCommerciaux" >
-                            <div class="table-responsive col-12" style="margin-left:25px">
-                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                    <thead >
-                                        <tr class="bg-secondary" style="color:white">
-                                            <th class="respText" scope="col-md-2">matricule</th>
-                                            <th class="respText" scope="col-md-2 d-none">nom et prenom</th>
-                                            <th class="respText" scope="col-md-1"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="equipe in commerciaux" v-bind:key="equipe">
-                                            <td class="respText" scope="col-md-2">{{ equipe.Matricule }}</td>
-                                            <td class="respText" scope="col-md-2">{{ equipe.Nom+equipe.Prenom }}</td>
-                                            <td class="respText" scope="col-md-1">
-                                                <button class="btn btn-danger" v-on:click="remove(equipe.Matricule)">
-                                                <div class="d-none d-lg-block">
-                                                    supprimer
-                                                </diV>
-                                                <div class="d-block d-lg-none">
-                                                    X
-                                                </div>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div> 
-                        </div>-->
-                        <div class="row" >
-                            <div class="col-12 text-right">
-                                <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
-                            </div>
-                        </div>
-                    </div>
+                    <button id="testt" class="btn btn-primary">azeza</button>
+                    
                 </div>
             </div>
-        </div>
-    </div>
-    <div v-if="showClassements">
-        <div class="panel-header bg-secondary-gradient">
-            <div class="page-inner py-4">
-                <h2 class="text-white pb-2 fw-bold">Classements</h2>
-            </div>
-        </div>
-        <div class="page-inner"> 
             <div class="card">
+                <div class="card-header">
+                    resultat
+                </div>
                 <div class="card-body">
                     <div class="row">
-                        <h4 class="col-12">
-                            total : {{ classements.length }}
-                        </h4>
+                        <div class="col-md-6 card">
+                            <div class="card-header">
+                                propositions
+                            </div>
+                            <div class="card-body">
+                            </div>
+                        </div>
+                        <div class="col-md-6 card">
+                            <div class="card-header">
+                                personnels validés
+                            </div>
+                            <div class="card-body">
+                            </div>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                            <thead >
-                                <tr class="bg-secondary" style="color:white">
-                                    <th class="respText" >Place</th>
-                                    <th class="respText" >Matricule</th>
-                                    <th class="respText" >Nom et Prenom</th>
-                                    <th class="respText" >CA Mission (en Ar)</th>
-                                    <th class="respText" >CA Local (en Ar)</th>
-                                    <th class="respText" >CA Total (en Ar)</th>
-                                    <th class="respText" >ratio de vente</th>
-                                    <th class="respText" >assuidite</th>
-                                    <th class="respText" >statut</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="personnel in classements" v-bind:key="personnel">
-                                    <td class="respText" >{{ personnel.place }}</td>
-                                    <td class="respText" >{{ personnel.Matricule }}</td>
-                                    <td class="respText" >{{ personnel.Nom+" "+personnel.Prenom }}</td>
-                                    <td class="respText" >{{ personnel.CAMission }}</td>
-                                    <td class="respText" >{{ personnel.CALocal }}</td>
-                                    <td class="respText" >{{ personnel.CAGlobal }}</td>
-                                    <td class="respText" >{{ personnel.pourcentageObjectif.toFixed(2) }}%</td>
-                                    <td class="respText" >{{ personnel.assuidite.toFixed(2) }}%</td>
-                                    <td class="respText" style="color:green" v-if="personnel.etatVente=='Qualifier'" >{{ personnel.etatVente }}</td>
-                                    <td class="respText" style="color:red" v-else="" >{{ personnel.etatVente }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-6 d-flex justify-content-start">
-                    <button class="btn btn-secondary btn-round" v-on:click="retourClassement">retour </button>
-                </div>
-                <div class="col-6 d-flex justify-content-end">
-                     <button class="btn btn-secondary btn-round" v-on:click="validateEquipe">Valider</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div>
-        <div class="panel-header bg-secondary-gradient">
-            <div class="page-inner py-4">
-                <h2 class="text-white pb-2 fw-bold">Classements</h2>
-            </div>
-        </div>
-        <div class="page-inner">
-            <div class="row">
-                <div class="col-6 card">
-                    <div class="card-body">
-                    </div>
-                </div>
-                <div class="col-6">
                 </div>
             </div>
         </div>
@@ -295,7 +172,10 @@ export default {
             idFonction: null,
             idMission: "n",
 
+            produitDesignation: "",
             idProduit: null,
+
+            isSearchingProduit: false,
 
             customId: null,
 
@@ -317,7 +197,7 @@ export default {
             dateExclu: '',
             listeDateExclu: [],
 
-            pourcentage: '30',
+            pourcentage: '70',
             minimumVente: 0
         }
     },
@@ -349,6 +229,55 @@ export default {
         this.loadAdvencedSearchData();
     },
     methods: {
+        autoCompleteProduit(){
+            if((this.produitDesignation.length > 2)&&(!this.isSearchingAutoComplete)){
+                this.isSearchingProduit = true;
+                if(this.produitDesignation != null ){
+                    setTimeout(this.searchProduitAutoComplete, 1000);
+                }
+            } 
+        },
+        searchProduitAutoComplete(){
+            this.resultats = [];
+            if(this.customId == null){
+                axios.get('/api/produits/getProduitByDesignation',{params: {Designation: this.produitDesignation}}).then(response => {
+                    this.isSearchingAutoComplete = false;
+                    if(response.data.success){
+                        this.resultats = response.data.produits;
+                    }
+                    else{
+                        alert(response.data.message);
+                    }
+                });
+            }
+        },
+        addProduit(){
+            let produitExist = false;
+            for(let i=0;i<this.produits.length;i++){
+                if(this.produits[i].Designation == this.produitDesignation){
+                    produitExist = true;
+                    break;
+                }
+            }
+            if(!produitExist){
+                axios.get('/api/produits/getFirst',{params: {criteres: {Designation: this.produitDesignation}}}).then(response => {
+                    if(response.data.success){
+                        this.produits.push(response.data.produit);
+                        this.produitDesignation = "";
+                    }
+                    else{
+                        alert('aucun resultat trouvé');
+                    }
+                });
+            }
+            else{
+                alert('ce produit a deja etait ajouter');
+            }
+        },
+        changeProduit(designation){
+            this.resultats = [];
+            this.produitDesignation = designation;
+        },
         remove(matricule){
             for( var i = 0; i < this.commerciaux.length; i++){ 
                 if ( this.commerciaux[i].Matricule ==  matricule) { 
@@ -507,7 +436,7 @@ export default {
             let produits =  this.getCodeProduitFromArray(this.produits);
             let data = {
                 "excel":"evaluation",
-                "Matricules":matricules,
+                "Matricules":matricules, 
                 "Produits": produits,
                 
                 "dateDebut": this.dateDebut,
@@ -517,6 +446,7 @@ export default {
 
                 "pourcentage": this.pourcentage,
                 "minimumVente": this.minimumVente
+
             };
             data = JSON.stringify(data);
             data ='/excel'+data

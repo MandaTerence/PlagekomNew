@@ -78,12 +78,18 @@ export default {
                         if (response.data.success) {
                             this.$router.go('/dashboard')
                         } else {
-                            this.error = response.data.message
+                            this.error = "impossible de se connecter"
                         }
                     })
+                    .catch((error) => {
+                        this.error = "impossible de se connecter"
+                        //console.warn('Not good man :(');
+                    })
+                    /*
                     .catch(
                         this.error = "impossible de se connecter"
                     );
+                    */
                 })
             }
         }
