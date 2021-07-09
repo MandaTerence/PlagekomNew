@@ -110,8 +110,13 @@
                             </div>
                         </div>
                     </div>
-                    <button id="testt" class="btn btn-primary">azeza</button>
-                    
+                </div>
+                <div class="card-footer">
+                    <div class="row" >
+                        <div class="col-12 text-center">
+                            <button v-on:click="getProposition" class="btn btn-primary btn-rounded">Proposer</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="card">
@@ -124,7 +129,17 @@
                             <div class="card-header">
                                 propositions
                             </div>
-                            <div class="card-body">
+                            <div class="card-body"> 
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <tbody>
+                                            <tr v-for="proposition in propositions">
+                                                <td>{{ proposition.Matricule }}</td>
+                                                <td><a v-on:click="addProposition(proposition)">+</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-6 card">
@@ -132,6 +147,16 @@
                                 personnels validés
                             </div>
                             <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <tbody>
+                                            <tr v-for="classements in propositions">
+                                                <td>{{ proposition.Matricule }}</td>
+                                                <td><a v-on:click="addProposition(proposition)">+</a></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -169,6 +194,8 @@ export default {
             coachs: [],
             produits: [],
 
+            propositions:[],
+
             idFonction: null,
             idMission: "n",
 
@@ -182,8 +209,6 @@ export default {
             resultats: [],
             classements: [],
             classementReel: [],
-            
-            propositions: [],
 
             buttonTeamA: "btn btn-secondary btn-border",
             buttonTeamB: "btn btn-secondary",
@@ -236,6 +261,18 @@ export default {
                     setTimeout(this.searchProduitAutoComplete, 1000);
                 }
             } 
+        },
+        getProposition(){
+            let produits =  this.getCodeProduitFromArray(this.produits);
+            axios.get('/api/personnels/getProposition',{params: {
+                idType: this.idMission,
+                dateDebut: this.dateDebut,
+                dateFin: this.dateFin,
+                produits: produits,
+                listeDateExclu: this.listeDateExclu,
+            }}).then(response => {
+                this.propositions = response.data.propositions;
+            });
         },
         searchProduitAutoComplete(){
             this.resultats = [];
@@ -456,8 +493,7 @@ export default {
                 
                 this.download(response);
             });
-        },
-        
+        },      
         download(data) {
             if(!data){
                 return
@@ -471,7 +507,6 @@ export default {
             document.body.appendChild(aLink)
             aLink.click()
         },
-
         getMatriculeAndPlaceFromArray(personnels){
             let matricules = [];
             for(let i=0;i<personnels.length;i++){
@@ -494,19 +529,9 @@ export default {
             }
             return codeProduits;
         },
-        getProposition(){
-            let produits =  this.getCodeProduitFromArray(this.produits);
-            alert(produits.length);
-            axios.get('/api/personnels/getProposition',{params: {
-                idType: this.idMission,
-                dateDebut: this.dateDebut,
-                dateFin: this.dateFin,
-                produits: produits,
-                listeDateExclu: this.listeDateExclu,
-            }}).then(response => {
-                this.propositions = response.propositions;
-                this.showClassements = true;
-            });
+        addProposition(proposition){
+            this.classements.push(proposition);
+            this.classementReel.push(proposition);
         },
         getClassement(){
             let matricules = this.getMatriculeFromArray(this.commerciaux);
@@ -525,8 +550,7 @@ export default {
                 pourcentage: this.pourcentage,
                 minimumVente: this.minimumVente
 
-            }}).then(response => { 
-                
+            }}).then(response => {
                 this.showClassements = true;
                 this.classements = response.data.classements;
                 localStorage.classements = JSON.stringify(this.classements);
@@ -538,7 +562,6 @@ export default {
                     this.fillPlaceTemp(response.data.classementsReel);
                     this.classementReel = response.data.classementsReel;
                     localStorage.classementReel = JSON.stringify(this.classementReel);
-                    
                 }*/
             });
         },
