@@ -125,34 +125,73 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6 card">
+                        <div class="col-md-6 card" style="border-color: blue;">
                             <div class="card-header">
                                 propositions
                             </div>
                             <div class="card-body"> 
+                                <div v-if="propositions.length>0" class="row d-flex justify-content-center" style="margin-bottom:20px">
+                                    <select class="col-8 form-control input-sm" v-model="filtreProposition" v-on:change="filtrer(filtreProposition,propositions)">
+                                        <option value="mp" selected>meilleur proposition</option>
+                                        <option value="cal">meilleur de chiffre d'affaire</option>
+                                        <option value="cam">meilleur moyenne de chiffre d'affaire moyen</option>
+                                        <option value="cal">meilleur chiffre d'affaire local</option>
+                                        <option value="cami">meilleur chiffre d'affaire mission</option>
+                                        <option v-if="(missionChoix!='')" value="cat">meilleur chiffre d'affaire {{ missionChoix }}</option>
+                                    </select>
+                                    <button class="col-2 btn btn-primary">filtrer</button>
+                                    
+                                </div>
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover table-head-bg-primary table-bordered-bd-primary">
+                                        <thead v-if="propositions.length>0">
+                                            <tr>
+                                                <th style="font-size:11px" >matricule</th>
+                                                <th style="font-size:11px" >nom</th>
+                                                <th style="font-size:11px" ></th>
+                                            </tr>
+                                        </thead>
                                         <tbody>
                                             <tr v-for="proposition in propositions">
-                                                <td>{{ proposition.Matricule }}</td>
-                                                <td><a v-on:click="addProposition(proposition)">+</a></td>
+                                                <td style="font-size:11px" >{{ proposition.Matricule }}</td>
+                                                <td style="font-size:11px" >{{ proposition.Nom+" "+proposition.Prenom }}</td>
+                                                <td style="font-size:11px" ><button class="btn btn-success btn-sm" v-on:click="validateProposition(proposition)">ajouter</button></td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 card">
+                        <div class="col-md-6 card" style="border-color: green;">
                             <div class="card-header">
                                 personnels validés
                             </div>
                             <div class="card-body">
+                                <div v-if="classements.length>0" class="row d-flex justify-content-center" style="margin-bottom:20px">
+                                    <select class="col-8 form-control input-sm" v-model="filtreClassement" v-on:change="filtrer(filtreClassement,classements)">
+                                        <option value="mp" selected>meilleur proposition</option>
+                                        <option value="cal">meilleur de chiffre d'affaire</option>
+                                        <option value="cam">meilleur moyenne de chiffre d'affaire moyen</option>
+                                        <option value="cal">meilleur chiffre d'affaire local</option>
+                                        <option value="cami">meilleur chiffre d'affaire mission</option>
+                                        <option v-if="(missionChoix!='')" value="cat">meilleur chiffre d'affaire {{ missionChoix }}</option>
+                                    </select>
+                                    <button class="col-2 btn btn-primary">filtrer</button>
+                                </div>
                                 <div class="table-responsive">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover table-head-bg-success table-bordered-bd-success" >
+                                        <thead v-if="classements.length>0">
+                                            <tr>
+                                                <th style="font-size:11px" >matricule</th>
+                                                <th style="font-size:11px" >nom</th>
+                                                <th style="font-size:11px" ></th>
+                                            </tr>
+                                        </thead>
                                         <tbody>
-                                            <tr v-for="classements in propositions">
-                                                <td>{{ proposition.Matricule }}</td>
-                                                <td><a v-on:click="addProposition(proposition)">+</a></td>
+                                            <tr v-for="classement in classements">
+                                                <td style="font-size:11px" >{{ classement.Matricule }}</td>
+                                                <td style="font-size:11px" >{{ classement.Nom+" "+classement.Prenom }}</td>
+                                                <td style="font-size:11px" ><button class="btn btn-danger btn-sm" v-on:click="removeClassement(classement)">supprimer</button></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -198,6 +237,7 @@ export default {
 
             idFonction: null,
             idMission: "n",
+            missionChoix: "",
 
             produitDesignation: "",
             idProduit: null,
@@ -223,7 +263,10 @@ export default {
             listeDateExclu: [],
 
             pourcentage: '70',
-            minimumVente: 0
+            minimumVente: 0,
+
+            filtreProposition: 'meilleur',
+            filtreClassement:  'meilleur'
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -270,9 +313,60 @@ export default {
                 dateFin: this.dateFin,
                 produits: produits,
                 listeDateExclu: this.listeDateExclu,
+                
             }}).then(response => {
-                this.propositions = response.data.propositions;
+                //this.propositions = response.data.propositions;
+                for(let i=0;i<response.data.propositions.length;i++){
+                    this.addProposition(response.data.propositions[i]);
+                }
+                let miss = this.getMissionFromId(this.idMission);
+                if(miss!=""){
+                    this.missionChoix = miss.designation;
+                }
             });
+        },
+        filtrer(critere,presonnels){
+            if(critere=="ca"){
+                presonnels.sort(function(a, b) {
+                    return b.CAGlobal - a.CAGlobal;
+                });
+            }
+            else if(critere=="cam"){
+                presonnels.sort(function(a, b) {
+                    return b.CAMoyen - a.CAMoyen;
+                });
+            }
+            else if(critere=="cami"){
+                presonnels.sort(function(a, b) {
+                    return b.CAMission - a.CAMission;
+                });
+            }
+            else if(critere=="cal"){
+                presonnels.sort(function(a, b) {
+                    return b.CALocal - a.CALocal;
+                });
+            }
+            else{
+                presonnels.sort(function(a, b) {
+                    return b.CATotal - a.CATotal;
+                });
+            }
+        },
+        addProposition(personnel){
+            for(let i=0;i<this.propositions.length;i++){
+                if(personnel.Matricule==this.propositions[i].Matricule){
+                    return;
+                }
+            }
+            this.propositions.push(personnel);
+        },
+        getMissionFromId(idMission){
+            this.missions.forEach((mission, index) => {
+                if(mission.id==idMission){
+                    return mission;
+                }
+            })
+            return "";
         },
         searchProduitAutoComplete(){
             this.resultats = [];
@@ -529,9 +623,35 @@ export default {
             }
             return codeProduits;
         },
-        addProposition(proposition){
+        validateProposition(proposition){
+            this.classements.forEach((classement, index) => {
+                if(classement.Matricule.trim()==proposition.Matricule.trim()){
+                    alert("le commercial "+classement.Matricule+" est deja present");
+                    return;
+                }
+            })
             this.classements.push(proposition);
             this.classementReel.push(proposition);
+            this.removeProposition(proposition)
+        },
+        removeProposition(personnel){
+            this.propositions.forEach((proposition, index) => {
+                if(proposition.Matricule.trim() == personnel.Matricule.trim()){
+                    this.propositions.splice(index,1);
+                }
+            })
+        },
+        removeClassement(personnel){
+            this.classements.forEach((classement, index) => {
+                if(classement.Matricule.trim() == personnel.Matricule.trim()){
+                    this.classements.splice(index,1);
+                }
+            });
+            this.classementReel.forEach((classement, index) => {
+                if(classement.Matricule.trim() == personnel.Matricule.trim()){
+                    this.classements.splice(index,0);
+                }
+            })
         },
         getClassement(){
             let matricules = this.getMatriculeFromArray(this.commerciaux);

@@ -156,6 +156,7 @@ class Personnel extends Model
 
 
         foreach($propositions as $proposition){
+            $proposition->getNomFromMAtricule();
             $proposition->getAllCA($interval,$dateExclus,$produits,$idTypeMission);
         }
 

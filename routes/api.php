@@ -11,7 +11,6 @@ use App\Http\Controllers\API\ProduitController;
 use App\Http\Controllers\API\ControleController;
 use App\Http\Controllers\API\SanctionController;
 use App\Http\Controllers\API\SanctionPersonnelController;
-
 use Illuminate\Support\Facades\Route;
 
 

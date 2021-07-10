@@ -18287,6 +18287,7 @@ __webpack_require__.r(__webpack_exports__);
       propositions: [],
       idFonction: null,
       idMission: "n",
+      missionChoix: "",
       produitDesignation: "",
       idProduit: null,
       isSearchingProduit: false,
@@ -18302,7 +18303,9 @@ __webpack_require__.r(__webpack_exports__);
       dateExclu: '',
       listeDateExclu: [],
       pourcentage: '70',
-      minimumVente: 0
+      minimumVente: 0,
+      filtreProposition: 'meilleur',
+      filtreClassement: 'meilleur'
     };
   },
   beforeRouteEnter: function beforeRouteEnter(to, from, next) {
@@ -18355,8 +18358,57 @@ __webpack_require__.r(__webpack_exports__);
           listeDateExclu: this.listeDateExclu
         }
       }).then(function (response) {
-        _this.propositions = response.data.propositions;
+        //this.propositions = response.data.propositions;
+        for (var i = 0; i < response.data.propositions.length; i++) {
+          _this.addProposition(response.data.propositions[i]);
+        }
+
+        var miss = _this.getMissionFromId(_this.idMission);
+
+        if (miss != "") {
+          _this.missionChoix = miss.designation;
+        }
       });
+    },
+    filtrer: function filtrer(critere, presonnels) {
+      if (critere == "ca") {
+        presonnels.sort(function (a, b) {
+          return b.CAGlobal - a.CAGlobal;
+        });
+      } else if (critere == "cam") {
+        presonnels.sort(function (a, b) {
+          return b.CAMoyen - a.CAMoyen;
+        });
+      } else if (critere == "cami") {
+        presonnels.sort(function (a, b) {
+          return b.CAMission - a.CAMission;
+        });
+      } else if (critere == "cal") {
+        presonnels.sort(function (a, b) {
+          return b.CALocal - a.CALocal;
+        });
+      } else {
+        presonnels.sort(function (a, b) {
+          return b.CATotal - a.CATotal;
+        });
+      }
+    },
+    addProposition: function addProposition(personnel) {
+      for (var i = 0; i < this.propositions.length; i++) {
+        if (personnel.Matricule == this.propositions[i].Matricule) {
+          return;
+        }
+      }
+
+      this.propositions.push(personnel);
+    },
+    getMissionFromId: function getMissionFromId(idMission) {
+      this.missions.forEach(function (mission, index) {
+        if (mission.id == idMission) {
+          return mission;
+        }
+      });
+      return "";
     },
     searchProduitAutoComplete: function searchProduitAutoComplete() {
       var _this2 = this;
@@ -18634,12 +18686,42 @@ __webpack_require__.r(__webpack_exports__);
 
       return codeProduits;
     },
-    addProposition: function addProposition(proposition) {
+    validateProposition: function validateProposition(proposition) {
+      this.classements.forEach(function (classement, index) {
+        if (classement.Matricule.trim() == proposition.Matricule.trim()) {
+          alert("le commercial " + classement.Matricule + " est deja present");
+          return;
+        }
+      });
       this.classements.push(proposition);
       this.classementReel.push(proposition);
+      this.removeProposition(proposition);
+    },
+    removeProposition: function removeProposition(personnel) {
+      var _this6 = this;
+
+      this.propositions.forEach(function (proposition, index) {
+        if (proposition.Matricule.trim() == personnel.Matricule.trim()) {
+          _this6.propositions.splice(index, 1);
+        }
+      });
+    },
+    removeClassement: function removeClassement(personnel) {
+      var _this7 = this;
+
+      this.classements.forEach(function (classement, index) {
+        if (classement.Matricule.trim() == personnel.Matricule.trim()) {
+          _this7.classements.splice(index, 1);
+        }
+      });
+      this.classementReel.forEach(function (classement, index) {
+        if (classement.Matricule.trim() == personnel.Matricule.trim()) {
+          _this7.classements.splice(index, 0);
+        }
+      });
     },
     getClassement: function getClassement() {
-      var _this6 = this;
+      var _this8 = this;
 
       var matricules = this.getMatriculeFromArray(this.commerciaux);
       var produits = this.getCodeProduitFromArray(this.produits);
@@ -18655,11 +18737,11 @@ __webpack_require__.r(__webpack_exports__);
           minimumVente: this.minimumVente
         }
       }).then(function (response) {
-        _this6.showClassements = true;
-        _this6.classements = response.data.classements;
-        localStorage.classements = JSON.stringify(_this6.classements);
+        _this8.showClassements = true;
+        _this8.classements = response.data.classements;
+        localStorage.classements = JSON.stringify(_this8.classements);
 
-        _this6.fillPlaceTemp(response.data.classements);
+        _this8.fillPlaceTemp(response.data.classements);
         /*
         if(response.data.personnels!=null){
             this.classements = response.data.classements;
@@ -18699,13 +18781,13 @@ __webpack_require__.r(__webpack_exports__);
     },
     // search perso
     loadFonctions: function loadFonctions() {
-      var _this7 = this;
+      var _this9 = this;
 
       this.$axios.get('/api/fonctions').then(function (response) {
         if (response.data.success) {
-          _this7.fonctions = response.data.fonctions;
-          _this7.idFonction = _this7.fonctions[0].id;
-          _this7.customId = _this7.fonctions[0].customId;
+          _this9.fonctions = response.data.fonctions;
+          _this9.idFonction = _this9.fonctions[0].id;
+          _this9.customId = _this9.fonctions[0].customId;
         } else {
           console.log(response.data.message);
         }
@@ -18714,7 +18796,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     searchAutoComplete: function searchAutoComplete() {
-      var _this8 = this;
+      var _this10 = this;
 
       this.resultats = [];
 
@@ -18725,10 +18807,10 @@ __webpack_require__.r(__webpack_exports__);
             search: this.matricule
           }
         }).then(function (response) {
-          _this8.isSearchingAutoComplete = false;
+          _this10.isSearchingAutoComplete = false;
 
           if (response.data.success) {
-            _this8.resultats = response.data.personnels;
+            _this10.resultats = response.data.personnels;
           } else {
             alert(response.data.message);
           }
@@ -18738,11 +18820,11 @@ __webpack_require__.r(__webpack_exports__);
           axios.get('/api/personnels/getMatriculeByFonction', {
             params: {
               fonction: element,
-              search: _this8.matricule
+              search: _this10.matricule
             }
           }).then(function (response) {
             if (response.data.success) {
-              _this8.resultats = _this8.resultats.concat(response.data.personnels);
+              _this10.resultats = _this10.resultats.concat(response.data.personnels);
             } else {
               alert(response.data.message);
             }
@@ -18755,7 +18837,7 @@ __webpack_require__.r(__webpack_exports__);
       this.addPersonnelToTable(this.commerciaux, personnel);
     },
     addPersonnel: function addPersonnel() {
-      var _this9 = this;
+      var _this11 = this;
 
       if (this.customId == null) {
         if (this.matricule != null && this.idFonction != null) {
@@ -18770,9 +18852,9 @@ __webpack_require__.r(__webpack_exports__);
             if (response.data.success) {
               if (response.data.personnel.Fonction_actuelle == 2) {
                 //this.addToCoachEquipe(response.data.personnel);
-                _this9.addEquipeFromCoach(response.data.personnel);
+                _this11.addEquipeFromCoach(response.data.personnel);
               } else {
-                _this9.addToEquipe(response.data.personnel);
+                _this11.addToEquipe(response.data.personnel);
               }
             } else {
               alert('aucun resultat trouvé');
@@ -18785,16 +18867,16 @@ __webpack_require__.r(__webpack_exports__);
             params: {
               criteres: {
                 Fonction_actuelle: element,
-                Matricule: _this9.matricule
+                Matricule: _this11.matricule
               }
             }
           }).then(function (response) {
             if (response.data.success) {
               if (response.data.personnel.Fonction_actuelle == 2) {
                 //this.addToCoachEquipe(response.data.personnel)
-                _this9.addEquipeFromCoach(response.data.personnel);
+                _this11.addEquipeFromCoach(response.data.personnel);
               } else {
-                _this9.addToEquipe(response.data.personnel);
+                _this11.addToEquipe(response.data.personnel);
               }
             }
           });
@@ -18817,7 +18899,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     //addEquipeFromCoach(coach){
     addEquipeFromCoach: function addEquipeFromCoach(coach) {
-      var _this10 = this;
+      var _this12 = this;
 
       //this.addPersonnelToTable(this.coachs,coach);
 
@@ -18847,8 +18929,8 @@ __webpack_require__.r(__webpack_exports__);
           }
         }).then(function (response) {
           for (var i = 0; i < response.data.data.length; i++) {
-            if (_this10.EquipeA.commerciaux.length >= _this10.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
-              _this10.addToEquipe(response.data.data[i]);
+            if (_this12.EquipeA.commerciaux.length >= _this12.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
+              _this12.addToEquipe(response.data.data[i]);
             }
           }
         });
@@ -18860,8 +18942,8 @@ __webpack_require__.r(__webpack_exports__);
           }
         }).then(function (response) {
           for (var i = 0; i < response.data.data.length; i++) {
-            if (_this10.EquipeB.commerciaux.length >= _this10.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
-              _this10.addToEquipe(response.data.data[i]);
+            if (_this12.EquipeB.commerciaux.length >= _this12.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
+              _this12.addToEquipe(response.data.data[i]);
             }
           }
         });
@@ -22488,7 +22570,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, null, 8
   /* PROPS */
-  , ["produits"])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_30])]), _hoisted_31, _hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("test"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                <div class=\"card-body\">\n                    <div class=\"row d-flex justify-content-center\" id=\"resultCoach\" >\n                        <div class=\"table-responsive col-12\" style=\"margin-left:25px\">\n                            <EquipeTab  v-model:equipes=\"coachs\" titre=\"Coachs\"/>\n                        </div>\n                    </div>\n                    <div class=\"row d-flex justify-content-center\" id=\"resultCommerciaux\" >\n                        <div class=\"table-responsive col-12\" style=\"margin-left:25px\">\n                            <EquipeTab  v-model:equipes=\"commerciaux\" titre=\"Commerciaux\"/>\n                        </div> \n                    </div>\n                    <div class=\"row\" >\n                        <div class=\"col-12 text-right\">\n                            <button class=\"btn btn-secondary\" v-on:click=\"getClassement\">lancer le classement</button>\n                        </div>\n                    </div>\n                </div>\n                "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+  , ["produits"])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_30])]), _hoisted_31, _hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("testqsdsqd"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                <div class=\"card-body\">\n                    <div class=\"row d-flex justify-content-center\" id=\"resultCoach\" >\n                        <div class=\"table-responsive col-12\" style=\"margin-left:25px\">\n                            <EquipeTab  v-model:equipes=\"coachs\" titre=\"Coachs\"/>\n                        </div>\n                    </div>\n                    <div class=\"row d-flex justify-content-center\" id=\"resultCommerciaux\" >\n                        <div class=\"table-responsive col-12\" style=\"margin-left:25px\">\n                            <EquipeTab  v-model:equipes=\"commerciaux\" titre=\"Commerciaux\"/>\n                        </div> \n                    </div>\n                    <div class=\"row\" >\n                        <div class=\"col-12 text-right\">\n                            <button class=\"btn btn-secondary\" v-on:click=\"getClassement\">lancer le classement</button>\n                        </div>\n                    </div>\n                </div>\n                "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     "class": $data.buttonTeamA,
     onClick: _cache[12] || (_cache[12] = function ($event) {
       return $options.toogleAvtiveTeamButton(1);
@@ -22947,7 +23029,10 @@ var _hoisted_53 = {
   "class": "row"
 };
 var _hoisted_54 = {
-  "class": "col-md-6 card"
+  "class": "col-md-6 card",
+  style: {
+    "border-color": "blue"
+  }
 };
 
 var _hoisted_55 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
@@ -22960,29 +23045,144 @@ var _hoisted_56 = {
   "class": "card-body"
 };
 var _hoisted_57 = {
-  "class": "table-responsive"
-};
-var _hoisted_58 = {
-  "class": "table table-hover"
-};
-var _hoisted_59 = {
-  "class": "col-md-6 card"
+  key: 0,
+  "class": "row d-flex justify-content-center",
+  style: {
+    "margin-bottom": "20px"
+  }
 };
 
-var _hoisted_60 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
+var _hoisted_58 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"mp\" selected>meilleur proposition</option><option value=\"cal\">meilleur de chiffre d&#39;affaire</option><option value=\"cam\">meilleur moyenne de chiffre d&#39;affaire moyen</option><option value=\"cal\">meilleur chiffre d&#39;affaire local</option><option value=\"cami\">meilleur chiffre d&#39;affaire mission</option>", 5);
+
+var _hoisted_63 = {
+  key: 0,
+  value: "cat"
+};
+
+var _hoisted_64 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+  "class": "col-2 btn btn-primary"
+}, "filtrer", -1
+/* HOISTED */
+);
+
+var _hoisted_65 = {
+  "class": "table-responsive"
+};
+var _hoisted_66 = {
+  "class": "table table-hover table-head-bg-primary table-bordered-bd-primary"
+};
+var _hoisted_67 = {
+  key: 0
+};
+
+var _hoisted_68 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  style: {
+    "font-size": "11px"
+  }
+}, "matricule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  style: {
+    "font-size": "11px"
+  }
+}, "nom"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  style: {
+    "font-size": "11px"
+  }
+})], -1
+/* HOISTED */
+);
+
+var _hoisted_69 = {
+  style: {
+    "font-size": "11px"
+  }
+};
+var _hoisted_70 = {
+  style: {
+    "font-size": "11px"
+  }
+};
+var _hoisted_71 = {
+  style: {
+    "font-size": "11px"
+  }
+};
+var _hoisted_72 = {
+  "class": "col-md-6 card",
+  style: {
+    "border-color": "green"
+  }
+};
+
+var _hoisted_73 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
   "class": "card-header"
 }, " personnels validés ", -1
 /* HOISTED */
 );
 
-var _hoisted_61 = {
+var _hoisted_74 = {
   "class": "card-body"
 };
-var _hoisted_62 = {
+var _hoisted_75 = {
+  key: 0,
+  "class": "row d-flex justify-content-center",
+  style: {
+    "margin-bottom": "20px"
+  }
+};
+
+var _hoisted_76 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"mp\" selected>meilleur proposition</option><option value=\"cal\">meilleur de chiffre d&#39;affaire</option><option value=\"cam\">meilleur moyenne de chiffre d&#39;affaire moyen</option><option value=\"cal\">meilleur chiffre d&#39;affaire local</option><option value=\"cami\">meilleur chiffre d&#39;affaire mission</option>", 5);
+
+var _hoisted_81 = {
+  key: 0,
+  value: "cat"
+};
+
+var _hoisted_82 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+  "class": "col-2 btn btn-primary"
+}, "filtrer", -1
+/* HOISTED */
+);
+
+var _hoisted_83 = {
   "class": "table-responsive"
 };
-var _hoisted_63 = {
-  "class": "table table-hover"
+var _hoisted_84 = {
+  "class": "table table-hover table-head-bg-success table-bordered-bd-success"
+};
+var _hoisted_85 = {
+  key: 0
+};
+
+var _hoisted_86 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  style: {
+    "font-size": "11px"
+  }
+}, "matricule"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  style: {
+    "font-size": "11px"
+  }
+}, "nom"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  style: {
+    "font-size": "11px"
+  }
+})], -1
+/* HOISTED */
+);
+
+var _hoisted_87 = {
+  style: {
+    "font-size": "11px"
+  }
+};
+var _hoisted_88 = {
+  style: {
+    "font-size": "11px"
+  }
+};
+var _hoisted_89 = {
+  style: {
+    "font-size": "11px"
+  }
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return !$data.showClassements ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_1, [_hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_3, [_hoisted_4, _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_10, [_hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("select", {
@@ -23099,26 +23299,58 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $options.getProposition && $options.getProposition.apply($options, arguments);
     }),
     "class": "btn btn-primary btn-rounded"
-  }, "Proposer")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_50, [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_54, [_hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.propositions, function (proposition) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(proposition.Matricule), 1
+  }, "Proposer")])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_50, [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_54, [_hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_56, [$data.propositions.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("select", {
+    "class": "col-8 form-control input-sm",
+    "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+      return $data.filtreProposition = $event;
+    }),
+    onChange: _cache[15] || (_cache[15] = function ($event) {
+      return $options.filtrer($data.filtreProposition, $data.propositions);
+    })
+  }, [_hoisted_58, $data.missionChoix != '' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("option", _hoisted_63, "meilleur chiffre d'affaire " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.missionChoix), 1
+  /* TEXT */
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filtreProposition]]), _hoisted_64])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_66, [$data.propositions.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("thead", _hoisted_67, [_hoisted_68])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.propositions, function (proposition) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_69, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(proposition.Matricule), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_70, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(proposition.Nom + " " + proposition.Prenom), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+      "class": "btn btn-success btn-sm",
       onClick: function onClick($event) {
-        return $options.addProposition(proposition);
+        return $options.validateProposition(proposition);
       }
-    }, "+", 8
+    }, "ajouter", 8
     /* PROPS */
     , ["onClick"])])]);
   }), 256
   /* UNKEYED_FRAGMENT */
-  ))])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_62, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.propositions, function (classements) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.proposition.Matricule), 1
+  ))])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_72, [_hoisted_73, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_74, [$data.classements.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_75, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("select", {
+    "class": "col-8 form-control input-sm",
+    "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+      return $data.filtreClassement = $event;
+    }),
+    onChange: _cache[17] || (_cache[17] = function ($event) {
+      return $options.filtrer($data.filtreClassement, $data.classements);
+    })
+  }, [_hoisted_76, $data.missionChoix != '' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("option", _hoisted_81, "meilleur chiffre d'affaire " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.missionChoix), 1
+  /* TEXT */
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 544
+  /* HYDRATE_EVENTS, NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.filtreClassement]]), _hoisted_82])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_83, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_84, [$data.classements.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("thead", _hoisted_85, [_hoisted_86])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.classements, function (classement) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_87, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Matricule), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
-      onClick: _cache[14] || (_cache[14] = function ($event) {
-        return $options.addProposition(_ctx.proposition);
-      })
-    }, "+")])]);
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_88, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Nom + " " + classement.Prenom), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_89, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+      "class": "btn btn-danger btn-sm",
+      onClick: function onClick($event) {
+        return $options.removeClassement(classement);
+      }
+    }, "supprimer", 8
+    /* PROPS */
+    , ["onClick"])])]);
   }), 256
   /* UNKEYED_FRAGMENT */
   ))])])])])])])])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true);
