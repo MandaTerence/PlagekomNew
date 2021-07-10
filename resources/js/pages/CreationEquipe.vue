@@ -71,7 +71,7 @@
             <h2 class="text-center"><span style="background-color:#f9fbfd">Resultat</span></h2>
             <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="card">
-                <!--test-->
+                <!--testqsdsqd-->
                 <!--
                 <div class="card-body">
                     <div class="row d-flex justify-content-center" id="resultCoach" >
