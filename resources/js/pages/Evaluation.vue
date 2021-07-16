@@ -5,6 +5,73 @@
                 <h2 class="text-white pb-2 fw-bold">Evaluation du Commerciale</h2>
             </div>
         </div>
+        <div v-if="showModal.detailPersonnel" @close="showModal.detailPersonnel = false">
+            <transition name="modal">
+                <div class="modal-mask">
+                    <div class="modal-wrapper">
+                        <div class="modal-container card">
+                            <div class="modal-body card-body">
+                                <slot name="body">
+                                    <div class="row justify-content-center">
+                                        <h3>{{ selectedCommercial.Matricule }}</h3>
+                                    </div>
+                                    <div class="row justify-content-center">
+                                        <h4>évaluation du {{ dateDebut }} à {{ dateFin }} ({{ nbrDeJourIntervale }} jours)</h4>
+                                    </div>
+                                    <div class="row">
+                                        <table class="table">
+                                            <tr>
+                                                <th>
+                                                    Chiffre d'Affaire Mission
+                                                </th>
+                                                <td class="text-right">
+                                                    {{ getMoneyFormat(selectedCommercial.CAMission) }} Ar
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    Chiffre d'Affaire Local
+                                                </th>
+                                                <td class="text-right">
+                                                    {{ getMoneyFormat(selectedCommercial.CALocal) }} Ar
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    Chiffre d'Affaire
+                                                </th>
+                                                <td class="text-right">
+                                                    {{ getMoneyFormat(selectedCommercial.CAGlobal) }} Ar
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>
+                                                    Chiffre d'Affaire Moyen par jour
+                                                </th>
+                                                <td class="text-right">
+                                                    {{ getMoneyFormat(selectedCommercial.CAMoyen) }} Ar
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </slot>
+                            </div>
+                            <div class="modal-footer card-footer">
+                                <slot name="footer">
+                                default footer
+                                <button class="modal-default-button" @click="showModal.detailPersonnel = false">
+                                    OK
+                                </button>
+                                </slot>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+        </div>
+
+
+
         <div class="page-inner">
             <h2 class="text-center">
                 <span style="background-color:#f9fbfd">Recherche</span>
@@ -154,7 +221,7 @@
                                         <tbody>
                                             <tr v-for="proposition in propositions">
                                                 <td style="font-size:11px" >{{ proposition.Matricule }}</td>
-                                                <td style="font-size:11px" >{{ proposition.Nom+" "+proposition.Prenom }}</td>
+                                                <td style="font-size:11px" v-on:click="showDetailCommercial(proposition)">{{ proposition.Nom+" "+proposition.Prenom }}</td>
                                                 <td style="font-size:11px" ><button class="btn btn-success btn-sm" v-on:click="validateProposition(proposition)">ajouter</button></td>
                                             </tr>
                                         </tbody>
@@ -190,7 +257,7 @@
                                         <tbody>
                                             <tr v-for="classement in classements">
                                                 <td style="font-size:11px" >{{ classement.Matricule }}</td>
-                                                <td style="font-size:11px" >{{ classement.Nom+" "+classement.Prenom }}</td>
+                                                <td style="font-size:11px" v-on:click="showDetailCommercial(classement)">{{ classement.Nom+" "+classement.Prenom }}</td>
                                                 <td style="font-size:11px" ><button class="btn btn-danger btn-sm" v-on:click="removeClassement(classement)">supprimer</button></td>
                                             </tr>
                                         </tbody>
@@ -222,7 +289,11 @@ export default {
             showAdvancedSearch: true,
             maxCoach:1,
             maxCommerciaux:8,
-            showModal: false,
+            showModal: {
+                "detailPersonnel": false
+            },
+            selectedCommercial: '',
+
 
             matricule: '',
 
@@ -297,6 +368,16 @@ export default {
         this.loadAdvencedSearchData();
     },
     methods: {
+        getMoneyFormat(monnaie){
+            if(monnaie)
+                return monnaie.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); 
+            else
+                return 0;
+        },
+        showDetailCommercial(commercial){
+            this.selectedCommercial = commercial;
+            this.showModal.detailPersonnel=true;
+        },
         autoCompleteProduit(){
             if((this.produitDesignation.length > 2)&&(!this.isSearchingAutoComplete)){
                 this.isSearchingProduit = true;
