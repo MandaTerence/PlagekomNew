@@ -18368,6 +18368,7 @@ __webpack_require__.r(__webpack_exports__);
           listeDateExclu: this.listeDateExclu
         }
       }).then(function (response) {
+        //this.fillPlaceTemp(response.data.propositions);
         //this.propositions = response.data.propositions;
         for (var i = 0; i < response.data.propositions.length; i++) {
           _this.addProposition(response.data.propositions[i]);
@@ -18626,8 +18627,31 @@ __webpack_require__.r(__webpack_exports__);
         }
       }
     },
-    validateEquipe: function validateEquipe() {
+    exportEquipe: function exportEquipe() {
       var _this5 = this;
+
+      var matricules = this.getMatriculeFromArray(this.classements);
+      var produits = this.getCodeProduitFromArray(this.produits);
+      var data = {
+        "excel": "evaluation",
+        "Matricules": matricules,
+        "Produits": produits,
+        "dateDebut": this.dateDebut,
+        "dateFin": this.dateFin,
+        "listeDateExclu": this.listeDateExclu,
+        "pourcentage": this.pourcentage,
+        "minimumVente": this.minimumVente
+      };
+      data = JSON.stringify(data);
+      data = '/excel' + data;
+      axios.get(data, {
+        responseType: 'blob'
+      }).then(function (response) {
+        _this5.download(response);
+      });
+    },
+    validateEquipe: function validateEquipe() {
+      var _this6 = this;
 
       var matricules = this.getMatriculeFromArray(this.commerciaux);
       var produits = this.getCodeProduitFromArray(this.produits);
@@ -18646,7 +18670,7 @@ __webpack_require__.r(__webpack_exports__);
       axios.get(data, {
         responseType: 'blob'
       }).then(function (response) {
-        _this5.download(response);
+        _this6.download(response);
       });
     },
     download: function download(data) {
@@ -18696,6 +18720,17 @@ __webpack_require__.r(__webpack_exports__);
 
       return codeProduits;
     },
+    changeClassement: function changeClassement(Classement, place, placeTemp) {
+      if (placeTemp < 1 || placeTemp > Classement.length) {
+        alert("changement de place impossible");
+        Classement[place - 1].placeTemp = place;
+      } else {
+        var elementTemp = Classement[place - 1];
+        Classement.splice(place - 1, 1);
+        Classement.splice(placeTemp - 1, 0, elementTemp);
+        this.recalculPlace(Classement);
+      }
+    },
     validateProposition: function validateProposition(proposition) {
       this.classements.forEach(function (classement, index) {
         if (classement.Matricule.trim() == proposition.Matricule.trim()) {
@@ -18706,32 +18741,33 @@ __webpack_require__.r(__webpack_exports__);
       this.classements.push(proposition);
       this.classementReel.push(proposition);
       this.removeProposition(proposition);
+      this.recalculPlace();
     },
     removeProposition: function removeProposition(personnel) {
-      var _this6 = this;
+      var _this7 = this;
 
       this.propositions.forEach(function (proposition, index) {
         if (proposition.Matricule.trim() == personnel.Matricule.trim()) {
-          _this6.propositions.splice(index, 1);
+          _this7.propositions.splice(index, 1);
         }
       });
     },
     removeClassement: function removeClassement(personnel) {
-      var _this7 = this;
+      var _this8 = this;
 
       this.classements.forEach(function (classement, index) {
         if (classement.Matricule.trim() == personnel.Matricule.trim()) {
-          _this7.classements.splice(index, 1);
+          _this8.classements.splice(index, 1);
         }
       });
       this.classementReel.forEach(function (classement, index) {
         if (classement.Matricule.trim() == personnel.Matricule.trim()) {
-          _this7.classements.splice(index, 0);
+          _this8.classements.splice(index, 0);
         }
       });
     },
     getClassement: function getClassement() {
-      var _this8 = this;
+      var _this9 = this;
 
       var matricules = this.getMatriculeFromArray(this.commerciaux);
       var produits = this.getCodeProduitFromArray(this.produits);
@@ -18747,11 +18783,11 @@ __webpack_require__.r(__webpack_exports__);
           minimumVente: this.minimumVente
         }
       }).then(function (response) {
-        _this8.showClassements = true;
-        _this8.classements = response.data.classements;
-        localStorage.classements = JSON.stringify(_this8.classements);
+        _this9.showClassements = true;
+        _this9.classements = response.data.classements;
+        localStorage.classements = JSON.stringify(_this9.classements);
 
-        _this8.fillPlaceTemp(response.data.classements);
+        _this9.fillPlaceTemp(response.data.classements);
         /*
         if(response.data.personnels!=null){
             this.classements = response.data.classements;
@@ -18776,28 +18812,32 @@ __webpack_require__.r(__webpack_exports__);
         this.classements.splice(_i, 1, newClassement[_i]);
       }
     },
-    changeClassement: function changeClassement(place, placeTemp) {
-      if (placeTemp < 1 || placeTemp > this.classements.length) {
-        alert("changement de place impossible");
-        this.classements[place - 1].placeTemp = place;
-      } else {
-        var elementTemp = this.classements[place - 1];
-        this.classements.splice(place - 1, 1);
-        this.classements.splice(placeTemp - 1, 0, elementTemp);
-        this.recalculPlace();
-        localStorage.sclassements = JSON.stringify(this.classements);
-        localStorage.classementReel = JSON.stringify(this.classementReel);
-      }
+
+    /*
+    changeClassement(place,placeTemp){
+        if((placeTemp<1)||(placeTemp>this.classements.length)){
+            alert("changement de place impossible");
+            this.classements[place-1].placeTemp = place;
+        }                        
+        else{
+            let elementTemp = this.classements[place-1];
+            this.classements.splice(place-1,1);
+            this.classements.splice(placeTemp-1, 0, elementTemp);
+            this.recalculPlace();
+            localStorage.sclassements = JSON.stringify(this.classements);
+            localStorage.classementReel = JSON.stringify(this.classementReel);
+        }
     },
+    */
     // search perso
     loadFonctions: function loadFonctions() {
-      var _this9 = this;
+      var _this10 = this;
 
       this.$axios.get('/api/fonctions').then(function (response) {
         if (response.data.success) {
-          _this9.fonctions = response.data.fonctions;
-          _this9.idFonction = _this9.fonctions[0].id;
-          _this9.customId = _this9.fonctions[0].customId;
+          _this10.fonctions = response.data.fonctions;
+          _this10.idFonction = _this10.fonctions[0].id;
+          _this10.customId = _this10.fonctions[0].customId;
         } else {
           console.log(response.data.message);
         }
@@ -18806,7 +18846,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     searchAutoComplete: function searchAutoComplete() {
-      var _this10 = this;
+      var _this11 = this;
 
       this.resultats = [];
 
@@ -18817,10 +18857,10 @@ __webpack_require__.r(__webpack_exports__);
             search: this.matricule
           }
         }).then(function (response) {
-          _this10.isSearchingAutoComplete = false;
+          _this11.isSearchingAutoComplete = false;
 
           if (response.data.success) {
-            _this10.resultats = response.data.personnels;
+            _this11.resultats = response.data.personnels;
           } else {
             alert(response.data.message);
           }
@@ -18830,11 +18870,11 @@ __webpack_require__.r(__webpack_exports__);
           axios.get('/api/personnels/getMatriculeByFonction', {
             params: {
               fonction: element,
-              search: _this10.matricule
+              search: _this11.matricule
             }
           }).then(function (response) {
             if (response.data.success) {
-              _this10.resultats = _this10.resultats.concat(response.data.personnels);
+              _this11.resultats = _this11.resultats.concat(response.data.personnels);
             } else {
               alert(response.data.message);
             }
@@ -18847,7 +18887,7 @@ __webpack_require__.r(__webpack_exports__);
       this.addPersonnelToTable(this.commerciaux, personnel);
     },
     addPersonnel: function addPersonnel() {
-      var _this11 = this;
+      var _this12 = this;
 
       if (this.customId == null) {
         if (this.matricule != null && this.idFonction != null) {
@@ -18862,9 +18902,9 @@ __webpack_require__.r(__webpack_exports__);
             if (response.data.success) {
               if (response.data.personnel.Fonction_actuelle == 2) {
                 //this.addToCoachEquipe(response.data.personnel);
-                _this11.addEquipeFromCoach(response.data.personnel);
+                _this12.addEquipeFromCoach(response.data.personnel);
               } else {
-                _this11.addToEquipe(response.data.personnel);
+                _this12.addToEquipe(response.data.personnel);
               }
             } else {
               alert('aucun resultat trouvé');
@@ -18877,16 +18917,16 @@ __webpack_require__.r(__webpack_exports__);
             params: {
               criteres: {
                 Fonction_actuelle: element,
-                Matricule: _this11.matricule
+                Matricule: _this12.matricule
               }
             }
           }).then(function (response) {
             if (response.data.success) {
               if (response.data.personnel.Fonction_actuelle == 2) {
                 //this.addToCoachEquipe(response.data.personnel)
-                _this11.addEquipeFromCoach(response.data.personnel);
+                _this12.addEquipeFromCoach(response.data.personnel);
               } else {
-                _this11.addToEquipe(response.data.personnel);
+                _this12.addToEquipe(response.data.personnel);
               }
             }
           });
@@ -18909,7 +18949,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     //addEquipeFromCoach(coach){
     addEquipeFromCoach: function addEquipeFromCoach(coach) {
-      var _this12 = this;
+      var _this13 = this;
 
       //this.addPersonnelToTable(this.coachs,coach);
 
@@ -18939,8 +18979,8 @@ __webpack_require__.r(__webpack_exports__);
           }
         }).then(function (response) {
           for (var i = 0; i < response.data.data.length; i++) {
-            if (_this12.EquipeA.commerciaux.length >= _this12.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
-              _this12.addToEquipe(response.data.data[i]);
+            if (_this13.EquipeA.commerciaux.length >= _this13.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
+              _this13.addToEquipe(response.data.data[i]);
             }
           }
         });
@@ -18952,8 +18992,8 @@ __webpack_require__.r(__webpack_exports__);
           }
         }).then(function (response) {
           for (var i = 0; i < response.data.data.length; i++) {
-            if (_this12.EquipeB.commerciaux.length >= _this12.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
-              _this12.addToEquipe(response.data.data[i]);
+            if (_this13.EquipeB.commerciaux.length >= _this13.maxCommerciaux) {} else if (response.data.data[i].Matricule != coach.Matricule) {
+              _this13.addToEquipe(response.data.data[i]);
             }
           }
         });
@@ -23246,6 +23286,14 @@ var _hoisted_105 = {
     "font-size": "11px"
   }
 };
+var _hoisted_106 = {
+  style: {
+    "font-size": "11px"
+  }
+};
+var _hoisted_107 = {
+  "class": "row justify-content-center"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return !$data.showClassements ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_1, [_hoisted_2, $data.showModal.detailPersonnel ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
     key: 0,
@@ -23456,7 +23504,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.Nom + " " + classement.Prenom), 9
     /* TEXT, PROPS */
-    , ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_105, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    , ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_105, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+      type: "number",
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return classement.placeTemp = $event;
+      },
+      onChange: function onChange($event) {
+        return $options.changeClassement($data.classements, classement.place, classement.placeTemp);
+      }
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
+    , ["onUpdate:modelValue", "onChange"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, classement.placeTemp]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_106, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
       "class": "btn btn-danger btn-sm",
       onClick: function onClick($event) {
         return $options.removeClassement(classement);
@@ -23466,7 +23524,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     , ["onClick"])])]);
   }), 256
   /* UNKEYED_FRAGMENT */
-  ))])])])])])])])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true);
+  ))])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_107, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    "class": "btn btn-success btn-rounded",
+    onClick: _cache[20] || (_cache[20] = function () {
+      return $options.exportEquipe && $options.exportEquipe.apply($options, arguments);
+    })
+  }, " exporter XLS ")])])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true);
 }
 
 /***/ }),

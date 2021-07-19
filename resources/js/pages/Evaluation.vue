@@ -69,9 +69,6 @@
                 </div>
             </transition>
         </div>
-
-
-
         <div class="page-inner">
             <h2 class="text-center">
                 <span style="background-color:#f9fbfd">Recherche</span>
@@ -258,6 +255,9 @@
                                             <tr v-for="classement in classements">
                                                 <td style="font-size:11px" >{{ classement.Matricule }}</td>
                                                 <td style="font-size:11px" v-on:click="showDetailCommercial(classement)">{{ classement.Nom+" "+classement.Prenom }}</td>
+                                                <td style="font-size:11px" >
+                                                    <input type="number" v-model="classement.placeTemp" v-on:change="changeClassement(classements,classement.place,classement.placeTemp)"/>
+                                                </td>
                                                 <td style="font-size:11px" ><button class="btn btn-danger btn-sm" v-on:click="removeClassement(classement)">supprimer</button></td>
                                             </tr>
                                         </tbody>
@@ -265,6 +265,11 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <button class="btn btn-success btn-rounded" v-on:click="exportEquipe">
+                            exporter XLS
+                        </button>
                     </div>
                 </div>
             </div>
@@ -396,6 +401,7 @@ export default {
                 listeDateExclu: this.listeDateExclu,
                 
             }}).then(response => {
+                //this.fillPlaceTemp(response.data.propositions);
                 //this.propositions = response.data.propositions;
                 for(let i=0;i<response.data.propositions.length;i++){
                     this.addProposition(response.data.propositions[i]);
@@ -643,6 +649,32 @@ export default {
                 }
             }    
         },
+        exportEquipe(){
+            let matricules = this.getMatriculeFromArray(this.classements);
+            let produits =  this.getCodeProduitFromArray(this.produits);
+            let data = {
+                "excel":"evaluation",
+                "Matricules":matricules, 
+                "Produits": produits,
+                
+                "dateDebut": this.dateDebut,
+                "dateFin": this.dateFin,
+
+                "listeDateExclu": this.listeDateExclu,
+
+                "pourcentage": this.pourcentage,
+                "minimumVente": this.minimumVente
+
+            };
+            data = JSON.stringify(data);
+            data ='/excel'+data
+            axios.get(data,{
+                responseType: 'blob',
+            }).then(response => {
+                
+                this.download(response);
+            });
+        }, 
         validateEquipe(){
             let matricules = this.getMatriculeFromArray(this.commerciaux);
             let produits =  this.getCodeProduitFromArray(this.produits);
@@ -665,7 +697,6 @@ export default {
             axios.get(data,{
                 responseType: 'blob',
             }).then(response => {
-                
                 this.download(response);
             });
         },      
@@ -704,6 +735,18 @@ export default {
             }
             return codeProduits;
         },
+        changeClassement(Classement,place,placeTemp){
+            if((placeTemp<1)||(placeTemp>Classement.length)){
+                alert("changement de place impossible");
+                Classement[place-1].placeTemp = place;
+            }                        
+            else{
+                let elementTemp = Classement[place-1];
+                Classement.splice(place-1,1);
+                Classement.splice(placeTemp-1, 0, elementTemp);
+                this.recalculPlace(Classement);
+            }
+        },
         validateProposition(proposition){
             this.classements.forEach((classement, index) => {
                 if(classement.Matricule.trim()==proposition.Matricule.trim()){
@@ -713,7 +756,9 @@ export default {
             })
             this.classements.push(proposition);
             this.classementReel.push(proposition);
-            this.removeProposition(proposition)
+            
+            this.removeProposition(proposition);
+            this.recalculPlace();
         },
         removeProposition(personnel){
             this.propositions.forEach((proposition, index) => {
@@ -777,6 +822,7 @@ export default {
                 this.classements.splice(i,1,newClassement[i]);
             }
         },
+        /*
         changeClassement(place,placeTemp){
             if((placeTemp<1)||(placeTemp>this.classements.length)){
                 alert("changement de place impossible");
@@ -791,6 +837,7 @@ export default {
                 localStorage.classementReel = JSON.stringify(this.classementReel);
             }
         },
+        */
         // search perso
         loadFonctions(){
             this.$axios.get('/api/fonctions') 

@@ -216,7 +216,7 @@ class Excel extends Model
 
         foreach($equipeA as $personnel){
             $personnel->getAllCA($interval,$listeDateExclu);
-            $personnel->getNbrJourObjectifAtteint($interval,$minimumVente,$listeDateExclu);
+            $personnel->getNbrJourObjectifAtteint($interval,$listeDateExclu);
             $personnel->getPourcentageObjectif($jourDeTravail);
             $personnel->getNbrProduit($interval);
             $personnel->getStatutbimestriel();
