@@ -405,7 +405,7 @@ export default {
             this.tempsFin = this.getCurrentDateTime();
             this.timerIsCounting = true;
         },
-        getTemps(){ 
+        getTemps(){
             var today = new Date();
             var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
             var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -424,7 +424,6 @@ export default {
         },
         loadURLdata(){
             let urlParams = new URLSearchParams(window.location.search);
-            
             if(urlParams.get('matricule')){
                 this.matricule = urlParams.get('matricule');
                 this.getPersonnel();

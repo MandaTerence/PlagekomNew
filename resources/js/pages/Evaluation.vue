@@ -188,14 +188,24 @@
                     resultat
                 </div>
                 <div class="card-body">
-                    <div class="row">
+                    <div class="row" id="resultatProposition">
                         <div class="col-md-6 card" style="border-color: blue;">
                             <div class="card-header">
                                 propositions
                             </div>
-                            <div class="card-body"> 
+                            <div class="card-body">
                                 <div v-if="propositions.length>0" class="row d-flex justify-content-center" style="margin-bottom:20px">
-                                    <select class="col-8 form-control input-sm" v-model="filtreProposition" v-on:change="filtrer(filtreProposition,propositions)">
+                                    <input type="text" placeholder="Matricule" v-model="matricule" class="col-12 form-control input-sm" v-on:keyup="autoComplete" v-on:click="autoComplete">
+                                    <div class="panel-footer" style="float:top;position: absolute;z-index: 1;" >
+                                        <ul class="list-group">
+                                            <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
+                                                <div >{{ result.Matricule }}</div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div v-if="propositions.length>0" class="row d-flex justify-content-center" style="margin-bottom:20px">
+                                    <select class="col-12 form-control input-sm" v-model="filtreProposition" v-on:change="filtrer(filtreProposition,propositions)">
                                         <option value="mp" selected>meilleur proposition</option>
                                         <option value="cal">meilleur de chiffre d'affaire</option>
                                         <option value="cam">meilleur moyenne de chiffre d'affaire moyen</option>
@@ -203,8 +213,6 @@
                                         <option value="cami">meilleur chiffre d'affaire mission</option>
                                         <option v-if="(missionChoix!='')" value="cat">meilleur chiffre d'affaire {{ missionChoix }}</option>
                                     </select>
-                                    <button class="col-2 btn btn-primary">filtrer</button>
-                                    
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover table-head-bg-primary table-bordered-bd-primary">
@@ -240,7 +248,6 @@
                                         <option value="cami">meilleur chiffre d'affaire mission</option>
                                         <option v-if="(missionChoix!='')" value="cat">meilleur chiffre d'affaire {{ missionChoix }}</option>
                                     </select>
-                                    <button class="col-2 btn btn-primary">filtrer</button>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover table-head-bg-success table-bordered-bd-success" >
@@ -248,6 +255,7 @@
                                             <tr>
                                                 <th style="font-size:11px" >matricule</th>
                                                 <th style="font-size:11px" >nom</th>
+                                                <th style="font-size:11px" ></th>
                                                 <th style="font-size:11px" ></th>
                                             </tr>
                                         </thead>
@@ -266,7 +274,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row justify-content-center">
+                    <div class="row justify-content-center" id="barreAction">
                         <button class="btn btn-success btn-rounded" v-on:click="exportEquipe">
                             exporter XLS
                         </button>
@@ -341,8 +349,8 @@ export default {
             pourcentage: '70',
             minimumVente: 0,
 
-            filtreProposition: 'meilleur',
-            filtreClassement:  'meilleur'
+            filtreProposition: 'mp',
+            filtreClassement:  'mp'
         }
     },
     beforeRouteEnter(to, from, next) {
