@@ -194,14 +194,19 @@
                                 propositions
                             </div>
                             <div class="card-body">
-                                <div v-if="propositions.length>0" class="row d-flex justify-content-center" style="margin-bottom:20px">
-                                    <input type="text" placeholder="Matricule" v-model="matricule" class="col-12 form-control input-sm" v-on:keyup="autoComplete" v-on:click="autoComplete">
+                                <div v-if="propositions.length>0" class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
+                                    <input type="text" placeholder="Matricule" v-model="matriculeProposition" class="col-12 form-control input-sm" v-on:keyup="autoComplete" v-on:click="autoComplete">
                                     <div class="panel-footer" style="float:top;position: absolute;z-index: 1;" >
                                         <ul class="list-group">
                                             <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
                                                 <div >{{ result.Matricule }}</div>
                                             </li>
                                         </ul>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            ajouter
+                                        </button>
                                     </div>
                                 </div>
                                 <div v-if="propositions.length>0" class="row d-flex justify-content-center" style="margin-bottom:20px">
@@ -239,8 +244,26 @@
                                 personnels validés
                             </div>
                             <div class="card-body">
-                                <div v-if="classements.length>0" class="row d-flex justify-content-center" style="margin-bottom:20px">
-                                    <select class="col-8 form-control input-sm" v-model="filtreClassement" v-on:change="filtrer(filtreClassement,classements)">
+                                <div v-if="classements.length>0" class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
+                                    <input type="text" placeholder="Matricule" v-model="matriculeClassement" class="col-12 form-control input-sm" v-on:keyup="autoComplete('classement',matriculeClassement,resultMatriculeClassement)" v-on:click="autoComplete('classement',matriculeClassement,resultMatriculeClassement)">
+                                    <div class="panel-footer" style="float:top;position: absolute;z-index: 1;" >
+                                        <ul class="list-group">
+                                            <li class="list-group-item" v-for="result in resultMatriculeProposition" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
+                                                <div >{{ result.Matricule }}</div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            ajouter
+                                        </button>
+                                    </div>
+                                </div>
+                                <div v-if="classements.length>0" class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
+                                    <div class="input-group-prepend">
+                                        <span> classé par </span>
+                                    </div>
+                                    <select class="col-12 form-control input-sm" v-model="filtreClassement" v-on:change="filtrer(filtreClassement,classements)">
                                         <option value="mp" selected>meilleur proposition</option>
                                         <option value="cal">meilleur de chiffre d'affaire</option>
                                         <option value="cam">meilleur moyenne de chiffre d'affaire moyen</option>
@@ -309,6 +332,11 @@ export default {
 
 
             matricule: '',
+
+            matriculeProposition: '',
+            matriculeClassement: '',
+            resultMatriculeProposition: '',
+            resultMatriculeClassement: '',
 
             fonctions: [],
             missions: [],
@@ -649,13 +677,33 @@ export default {
         toogleClassementsView(){
             (this.showClassements)? this.showClassements = false : this.showClassements = true;
         },
-        autoComplete(){
-            if((this.matricule.length > 2)&&(!this.isSearchingAutoComplete)){
-                this.isSearchingAutoComplete = true;
-                if(this.idFonction != null ){
-                    setTimeout(this.searchAutoComplete, 1000);
-                }
-            }    
+        autoComplete(type,matricule,resultats){
+            if(type=="classement"){
+                if((matricule.length > 2)&&(!this.isSearchingAutoComplete)){
+                    this.isSearchingAutoComplete = true;
+                    setTimeout(this.searchAutoComplete(matricule,resultats), 1000);
+                }  
+            }
+            else if(type=="proposition"){
+                if((matricule.length > 2)&&(!this.isSearchingAutoComplete)){
+                    this.isSearchingAutoComplete = true;
+                    setTimeout(this.searchAutoComplete(matricule,resultats), 1000);
+                }  
+            }
+        },
+        searchAutoComplete(matricule,resultats){
+            resultats = [];
+            this.customId.forEach(element => {
+                axios.get('/api/personnels/getMatriculeByFonction',{params: {fonction: element,search: matricule}}).then(response => { 
+                    if(response.data.success){
+                        resultats = resultats.concat(response.data.personnels);
+                    }
+                    else{
+                        alert(response.data.message);
+                    }
+                });
+            });
+            this.isSearchingAutoComplete = false;
         },
         exportEquipe(){
             let matricules = this.getMatriculeFromArray(this.classements);
@@ -819,6 +867,7 @@ export default {
                 }*/
             });
         },
+        
         recalculPlace(){
             let newClassement = [];
             for(let i=0;i<this.classements.length;i++){
@@ -863,33 +912,7 @@ export default {
                 console.error(error);
             });
         },
-        searchAutoComplete(){
-            this.resultats = [];
-            if(this.customId == null){
-                axios.get('/api/personnels/getMatriculeByFonction',{params: {fonction: this.idFonction,search: this.matricule}}).then(response => {
-                    this.isSearchingAutoComplete = false;
-                    if(response.data.success){
-                        this.resultats = response.data.personnels;
-                    }
-                    else{
-                        alert(response.data.message);
-                    }
-                });
-            }
-            else{
-                this.customId.forEach(element => {
-                    axios.get('/api/personnels/getMatriculeByFonction',{params: {fonction: element,search: this.matricule}}).then(response => { 
-                        if(response.data.success){
-                            this.resultats = this.resultats.concat(response.data.personnels);
-                        }
-                        else{
-                            alert(response.data.message);
-                        }
-                    });
-                });
-                this.isSearchingAutoComplete = false;
-            }
-        },
+        
         addToEquipe(personnel){
             this.addPersonnelToTable(this.commerciaux,personnel);
         },

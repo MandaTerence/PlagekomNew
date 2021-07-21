@@ -8,9 +8,11 @@
         <div class="card">
             <div class="card-header">
                 <div class="row d-flex justify-content-end">
-                    <div class="col-6">
-                        <label>Mois</label>
-                        <month-picker-input v-bind:default-month="dateNow.getMonth()" v-bind:default-year="dateNow.getFullYear()" style="z-index:10" class="col-6" @change="showDate" @input="true"></month-picker-input>
+                    <div class="col-6 input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Mois</span>
+                        </div>
+                        <month-picker-input v-bind:default-year="2021" style="z-index:10" class="col-6" @change="showDate" @input="true"></month-picker-input>
                     </div>
                     <div class="input-group col-6">
                         <input type="text" class="form-control" v-model="matricule" placeholder="matricule">
@@ -40,9 +42,9 @@
                                 <tr v-for="personnel in personnels" v-bind:key="personnel">
                                     <td class="respText" >{{ personnel.Matricule }}</td>
                                     <td class="respText" >{{ personnel.Nom+" "+personnel.Prenom }}</td>
-                                    <td class="respText"  style="text-algin:right">{{ personnel.salaire }} Ar</td>
-                                    <td class="respText"  style="text-algin:right">{{ personnel.malusVente }} Ar</td>
-                                    <td class="respText"  style="text-algin:right">{{ personnel.salaire - personnel.malusVente }} Ar</td>
+                                    <td class="respText text-right" >{{ personnel.salaire }} Ar</td>
+                                    <td class="respText text-right" >{{ personnel.malusVente }} Ar</td>
+                                    <td class="respText text-right" >{{ personnel.salaire - personnel.malusVente }} Ar</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -75,7 +77,6 @@ export default {
         next();
     },
     created() {
-        alert(this.dateNow.getMonth()+" "+this.dateNow.getFullYear());
         this.loadAllSalaire();
         this.reloadPersonnel();
     },
@@ -85,6 +86,7 @@ export default {
             var year = date.year;
             var dat = this.getMonthDays(mon+" "+year);
             this.mois = dat;
+            alert(this.mois);
 		},
         loadAllSalaire(){
             axios.get('/api/personnels/getAllSalaire').then(response => {
