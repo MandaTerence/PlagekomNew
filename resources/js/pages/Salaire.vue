@@ -12,7 +12,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text">Mois</span>
                         </div>
-                        <month-picker-input v-bind:default-year="2021" style="z-index:10" class="col-6" @change="showDate" @input="true"></month-picker-input>
+                        <month-picker-input :default-year="dateNow.getFullYear()" :default-month="dateNow.getMonth()+1" :input-pre-filled="true" style="z-index:10" class="col-6" @change="showDate" @input="true"></month-picker-input>
                     </div>
                     <div class="input-group col-6">
                         <input type="text" class="form-control" v-model="matricule" placeholder="matricule">
@@ -27,7 +27,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-12 table-responsive-sm">
+                    <div class="col-12 table-responsive-sm" v-if="personnels.length>0">
                         <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
                             <thead >
                                 <tr class="bg-secondary" style="color:white">
@@ -36,18 +36,25 @@
                                     <th class="respText" >Salaire net</th>
                                     <th class="respText" >Deduction</th>
                                     <th class="respText" >Salaire totale</th>
+                                    <th class="respText" >action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="personnel in personnels" v-bind:key="personnel">
                                     <td class="respText" >{{ personnel.Matricule }}</td>
                                     <td class="respText" >{{ personnel.Nom+" "+personnel.Prenom }}</td>
-                                    <td class="respText text-right" >{{ personnel.salaire }} Ar</td>
-                                    <td class="respText text-right" >{{ personnel.malusVente }} Ar</td>
-                                    <td class="respText text-right" >{{ personnel.salaire - personnel.malusVente }} Ar</td>
+                                    <td class="respText text-right" >{{ getMoneyFormat(personnel.salaire) }} Ar</td>
+                                    <td class="respText text-right" >{{ getMoneyFormat(personnel.malusVente) }} Ar</td>
+                                    <td class="respText text-right" >{{ getMoneyFormat(personnel.salaire - personnel.malusVente) }} Ar</td>
+                                    <td class="respText text-right" ><a v-on:click="afficherDetail(personnel)">voir detail</a></td>
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                    <div v-else class="row col-12 d-flex justify-content-center">
+                        <span>
+                            aucun résultat trouvé
+                        </span>
                     </div>
                 </div>
             </div>
@@ -64,10 +71,13 @@ export default {
         return {
             dateNow: new Date(),
             mois: '',
+            annee: '',
             matricule: '',
             personnels:[],
             personnelsSave:[],
-            hideZero: false
+            hideZero: false,
+            showModalDetail: false,
+            personneDetail: ''
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -77,17 +87,34 @@ export default {
         next();
     },
     created() {
-        this.loadAllSalaire();
+        //this.loadAllSalaire();
+        this.getSalaire();
         this.reloadPersonnel();
     },
     methods: {
+        afficherDetail(personnel){
+            this.personneDetail = personnel;
+        },
+        getMoneyFormat(monnaie){
+            if(monnaie)
+                return monnaie.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$& '); 
+            else
+                return 0;
+        },
         showDate (date) {
             var mon = date.month;
             var year = date.year;
             var dat = this.getMonthDays(mon+" "+year);
-            this.mois = dat;
-            alert(this.mois);
+            this.mois = dat.getMonth();
+            this.annee = dat.getFullYear();
+            this.getSalaire();
 		},
+        getSalaire(){
+            axios.get('/api/personnels/getAllSalaire',{params: {mois: this.mois,annee: this.annee}}).then(response => {
+                this.personnels = response.data.personnels;
+                this.personnelsSave = response.data.personnels;
+            });
+        },
         loadAllSalaire(){
             axios.get('/api/personnels/getAllSalaire').then(response => {
                 this.personnels = response.data.personnels;
@@ -112,7 +139,7 @@ export default {
 
             var Value=MonthYear.split(" ");      
             var month = (months.indexOf(Value[0]) + 1);      
-            return new Date(Value[1], month, 1).toISOString().slice(0, 10);
+            return new Date(Value[1], month, 1);
         },
         reloadPersonnel(){
             if(this.matricule.length>1){

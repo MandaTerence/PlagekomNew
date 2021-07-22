@@ -36,6 +36,10 @@ class Personnel extends Model
         'produit' => [],
         'typeMission' => 2
     ];
+    const SALAIRE_NUMERATEUR = 8300;
+    const SALAIRE_MISSION_DENOMINATEUR = 55000;
+    const SALAIRE_LOCAL_DENOMINATEUR = 50000;
+    const SALAIRE_EXTRA_DENOMINATEUR = 75000;
 
     public static $tabBis = [
         ['moisBis'=>[11,12]],
@@ -85,6 +89,47 @@ class Personnel extends Model
         "local"=>"LOCAL",
         "mission"=>"MISSION"
     ];
+
+    public function getSalaire($mois,$annee,$malus){
+        $salaires = Facture::selectRaw("coalesce(sum(prix.Prix_detail*detailvente.Quantite),0) as ca,Mission.Type_de_mission,facture.date,facture.Id_zone as Id_zone")
+        ->join("detailvente","detailvente.Facture","facture.Id")
+        ->join("prix","detailvente.Id_prix","prix.Id")
+        ->join("Mission","facture.Id_de_la_mission","Mission.Id_de_la_mission")
+        ->where("Facture.Matricule_personnel",$this->Matricule)
+        ->whereRaw(" ".$mois." = MONTH(Date)")
+        ->whereRaw(" ".$annee." = YEAR(Date)")
+        ->groupBy(["Mission.Type_de_mission","facture.date","Id_zone"])
+        ->get();
+
+        $salaireTotal = 0;
+        $malusVente = 0;
+
+        foreach($salaires as $sal){
+            if($sal->Type_de_mission == 'LOCAL'){
+                $sal->montant = (($sal->ca)*(self::SALAIRE_NUMERATEUR))/(self::SALAIRE_LOCAL_DENOMINATEUR);
+                $salaireTotal += $sal->montant;
+            }
+            else if($sal->Type_de_mission == 'MISSION'){
+                $sal->montant = (($sal->ca)*(self::SALAIRE_NUMERATEUR))/(self::SALAIRE_MISSION_DENOMINATEUR);
+                $salaireTotal += $sal->montant;
+            }
+            else if($sal->Type_de_mission == 'PROVINCE'){
+                $sal->montant = (($sal->ca)*(self::SALAIRE_NUMERATEUR))/(self::SALAIRE_EXTRA_DENOMINATEUR);
+                $salaireTotal += $sal->montant;
+            }
+            $sal->malusVente = 0;
+            foreach($malus as $m){
+                if(($sal->Id_zone == $m->Id_zone)&&($sal->ca < $m->montant_vente)){
+                    $malusVente += $m->valeur_malus;
+                    $sal->malusVente = $m->valeur_malus;
+                    break;
+                }
+            }
+        }
+        $this->salaire = $salaireTotal;
+        $this->malusVente = $malusVente;
+        $this->salaires = $salaires;
+    }
 
     public static function getPersonnelEnMission(){
         $personnelEnMission = [];
@@ -289,6 +334,15 @@ class Personnel extends Model
     public static function getObjectif(){
         return DB::table('Objectif')
         ->get();
+    }
+
+    public static function getMalus(){
+        $malus = DB::table('malus_detail')
+        ->select('Id_zone','montant_vente','valeur_malus')
+        ->join('malus','malus.Id','=','malus_detail.Id_malus')
+        ->orderBy('montant_vente','asc')
+        ->get();
+        return $malus;
     }
 
     public function getNbrJourObjectifAtteint($interval="",$dateXclu=[]){

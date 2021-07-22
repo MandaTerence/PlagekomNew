@@ -65,14 +65,29 @@ class PersonnelService {
         return $personnels;
     }
 
-    public static function getAllSalaire(){
-        $personnels = Personnel::select("Matricule","Nom","Prenom")
-        ->get();
+    public static function getAllSalaire($mois,$annee){
+        $personnels = self::getPersonnelFromDate($mois,$annee);
+        $malus = Personnel::getMalus();
         foreach($personnels as $personnel){
-            $personnel->getCA();
-            $personnel->salaire = (self::pourCentSalaire/100)*$personnel->CA;
-            unset($personnel->CA);
-            $personnel->getMalusVente();
+            $personnel->getNomFromMAtricule();
+            $personnel->getSalaire($mois,$annee,$malus);
+        }
+        return $personnels;
+    }
+
+    public static function getPersonnelFromDate($mois,$annee){
+        $matricules = DB::table("facture")
+        ->select("Matricule_personnel as matricule")
+        ->whereRaw("Matricule_personnel not like 'C%' ")
+        ->whereRaw("MONTH(date) = ".$mois."")
+        ->whereRaw("YEAR(date) = ".$annee."")
+        ->distinct()
+        ->get();
+        $personnels = [];
+        foreach($matricules as $matricule){
+            $p = new Personnel;
+            $p->Matricule = $matricule->matricule;
+            $personnels[] = $p;
         }
         return $personnels;
     }

@@ -25,10 +25,26 @@ class PersonnelController extends Controller
     ];
 
     public function getAllSalaire(Request $request){
-        $personnels = PersonnelService::getAllSalaire();
+        $annee = '';
+        $mois = '';
+
+        if($request->annee){
+            $annee = $request->annee;
+        }
+        else{
+            $annee = date("y");
+        }
+        if($request->mois){
+            $mois = $request->mois;
+        }
+        else{
+            $mois = date("m");
+        }
+        $personnels = PersonnelService::getAllSalaire($mois,$annee);
         $response = [
             'success' => true,
             'personnels' => $personnels,
+            'test' => $request->annee.' '.$request->mois
         ];
         return $response;
     }

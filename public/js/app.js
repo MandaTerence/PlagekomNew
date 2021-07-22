@@ -19437,10 +19437,13 @@ __webpack_require__.r(__webpack_exports__);
     return {
       dateNow: new Date(),
       mois: '',
+      annee: '',
       matricule: '',
       personnels: [],
       personnelsSave: [],
-      hideZero: false
+      hideZero: false,
+      showModalDetail: false,
+      personneDetail: ''
     };
   },
   beforeRouteEnter: function beforeRouteEnter(to, from, next) {
@@ -19451,30 +19454,51 @@ __webpack_require__.r(__webpack_exports__);
     next();
   },
   created: function created() {
-    this.loadAllSalaire();
+    //this.loadAllSalaire();
+    this.getSalaire();
     this.reloadPersonnel();
   },
   methods: {
+    afficherDetail: function afficherDetail(personnel) {
+      this.personneDetail = personnel;
+    },
+    getMoneyFormat: function getMoneyFormat(monnaie) {
+      if (monnaie) return monnaie.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$& ');else return 0;
+    },
     showDate: function showDate(date) {
       var mon = date.month;
       var year = date.year;
       var dat = this.getMonthDays(mon + " " + year);
-      this.mois = dat;
-      alert(this.mois);
+      this.mois = dat.getMonth();
+      this.annee = dat.getFullYear();
+      this.getSalaire();
     },
-    loadAllSalaire: function loadAllSalaire() {
+    getSalaire: function getSalaire() {
       var _this = this;
 
-      axios.get('/api/personnels/getAllSalaire').then(function (response) {
+      axios.get('/api/personnels/getAllSalaire', {
+        params: {
+          mois: this.mois,
+          annee: this.annee
+        }
+      }).then(function (response) {
         _this.personnels = response.data.personnels;
         _this.personnelsSave = response.data.personnels;
+      });
+    },
+    loadAllSalaire: function loadAllSalaire() {
+      var _this2 = this;
+
+      axios.get('/api/personnels/getAllSalaire').then(function (response) {
+        _this2.personnels = response.data.personnels;
+        _this2.personnelsSave = response.data.personnels;
       });
     },
     getMonthDays: function getMonthDays(MonthYear) {
       var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       var Value = MonthYear.split(" ");
       var month = months.indexOf(Value[0]) + 1;
-      return new Date(Value[1], month, 1).toISOString().slice(0, 10);
+      return new Date(Value[1], month, 1);
     },
     reloadPersonnel: function reloadPersonnel() {
       if (this.matricule.length > 1) {
@@ -24595,6 +24619,7 @@ var _hoisted_13 = {
   "class": "row"
 };
 var _hoisted_14 = {
+  key: 0,
   "class": "col-12 table-responsive-sm"
 };
 var _hoisted_15 = {
@@ -24616,7 +24641,9 @@ var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(
   "class": "respText"
 }, "Deduction"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
   "class": "respText"
-}, "Salaire totale")])], -1
+}, "Salaire totale"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("th", {
+  "class": "respText"
+}, "action")])], -1
 /* HOISTED */
 );
 
@@ -24635,11 +24662,25 @@ var _hoisted_20 = {
 var _hoisted_21 = {
   "class": "respText text-right"
 };
+var _hoisted_22 = {
+  "class": "respText text-right"
+};
+var _hoisted_23 = {
+  key: 1,
+  "class": "row col-12 d-flex justify-content-center"
+};
+
+var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, " aucun résultat trouvé ", -1
+/* HOISTED */
+);
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_month_picker_input = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("month-picker-input");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_month_picker_input, {
-    "default-year": 2021,
+    "default-year": $data.dateNow.getFullYear(),
+    "default-month": $data.dateNow.getMonth() + 1,
+    "input-pre-filled": true,
     style: {
       "z-index": "10"
     },
@@ -24648,7 +24689,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onInput: true
   }, null, 8
   /* PROPS */
-  , ["onChange"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+  , ["default-year", "default-month", "onChange"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
     type: "text",
     "class": "form-control",
     "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
@@ -24663,23 +24704,29 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[2] || (_cache[2] = function () {
       return $options.reloadPersonnel && $options.reloadPersonnel.apply($options, arguments);
     })
-  }, [_hoisted_10, _hoisted_11])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_15, [_hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.personnels, function (personnel) {
+  }, [_hoisted_10, _hoisted_11])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_13, [$data.personnels.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_15, [_hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.personnels, function (personnel) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", {
       key: personnel
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.Matricule), 1
     /* TEXT */
     ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.Nom + " " + personnel.Prenom), 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.salaire) + " Ar", 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.getMoneyFormat(personnel.salaire)) + " Ar", 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.malusVente) + " Ar", 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.getMoneyFormat(personnel.malusVente)) + " Ar", 1
     /* TEXT */
-    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(personnel.salaire - personnel.malusVente) + " Ar", 1
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.getMoneyFormat(personnel.salaire - personnel.malusVente)) + " Ar", 1
     /* TEXT */
-    )]);
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("a", {
+      onClick: function onClick($event) {
+        return $options.afficherDetail(personnel);
+      }
+    }, "voir detail", 8
+    /* PROPS */
+    , ["onClick"])])]);
   }), 128
   /* KEYED_FRAGMENT */
-  ))])])])])])])])], 64
+  ))])])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_23, [_hoisted_24]))])])])])], 64
   /* STABLE_FRAGMENT */
   );
 }
