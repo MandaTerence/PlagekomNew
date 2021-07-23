@@ -6,6 +6,7 @@ use App\Models\DetailMission;
 use App\Models\Classement;
 use App\Models\Mission;
 use App\Models\Accompagnement;
+use Illuminate\Support\Facades\DB;
 
 
 class AccompagnementService {
@@ -103,10 +104,34 @@ class AccompagnementService {
         return true;
     }
 
+    public static function fillEmptyPersonnel($personnels){
+        if(count($personnels)>0){
+            $tableauFinal = [];
+            $personnelsInverse = array_reverse($personnels);
+            $indexFinal = 0;
+            
+            $taillePerso = count($personnels);
+            while($indexFinal<8){
+                $indexPerso = $indexFinal%$taillePerso;
+                $tableauFinal[] = $personnelsInverse[$indexPerso];
+                $indexFinal++;
+            }
+            $tableauFinal = array_reverse($tableauFinal);
+            $personnels = $tableauFinal;
+            $test = "";
+            for($i=0;$i<count($tableauFinal);$i++){
+                $test .= " |".$i."p".$tableauFinal[$i]["Matricule"];
+            }
+            DB::insert('insert into test (data) values (?)', [$test]);
+            return $tableauFinal;
+        }
+    }   
+
     public static function generatePlanning($idMission,$coach,$personnels=null){
         if($personnels==null){
             $personnels = DetailMission::getPersonnelFromCoach($coach,$idMission);
         }
+        $personnels = self::fillEmptyPersonnel($personnels);
         $matricules = [];
         foreach($personnels as $p){
             if(isset($p['Matricule'])){
@@ -122,26 +147,6 @@ class AccompagnementService {
         $Date_de_fin = $mission->Date_de_fin;
         $periods = self::date_range($Date_depart,$Date_de_fin);
         $accArray = [];
-        /*for($i=0;$i<count($periods);$i++){
-            $p = str_replace('/', '-', $periods[$i]);
-            $jour = date('w', strtotime($p));
-            $dateInserer = date(self::DATE_FORMAT, strtotime($p));
-            foreach(self::JOUR_ACCOMPAGNEMENT as $plan){
-                if((($i%6)+1) == $plan['Date']){
-                    $com = $classement[$plan['place']-1];
-                    $acc = [
-                        'Id_de_la_mission'=>$idMission, 
-                        'Commercial'=>$com->Commercial,
-                        'Coach'=>$coach,
-                        'Date'=>$dateInserer,
-                        'Heure_debut'=>$plan['Heure_debut'],
-                        'Heure_fin'=>$plan['Heure_fin'],
-                        'Ordre'=>$plan['Ordre']
-                    ];
-                    $accArray[] = $acc;
-                }
-            }
-        }*/
         for($i=0;$i<count($periods);$i++){
             $p = str_replace('/', '-', $periods[$i]);
             //$jour = date('w', strtotime($p));

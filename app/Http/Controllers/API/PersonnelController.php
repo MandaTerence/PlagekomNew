@@ -173,6 +173,43 @@ class PersonnelController extends Controller
         ];
     }
 
+    public function getFirstForEvaluation(Request $request){
+        $matricule = $request->matricule;
+        $interval = getDateInterval(30);
+        $idType = $request->idType;
+        $produits = $request->produits;
+        $pourcentage = $request->pourcentage;
+        $dateExclus = [];
+        if($request->listeDateExclu){
+            $dateExclus = $request->listeDateExclu;
+        }
+        if((isset($request->dateDebut))&&(isset($request->dateFin))){
+            $interval = (object) [
+                "lastDate" => $request->dateFin,
+                "firstDate" => $request->dateDebut
+            ];
+        }
+        $jourTravail = PersonnelService::getJourTravail($interval,$dateExclus);
+
+        $personnel = new Personnel();
+        $personnel->Matricule = $matricule;
+        $personnel->getNomFromMAtricule();
+
+        if(isset($personnel->Nom)){
+            $personnel->getAllCA($interval,$dateExclus,$produits,$idType);
+            return [
+                'success' => true,
+                'personnel' => $personnel
+            ];
+        }
+
+        else{
+            return [
+                'success' => false,
+            ];
+        }
+    }
+
     public function getEvaluation(Request $request){
         
         $equipeA = [];

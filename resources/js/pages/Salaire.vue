@@ -5,6 +5,15 @@
         </div>
     </div>
     <div class="page-inner">
+
+
+        <div class="small">
+            <line :chart-data="datacollection"></line>
+            <button @click="fillData()">Randomize</button>
+        </div>
+
+
+
         <div class="card">
             <div class="card-header">
                 <div class="row d-flex justify-content-end">
@@ -27,7 +36,10 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-12 table-responsive-sm" v-if="personnels.length>0">
+                    <div v-if="isSearching" class="row col-12 d-flex justify-content-center">
+                        <div class="loader loader-lg loader-primary"></div>
+                    </div>
+                    <div class="col-12 table-responsive-sm" v-else-if="personnels.length>0">
                         <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
                             <thead >
                                 <tr class="bg-secondary" style="color:white">
@@ -46,7 +58,7 @@
                                     <td class="respText text-right" >{{ getMoneyFormat(personnel.salaire) }} Ar</td>
                                     <td class="respText text-right" >{{ getMoneyFormat(personnel.malusVente) }} Ar</td>
                                     <td class="respText text-right" >{{ getMoneyFormat(personnel.salaire - personnel.malusVente) }} Ar</td>
-                                    <td class="respText text-right" ><a v-on:click="afficherDetail(personnel)">voir detail</a></td>
+                                    <td class="respText text-right" ><a v-on:click="afficherDetail(personnel)">detail <i class="fas fa-info-circle"></i></a></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -59,11 +71,58 @@
                 </div>
             </div>
         </div>
+        <div v-if="showModal.detailPersonnel" @close="showModal.detailPersonnel = false">
+            <transition name="modal">
+                <div class="modal-mask">
+                    <div class="modal-wrapper">
+                        <div class="modal-container card">
+                            <div class="modal-body card-body">
+                                <slot name="body">
+                                    <div class="row">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Nom et Prenom</td>
+                                                        <td>{{ personnelDetail.Nom+" "+personnelDetail.Prenom }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Matricule</td>
+                                                        <td>{{ personnelDetail.Matricule }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Salaire net</td>
+                                                        <td>{{ getMoneyFormat(personnelDetail.salaire) }} Ar</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Malus de vente</td>
+                                                        <td>{{ getMoneyFormat(personnelDetail.malusVente) }} Ar</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </slot>
+                            </div>
+                            <div class="modal-footer card-footer">
+                                <slot name="footer">
+                                default footer
+                                <button class="modal-default-button" @click="showModal.detailPersonnel = false">
+                                    OK
+                                </button>
+                                </slot>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+        </div>
     </div>
 </template>
 
 <script>
 import { MonthPickerInput } from 'vue-month-picker'
+import { Line } from 'vue-chartjs'
 
 export default {
     name: "Salaire",
@@ -76,8 +135,12 @@ export default {
             personnels:[],
             personnelsSave:[],
             hideZero: false,
-            showModalDetail: false,
-            personneDetail: ''
+            showModal: {
+                "detailPersonnel": false
+            },
+            personnelDetail: '',
+            isSearching: false,
+            datacollection: null
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -92,8 +155,34 @@ export default {
         this.reloadPersonnel();
     },
     methods: {
+
+        fillData () {
+        this.datacollection = {
+          labels: [this.getRandomInt(), this.getRandomInt()],
+          datasets: [
+            {
+              label: 'Data One',
+              backgroundColor: '#f87979',
+              data: [this.getRandomInt(), this.getRandomInt()]
+            }, {
+              label: 'Data One',
+              backgroundColor: '#f87979',
+              data: [this.getRandomInt(), this.getRandomInt()]
+            }
+          ]
+        }
+      },
+      getRandomInt () {
+        return Math.floor(Math.random() * (50 - 5 + 1)) + 5
+      },
+
+
+
+
+
         afficherDetail(personnel){
-            this.personneDetail = personnel;
+            this.personnelDetail = personnel;
+            this.showModal.detailPersonnel = true;
         },
         getMoneyFormat(monnaie){
             if(monnaie)
@@ -110,9 +199,11 @@ export default {
             this.getSalaire();
 		},
         getSalaire(){
+            this.isSearching = true;
             axios.get('/api/personnels/getAllSalaire',{params: {mois: this.mois,annee: this.annee}}).then(response => {
                 this.personnels = response.data.personnels;
                 this.personnelsSave = response.data.personnels;
+                this.isSearching = false;
             });
         },
         loadAllSalaire(){
@@ -160,7 +251,8 @@ export default {
         }
     },
     components: {
-		MonthPickerInput
+		MonthPickerInput,
+        Line
 	}
 }
 

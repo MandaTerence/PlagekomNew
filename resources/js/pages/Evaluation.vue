@@ -244,9 +244,18 @@
                                 personnels validés
                             </div>
                             <div class="card-body">
-                                <div v-if="classements.length>0" class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
+                                <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
+                                    <input type="textarea" placeholder="Matricule" v-model="listeMatricule" class="col-12 form-control input-sm">
+                                </div>
+                                <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
+                                    <button v-on:click="addListePersonnel" class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        ajouter
+                                    </button>
+                                </div>
+                                <!--xsd-->
+                                <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
                                     <input type="text" placeholder="Matricule" v-model="matriculeClassement" class="col-12 form-control input-sm" v-on:keyup="autoComplete('classement',matriculeClassement,resultMatriculeClassement)" v-on:click="autoComplete('classement',matriculeClassement,resultMatriculeClassement)">
-                                    <div class="panel-footer" style="float:top;position: absolute;z-index: 1;" >
+                                    <div class="panel-footer" style="float:top;position: absolute;z-index: 1;width: -moz-available;">
                                         <ul class="list-group">
                                             <li class="list-group-item" v-for="result in resultMatriculeProposition" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
                                                 <div >{{ result.Matricule }}</div>
@@ -254,7 +263,7 @@
                                         </ul>
                                     </div>
                                     <div class="input-group-append">
-                                        <button class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <button v-on:click="addPersonnel" class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             ajouter
                                         </button>
                                     </div>
@@ -378,7 +387,9 @@ export default {
             minimumVente: 0,
 
             filtreProposition: 'mp',
-            filtreClassement:  'mp'
+            filtreClassement:  'mp',
+
+            listeMatricule: ''
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -409,6 +420,34 @@ export default {
         this.loadAdvencedSearchData();
     },
     methods: {
+        addListePersonnel(){
+            let matricules=[];
+            let tableMatricule = this.listeMatricule.split(",");
+            let produits =  this.getCodeProduitFromArray(this.produits);
+            
+            tableMatricule.forEach((matricule, index) => {
+                matricules.push(matricule.trim());
+            })
+            
+            matricules.forEach((matricule, index) => {
+                axios.get('/api/personnels/getFirstForEvaluation',{params: {
+                    idType: this.idMission,
+                    dateDebut: this.dateDebut,
+                    dateFin: this.dateFin,
+                    produits: produits,
+                    listeDateExclu: this.listeDateExclu,
+                    matricule: matricule,
+                }})
+                .then(response => {
+                    if(response.data.success){
+                        let p = response.data.personnel;
+                        p.placeTemp = this.classements.length+1;
+                        this.classements.push(p);
+                        this.filtrer(this.filtreProposition,this.propositions);
+                    }
+                })
+            })
+        },
         getMoneyFormat(monnaie){
             if(monnaie)
                 return monnaie.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); 
@@ -660,8 +699,8 @@ export default {
             this.matricule = '';
         },
         changeMatriculeValue(newMatricule){
-            this.resultats = [];
-            this.matricule = newMatricule;
+            this.resultMatriculeClassement = [];
+            this.matriculeClassement = newMatricule;
         },
         changeCustomId(){
             this.customId = null;
@@ -677,7 +716,11 @@ export default {
         toogleClassementsView(){
             (this.showClassements)? this.showClassements = false : this.showClassements = true;
         },
+        /*
+        autoComplete('classement',matriculeClassement,resultMatriculeClassement)
+        */
         autoComplete(type,matricule,resultats){
+            //alert(type);
             if(type=="classement"){
                 if((matricule.length > 2)&&(!this.isSearchingAutoComplete)){
                     this.isSearchingAutoComplete = true;
@@ -696,7 +739,7 @@ export default {
             this.customId.forEach(element => {
                 axios.get('/api/personnels/getMatriculeByFonction',{params: {fonction: element,search: matricule}}).then(response => { 
                     if(response.data.success){
-                        resultats = resultats.concat(response.data.personnels);
+                        this.resultMatriculeProposition = resultats.concat(response.data.personnels);
                     }
                     else{
                         alert(response.data.message);
@@ -902,7 +945,7 @@ export default {
                 if(response.data.success){
                     this.fonctions = response.data.fonctions;
                     this.idFonction = this.fonctions[0].id;
-                    this.customId = this.fonctions[0].customId;
+                    this.customId = this.fonctions[1].customId;
                 }
                 else{
                     console.log(response.data.message);
@@ -916,37 +959,24 @@ export default {
         addToEquipe(personnel){
             this.addPersonnelToTable(this.commerciaux,personnel);
         },
-        addPersonnel(){
-            if(this.customId == null){
-                if((this.matricule!=null)&&(this.idFonction!=null)){
-                    axios.get('/api/personnels/getFirstWhere',{params: {criteres: {Fonction_actuelle: this.idFonction,Matricule: this.matricule}}}).then(response => {
-                        if(response.data.success){
-                            if(response.data.personnel.Fonction_actuelle == 2){
-                                //this.addToCoachEquipe(response.data.personnel);
-                                this.addEquipeFromCoach(response.data.personnel);
-                            }else{
-                                this.addToEquipe(response.data.personnel);
-                            }
-                        }
-                        else{
-                            alert('aucun resultat trouvé');
-                        }
-                    });
+        addPersonnel(matricule){
+            let produits =  this.getCodeProduitFromArray(this.produits);
+            axios.get('/api/personnels/getFirstForEvaluation',{params: {
+                idType: this.idMission,
+                dateDebut: this.dateDebut,
+                dateFin: this.dateFin,
+                produits: produits,
+                listeDateExclu: this.listeDateExclu,
+                matricule: this.matriculeClassement,
+            }})
+            .then(response => {
+                if(response.data.success){
+                    let p = response.data.personnel;
+                    p.placeTemp = this.classements.length+1;
+                    this.classements.push(p);
+                    this.filtrer(this.filtreProposition,this.propositions);
                 }
-            }else{
-                this.customId.forEach(element => {
-                    axios.get('/api/personnels/getFirstWhere',{params: {criteres: {Fonction_actuelle: element,Matricule: this.matricule}}}).then(response => {
-                        if(response.data.success){
-                            if(response.data.personnel.Fonction_actuelle == 2){
-                                //this.addToCoachEquipe(response.data.personnel)
-                                this.addEquipeFromCoach(response.data.personnel);
-                            }else{
-                                this.addToEquipe(response.data.personnel);
-                            }
-                        }
-                    });  
-                });
-            }
+            })
         },
         addPersonnelToTable(table,personnel){
             let exist = false

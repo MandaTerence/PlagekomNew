@@ -1,5 +1,4 @@
 <template>
-
     <div v-if="!showClassements">
         <div class="panel-header bg-secondary-gradient">
             <div class="page-inner py-4">
@@ -71,36 +70,17 @@
             <h2 class="text-center"><span style="background-color:#f9fbfd">Resultat</span></h2>
             <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="card">
-                <!--testqsdsqd-->
-                <!--
                 <div class="card-body">
-                    <div class="row d-flex justify-content-center" id="resultCoach" >
-                        <div class="table-responsive col-12" style="margin-left:25px">
-                            <EquipeTab  v-model:equipes="coachs" titre="Coachs"/>
-                        </div>
-                    </div>
-                    <div class="row d-flex justify-content-center" id="resultCommerciaux" >
-                        <div class="table-responsive col-12" style="margin-left:25px">
-                            <EquipeTab  v-model:equipes="commerciaux" titre="Commerciaux"/>
-                        </div> 
-                    </div>
-                    <div class="row" >
-                        <div class="col-12 text-right">
-                            <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
-                        </div>
-                    </div>
-                </div>
-                -->
-                
-                <div class="card-body">
-                    <div class="row" style="margin-left:20px">
-                        <button v-bind:class="buttonTeamA" v-on:click="toogleAvtiveTeamButton(1)">
-                            Equipe 1
+                    
+                        <div class="row" style="margin-left:20px">
+                            <button v-bind:class="buttonTeamA" v-on:click="toogleAvtiveTeamButton(1)">
+                                Equipe 1
+                                </button>
+                            <button v-bind:class="buttonTeamB" v-on:click="toogleAvtiveTeamButton(2)">
+                                Equipe 2
                             </button>
-                        <button v-bind:class="buttonTeamB" v-on:click="toogleAvtiveTeamButton(2)">
-                            Equipe 2
-                        </button>
-                    </div>
+                        </div>
+                    
                     <div class="row" v-if="buttonTeamA=='btn btn-secondary'">
                         <div class="table-responsive table-sm">
                             <div class="card-body">
@@ -214,8 +194,8 @@
                     </div>
                 </div>
                 <div class="col-sm-6">
-                    <div class="card">
-                        <div class="card-header">
+                    <div class="card" v-if="EquipeB.coachs[0]">
+                        <div class="card-header" >
                             Classement Proposé pour l'équipe B du coach {{ EquipeB.coachs[0].Matricule }} 
                         </div>
                         <div class="card-body">
@@ -325,6 +305,18 @@ export default {
             resultats: [],
             classements: [],
             classementReel: [],
+
+
+            Equipes: [
+                {
+                    coachs : [],
+                    commerciaux : []
+                },
+                {
+                    coachs : [],
+                    commerciaux : []
+                }
+            ],
 
             EquipeA: {
                 coachs : [],
@@ -482,6 +474,7 @@ export default {
         },
         validateEquipe(coach,equipe){
             //alert(JSON.stringify(this.getMatriculeAndPlaceFromArray(equipe)));
+            /*
             if(coach.length<this.maxCoach){
                 alert("il manque "+(this.maxCoach-coach.length)+" coach");
             }
@@ -489,6 +482,7 @@ export default {
                 alert("il manque "+(this.maxCommerciaux-equipe.length)+" commerciaux");
             }
             else{
+            */
                 axios.post('/api/classements/',{matriculeCoach: coach[0].Matricule,matriculeCommerciaux: this.getMatriculeAndPlaceFromArray(equipe),idMission:this.idMission}).then(response => {
                     if(response.data.success){
                         this.showModal = false;
@@ -498,7 +492,7 @@ export default {
                         alert('insertion echoué');
                     }
                 });
-            }
+            //}
         },
         validateAllEquipe(){
             this.validateEquipe(this.EquipeA.coachs,this.ClassementA);
@@ -584,9 +578,7 @@ export default {
                     this.ClassementDetailB = response.data.resultatEquipeB.classementDetail;
                     this.fillPlaceTemp(response.data.resultatEquipeB.classementReel);
                 }
-                if((response.data.resultatEquipeB!=null)||((response.data.resultatEquipeB!=null))){
-                    this.toogleClassementsView();
-                }
+                this.toogleClassementsView();
             });
         },
         savePersonnelOnlocalStorage(){

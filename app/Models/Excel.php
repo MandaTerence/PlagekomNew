@@ -221,12 +221,16 @@ class Excel extends Model
             $personnel->getNbrProduit($interval);
             $personnel->getStatutbimestriel();
             $personnel->getAssuidite();
+            $personnel->getCAMoyen();
         }
         
         $classement = ClassementService::getEvaluation($equipeA,self::DEFAULT_COEF,$interval,$minimumVente,$listeDateExclu,$pourcentage);
-        $excel = "\tPlace\tMatricule\tNom et Prenom\tCA Mission\tCA Local\tCA Total\tratio de vente\tassuidite\tstatut\n";
+        $excel = "\tPlace\tMatricule\tNom et Prenom\tCA Mission\tCA Local\tCA Total\tCA Moyen\tratio de vente\tassuidite\tstatut\n";
         foreach($classement as $personnel){
-            $excel .= "\t$personnel->place\t$personnel->Matricule\t$personnel->Nom $personnel->Prenom\t$personnel->CAMission\t$personnel->CALocal\t$personnel->CAGlobal\t".number_format($personnel->pourcentageObjectif, 2, '.', '')."\t".number_format($personnel->assuidite, 2, '.', '')."\t$personnel->etatVente\n";
+
+            $personnel->CAMoyen = (int)$personnel->CAMoyen;
+
+            $excel .= "\t$personnel->place\t$personnel->Matricule\t$personnel->Nom $personnel->Prenom\t$personnel->CAMission\t$personnel->CALocal\t$personnel->CAGlobal\t$personnel->CAMoyen\t".number_format($personnel->pourcentageObjectif, 2, '.', '')."\t".number_format($personnel->assuidite, 2, '.', '')."\t$personnel->etatVente\n";
         }
         //header("Content-type: application/vnd.ms-excel");
         header("Content-disposition: attachment; filename=evaluation.xls");

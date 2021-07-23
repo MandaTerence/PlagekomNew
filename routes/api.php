@@ -39,6 +39,7 @@ Route::group(['prefix' => 'missions', 'middleware' => 'auth:sanctum'], function 
 Route::group(['prefix' => 'personnels', 'middleware' => 'auth:sanctum'], function () {
     Route::get('/', [PersonnelController::class, 'index']);
     Route::get('/getFirstWhere', [PersonnelController::class, 'getFirstWhere']);
+    Route::get('/getFirstForEvaluation', [PersonnelController::class, 'getFirstForEvaluation']);
     Route::get('/getPersonnelData', [PersonnelController::class, 'getPersonnelData']);
     Route::get('/getMatriculeByFonction', [PersonnelController::class, 'getMatriculeByFonction']);
     Route::get('/getEvaluation', [PersonnelController::class, 'getEvaluation']);
