@@ -185,30 +185,51 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    resultat
+                    <h6>
+                        Resultat
+                    </h6>
                 </div>
                 <div class="card-body">
+
+                        <div class="form-group">
+
+                            <label for="RecherchePersonnel">
+                                Recherche de Personnel
+                            </label>
+                            <div class="input-group">
+                                <input type="text" id="RecherchePersonnel" placeholder="Matricule" class="form-control" v-model="matriculeClassement" v-on:keyup="autoComplete('classement',matriculeClassement,resultMatriculeClassement)" v-on:click="autoComplete('classement',matriculeClassement,resultMatriculeClassement)">
+                                <div class="panel-footer" style="float:top;position: absolute;z-index: 1;width: -moz-available;">
+                                    <ul class="list-group">
+                                        <li class="list-group-item" v-for="result in resultMatriculeProposition" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
+                                            <div >{{ result.Matricule }}</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="input-group-append">
+                                    <button v-on:click="addPersonnel" class="btn btn-primary" type="button">
+                                        ajouter
+                                    </button>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <textarea aria-label="With textarea" placeholder="Matricule" v-model="listeMatricule" class="col-12 form-control input-sm"></textarea>
+                            </div>
+                        </div>
+                        <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
+                            <button v-on:click="addListePersonnel" class="btn btn-primary btn-rounded" type="button">
+                                ajouter
+                            </button>
+                        </div>
                     <div class="row" id="resultatProposition">
                         <div class="col-md-6 card" style="border-color: blue;">
                             <div class="card-header">
                                 propositions
                             </div>
                             <div class="card-body">
-                                <div v-if="propositions.length>0" class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
-                                    <input type="text" placeholder="Matricule" v-model="matriculeProposition" class="col-12 form-control input-sm" v-on:keyup="autoComplete" v-on:click="autoComplete">
-                                    <div class="panel-footer" style="float:top;position: absolute;z-index: 1;" >
-                                        <ul class="list-group">
-                                            <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
-                                                <div >{{ result.Matricule }}</div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            ajouter
-                                        </button>
-                                    </div>
-                                </div>
                                 <div v-if="propositions.length>0" class="row d-flex justify-content-center" style="margin-bottom:20px">
                                     <select class="col-12 form-control input-sm" v-model="filtreProposition" v-on:change="filtrer(filtreProposition,propositions)">
                                         <option value="mp" selected>meilleur proposition</option>
@@ -244,30 +265,11 @@
                                 personnels validés
                             </div>
                             <div class="card-body">
+
                                 <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
-                                    <input type="textarea" placeholder="Matricule" v-model="listeMatricule" class="col-12 form-control input-sm">
+                                    
                                 </div>
-                                <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
-                                    <button v-on:click="addListePersonnel" class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        ajouter
-                                    </button>
-                                </div>
-                                <!--xsd-->
-                                <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
-                                    <input type="text" placeholder="Matricule" v-model="matriculeClassement" class="col-12 form-control input-sm" v-on:keyup="autoComplete('classement',matriculeClassement,resultMatriculeClassement)" v-on:click="autoComplete('classement',matriculeClassement,resultMatriculeClassement)">
-                                    <div class="panel-footer" style="float:top;position: absolute;z-index: 1;width: -moz-available;">
-                                        <ul class="list-group">
-                                            <li class="list-group-item" v-for="result in resultMatriculeProposition" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
-                                                <div >{{ result.Matricule }}</div>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="input-group-append">
-                                        <button v-on:click="addPersonnel" class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            ajouter
-                                        </button>
-                                    </div>
-                                </div>
+                                
                                 <div v-if="classements.length>0" class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
                                     <div class="input-group-prepend">
                                         <span> classé par </span>
@@ -429,24 +431,31 @@ export default {
                 matricules.push(matricule.trim());
             })
             
-            matricules.forEach((matricule, index) => {
-                axios.get('/api/personnels/getFirstForEvaluation',{params: {
-                    idType: this.idMission,
-                    dateDebut: this.dateDebut,
-                    dateFin: this.dateFin,
-                    produits: produits,
-                    listeDateExclu: this.listeDateExclu,
-                    matricule: matricule,
-                }})
-                .then(response => {
-                    if(response.data.success){
-                        let p = response.data.personnel;
-                        p.placeTemp = this.classements.length+1;
-                        this.classements.push(p);
-                        this.filtrer(this.filtreProposition,this.propositions);
+
+            if(matricules.length>0){
+                matricules.forEach((matricule, index) => {
+                    if(matricule.length>0){
+                        axios.get('/api/personnels/getFirstForEvaluation',{params: {
+                            idType: this.idMission,
+                            dateDebut: this.dateDebut,
+                            dateFin: this.dateFin,
+                            produits: produits,
+                            listeDateExclu: this.listeDateExclu,
+                            matricule: matricule,
+                        }})
+                        .then(response => {
+                            if(response.data.success){
+                                let p = response.data.personnel;
+                                p.placeTemp = this.classements.length+1;
+                                this.classements.push(p);
+                                this.filtrer(this.filtreProposition,this.propositions);
+                            }
+                        })
                     }
                 })
-            })
+            }
+
+            
         },
         getMoneyFormat(monnaie){
             if(monnaie)

@@ -789,12 +789,12 @@ class Personnel extends Model
         $result = self::select('Nom','Prenom')
         ->where('Matricule','=',$this->Matricule)
         ->first();
-        $this->Nom = $result->Nom;
-        $this->Prenom = $result->Prenom;
-        return $this->Nom.' '.$this->Prenom;
+        if(isset($result->Nom)){
+            $this->Nom = $result->Nom;
+            $this->Prenom = $result->Prenom;
+            return $this->Nom.' '.$this->Prenom;
+        }
     }
-
-
     
     public function getAllCA($interval="",$dateXclu=[],$produits = [],$idType=""){
         $nbrJour=self::$DAY_INTERVAL; 
