@@ -268,17 +268,80 @@ class PersonnelController extends Controller
     public function getClassement(Request $request){
         $equipeA = [];
         $equipeB = [];
+
         $interval = getDateInterval(30);
-        if((isset($request->matriculeA))&&(isset($request->matriculeB))){
-            $equipeA = PersonnelService::getPersonnelFromMatricule($request->matriculeA);
-            $equipeB = PersonnelService::getPersonnelFromMatricule($request->matriculeB);
-        }
+        $equipes = [];
+        $resultat = [];
+
         if((isset($request->dateDebut))&&(isset($request->dateFin))){
             $interval = [
                 "lastDate" => $request->dateDebut,
                 "firstDate" => $request->dateFin
             ];
         }
+
+        $equipes = $request->equipes;
+        return $equipes;
+        $equipe = PersonnelService::getPersonnelFromMatricule($equipes[0]);
+        return $equipes;
+
+        foreach($equipes as $equipe){
+            $equipe = PersonnelService::getPersonnelFromMatricule($equipe['commerciaux']);
+            foreach($equipe['commerciaux'] as $personnel){
+                if(isset($request->Produits)){
+                    $personnel->getAllCA($request->Produits);
+                }
+                else{
+                    $personnel->getAllCA();
+                }
+            }
+            $resultatEquipe = [
+                'classementReel' => ClassementService::getClassementTotal($equipe,self::DEFAULT_COEF),
+                'classementDetail' =>[
+                    [
+                        'nom' =>'classementGlobal',
+                        'classement' => ClassementService::getClassementGlobal($equipe)
+                    ]
+                    ,
+                    [
+                        'nom' => 'classementLocal',
+                        'classement' => ClassementService::getClassementLocal($equipe)
+                    ]
+                    ,
+                    [
+                        'nom' =>'classementMission',
+                        'classement' => ClassementService::getClassementMission($equipe)
+                    ]
+                ]
+            ];
+            if(isset($request->Produits)){
+                $resultatEquipe->classementDetail[] = 
+                [
+                    'nom' => 'classementProduitPlusCher',
+                    'classement' => ClassementService::getClassementProduitPlusCher($equipe)
+                ];
+                $resultatEquipe->classementDetail[] = 
+                [
+                    'nom' => 'classementProduitPlusCher',
+                    'classement' => ClassementService::getClassementProduitPlusCher($equipe)
+                ];
+            };
+            $resultat[] = $resultatEquipe;
+        }
+
+
+
+        $response = [
+            'success' => $success,
+            'resultat' => $resultat,
+        ];
+        /*
+
+        if((isset($request->matriculeA))&&(isset($request->matriculeB))){
+            $equipeA = PersonnelService::getPersonnelFromMatricule($request->matriculeA);
+            $equipeB = PersonnelService::getPersonnelFromMatricule($request->matriculeB);
+        }
+        
         foreach($equipeA as $personnel){
             if(isset($request->Produits)){
                 $personnel->getAllCA($request->Produits);
@@ -368,6 +431,7 @@ class PersonnelController extends Controller
         ];
         
         return $response;
+        */
     }
 
     public function getClassementsss(Request $request){

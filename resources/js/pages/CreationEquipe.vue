@@ -71,16 +71,53 @@
             <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
             <div class="card">
                 <div class="card-body">
-                    
-                        <div class="row" style="margin-left:20px">
+                    <div class="row" style="margin-left:20px">
+                        <div id="listeButtonEquipe" class="col-9 text-justify-content-start">
+                            <div v-bind:class="getButtonClass(index)" v-for="(equipe, index) in Equipes">
+                                <span v-on:click="toogleAvtiveTeamButton(index)">
+                                    Equipe {{ index+1 }}
+                                </span>
+                                <a v-if="Equipes.length>1" v-on:click="removeEquipe(index)" style="margin-left:20px">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div id="listeButtonEquipe" class="col-3 text-justify-content-end">
+                            <button v-on:click="ajouterNouveauEquipe" class="btn btn-secondary btn-border btn-rounded">
+                                ajouter
+                            </button>
+                        </div>
+                        <!-- OLD
                             <button v-bind:class="buttonTeamA" v-on:click="toogleAvtiveTeamButton(1)">
                                 Equipe 1
                                 </button>
                             <button v-bind:class="buttonTeamB" v-on:click="toogleAvtiveTeamButton(2)">
                                 Equipe 2
                             </button>
+                        -->
+                    </div>
+                    <div class="row">
+                        <div class="table-responsive table-sm">
+                            <div class="card-body">
+                                <div class="row d-flex justify-content-center" id="resultCoach" >
+                                    <div class="table-responsive col-12" style="margin-left:25px">
+                                        <EquipeTab  v-model:equipes="equipeChoisit.coachs" titre="Coachs"/>
+                                    </div>
+                                </div>
+                                <div class="row d-flex justify-content-center" id="resultCommerciaux" >
+                                    <div class="table-responsive col-12" style="margin-left:25px">
+                                        <EquipeTab  v-model:equipes="equipeChoisit.commerciaux" titre="Commerciaux"/>
+                                    </div> 
+                                </div>
+                                <div class="row" >
+                                    <div class="col-12 text-right">
+                                        <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    
+                    </div>
+                    <!-- OLD
                     <div class="row" v-if="buttonTeamA=='btn btn-secondary'">
                         <div class="table-responsive table-sm">
                             <div class="card-body">
@@ -123,11 +160,11 @@
                             </div>
                         </div>
                     </div>
+                    -->
                 </div>
             </div>
         </div>
     </div>
-
     <div v-if="showClassements">
         <div class="panel-header bg-secondary-gradient">
             <div class="page-inner py-4">
@@ -265,7 +302,6 @@
             </div>
         </div>
     </div>
-
 </template>
 
 <script>
@@ -306,6 +342,7 @@ export default {
             classements: [],
             classementReel: [],
 
+            selectedEquipe: 0,
 
             Equipes: [
                 {
@@ -353,6 +390,9 @@ export default {
             else{
                 return "B";
             }
+        },
+        equipeChoisit: function (){
+            return this.Equipes[this.selectedEquipe];
         }
     },
     created() {
@@ -361,6 +401,24 @@ export default {
         this.loadLocalData();
     },
     methods: {
+        removeEquipe(index){
+            this.Equipes.splice(index, 1);
+        },
+        ajouterNouveauEquipe(){
+            let nouveauEquipe = {
+                coachs : [],
+                commerciaux : []
+            };
+            this.Equipes.push(nouveauEquipe);
+        },
+        getButtonClass(index){
+            if(index==this.selectedEquipe){
+                return "btn btn-secondary";
+            }
+            else{
+                return "btn btn-secondary btn-border";
+            }
+        },
         toogleDetail(equipe){
             if(equipe=="A"){
                 if(this.showDetailA){
@@ -391,15 +449,8 @@ export default {
             };
             alert("Vous avez choisit la mission : "+this.idMission);
         },
-        toogleAvtiveTeamButton(team){
-            if(team==1){
-                this.buttonTeamA="btn btn-secondary";
-                this.buttonTeamB="btn btn-secondary btn-border";
-            }
-            else{
-                this.buttonTeamA="btn btn-secondary btn-border";
-                this.buttonTeamB="btn btn-secondary ";
-            }
+        toogleAvtiveTeamButton(teamIndex){
+            this.selectedEquipe = teamIndex;
         },
         retourClassement(){
             this.toogleClassementsView();
@@ -538,6 +589,13 @@ export default {
             }
             return codeProduits;
         },
+        getMatriculesEquipes(){
+            let matricules = [];
+            for(let i=0;i<this.Equipes.length;i++){
+                matricules.push(this.Equipes[i].commerciaux);
+            }
+            return matricules;
+        },
         getClassement(){
             /*
             let matricules = this.getMatriculeFromArray(this.commerciaux);
@@ -562,12 +620,12 @@ export default {
             axios.get('/api/personnels/getClassement',
                 {
                     params: {
+                        equipes: this.getMatriculesEquipes(),
                         matriculeA: matriculeA,
                         matriculeB: matriculeB,
                         Produits: produits
                     }
                 }).then(response => {
-                //alert(this.EquipeA.commerciaux);
                 if(response.data.resultatEquipeA!=null){
                     this.ClassementA = response.data.resultatEquipeA.classementReel;
                     this.ClassementDetailA = response.data.resultatEquipeA.classementDetail;
@@ -613,7 +671,6 @@ export default {
             }
             alert(JSON.stringify(Classement));
         },
-        // search perso
         loadFonctions(){
             this.$axios.get('/api/fonctions') 
             .then(response => {
@@ -658,20 +715,10 @@ export default {
             }
         },
         addToEquipe(personnel){
-            if(this.selectedTeam=="A"){
-                this.addPersonnelToTable(this.EquipeA.commerciaux,personnel);
-            }
-            else{
-                this.addPersonnelToTable(this.EquipeB.commerciaux,personnel);
-            }
+            this.addPersonnelToTable(this.Equipes[this.selectedEquipe].commerciaux,personnel);
         },
         addToCoachEquipe(personnel){
-            if(this.selectedTeam=="A"){
-                this.addPersonnelToTable(this.EquipeA.coachs,personnel);
-            }
-            else{
-                this.addPersonnelToTable(this.EquipeB.coachs,personnel);
-            }
+            this.addPersonnelToTable(this.Equipes[this.selectedEquipe].coachs,personnel);
         },
         addPersonnel(){
             if(this.customId == null){
@@ -735,54 +782,22 @@ export default {
                 table.push(personnel);
             }
         },
-        //addEquipeFromCoach(coach){
         addEquipeFromCoach(coach){
-            //this.addPersonnelToTable(this.coachs,coach);
-            /*
-            if(coach!=''){
-                axios.get('/api/personnels/getPersonnelFromCoach',{params: {coach: coach.Matricule,idMission: this.idMission}}).then(response => {
-                    for(let i=0;i<response.data.data.length;i++){
-                        if(this.commerciaux.length>=this.maxCommerciaux){
-                            
-                        }
-                        else if(response.data.data[i].Matricule!=coach.Matricule){
-                            this.addToEquipe(response.data.data[i]);
-                        }
+            axios.get('/api/personnels/getPersonnelFromCoach',{params: {coach: coach.Matricule,idMission: this.idMission}}).then(response => {
+                for(let i=0;i<response.data.data.length;i++){
+                    if(
+                        (!(this.Equipes[this.selectedEquipe].commerciaux.length>=this.maxCommerciaux))
+                        &&(response.data.data[i].Matricule!=coach.Matricule)
+                    )
+                    {
+                        this.addToEquipe(response.data.data[i]);
                     }
-                });
-            }
-            EquipeA: {
-                coachs : [],
-                commerciaux : []
-            },
-            */
-            
-            if(this.selectedTeam=="A"){
-                axios.get('/api/personnels/getPersonnelFromCoach',{params: {coach: coach.Matricule,idMission: this.idMission}}).then(response => {
-                    for(let i=0;i<response.data.data.length;i++){
-                        if(this.EquipeA.commerciaux.length>=this.maxCommerciaux){
-                            
-                        }
-                        else if(response.data.data[i].Matricule!=coach.Matricule){
-                            this.addToEquipe(response.data.data[i]);
-                        }
-                    }
-                });
-            }
-            else{
-                axios.get('/api/personnels/getPersonnelFromCoach',{params: {coach: coach.Matricule,idMission: this.idMission}}).then(response => {
-                    for(let i=0;i<response.data.data.length;i++){
-                        if(this.EquipeB.commerciaux.length>=this.maxCommerciaux){
-                            
-                        }
-                        else if(response.data.data[i].Matricule!=coach.Matricule){
-                            this.addToEquipe(response.data.data[i]);
-                        }
-                    }
-                });
-            }
+                }
+            });
         },
-        // search perso
+        test(){
+            alert("test ok");
+        }
     },   
     components: {
         EquipeTab,

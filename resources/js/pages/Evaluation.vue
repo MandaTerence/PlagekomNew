@@ -215,8 +215,11 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="rechercheEnGros">
+                                Insertion en gros
+                            </label>
                             <div class="input-group">
-                                <textarea aria-label="With textarea" placeholder="Matricule" v-model="listeMatricule" class="col-12 form-control input-sm"></textarea>
+                                <textarea id="rechercheEnGros" aria-label="With textarea" placeholder="ex: VP00000,VP00001,VP00002... " v-model="listeMatricule" class="col-12 form-control input-sm"></textarea>
                             </div>
                         </div>
                         <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
@@ -265,15 +268,7 @@
                                 personnels validés
                             </div>
                             <div class="card-body">
-
-                                <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
-                                    
-                                </div>
-                                
                                 <div v-if="classements.length>0" class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
-                                    <div class="input-group-prepend">
-                                        <span> classé par </span>
-                                    </div>
                                     <select class="col-12 form-control input-sm" v-model="filtreClassement" v-on:change="filtrer(filtreClassement,classements)">
                                         <option value="mp" selected>meilleur proposition</option>
                                         <option value="cal">meilleur de chiffre d'affaire</option>
