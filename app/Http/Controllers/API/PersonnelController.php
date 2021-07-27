@@ -261,7 +261,7 @@ class PersonnelController extends Controller
             'nbrJourDeTravail' => $jourDeTravail,
             'classements' => $classement
         ];
-        
+        //
         return $response;
     }
 
