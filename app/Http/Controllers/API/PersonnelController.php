@@ -281,60 +281,72 @@ class PersonnelController extends Controller
         }
 
         $equipes = $request->equipes;
-        return $equipes;
-        $equipe = PersonnelService::getPersonnelFromMatricule($equipes[0]);
-        return $equipes;
-
         foreach($equipes as $equipe){
-            $equipe = PersonnelService::getPersonnelFromMatricule($equipe['commerciaux']);
-            foreach($equipe['commerciaux'] as $personnel){
+            if($equipe != "[]"){
+                $personnels = [];
+                $listeEquipe = json_decode($equipe);
+                foreach($listeEquipe as $element){
+                    $p = new Personnel;
+                    $p->Matricule = $element->Matricule;
+                    $p->getNomFromMAtricule();
+                    $personnels[] = $p;
+                }
+
+                $equipe = $personnels;
+                
+                foreach($equipe as $personnel){
+                    if(isset($request->Produits)){
+                        $personnel->getAllCA($request->Produits);
+                    }
+                    else{
+                        $personnel->getAllCA();
+                    }
+                }
+                $resultatEquipe = [
+                    'classementReel' => ClassementService::getClassementTotal($equipe,self::DEFAULT_COEF),
+                    'classementDetail' =>[
+                        [
+                            'nom' =>'classementGlobal',
+                            'classement' => ClassementService::getClassementGlobal($equipe)
+                        ]
+                        ,
+                        [
+                            'nom' => 'classementLocal',
+                            'classement' => ClassementService::getClassementLocal($equipe)
+                        ]
+                        ,
+                        [
+                            'nom' =>'classementMission',
+                            'classement' => ClassementService::getClassementMission($equipe)
+                        ]
+                    ]
+                ];
                 if(isset($request->Produits)){
-                    $personnel->getAllCA($request->Produits);
-                }
-                else{
-                    $personnel->getAllCA();
-                }
+                    $resultatEquipe->classementDetail[] = 
+                    [
+                        'nom' => 'classementProduitPlusCher',
+                        'classement' => ClassementService::getClassementProduitPlusCher($equipe)
+                    ];
+                    $resultatEquipe->classementDetail[] = 
+                    [
+                        'nom' => 'classementProduitPlusCher',
+                        'classement' => ClassementService::getClassementProduitPlusCher($equipe)
+                    ];
+                };
+                $resultat[] = $resultatEquipe;
             }
-            $resultatEquipe = [
-                'classementReel' => ClassementService::getClassementTotal($equipe,self::DEFAULT_COEF),
-                'classementDetail' =>[
-                    [
-                        'nom' =>'classementGlobal',
-                        'classement' => ClassementService::getClassementGlobal($equipe)
-                    ]
-                    ,
-                    [
-                        'nom' => 'classementLocal',
-                        'classement' => ClassementService::getClassementLocal($equipe)
-                    ]
-                    ,
-                    [
-                        'nom' =>'classementMission',
-                        'classement' => ClassementService::getClassementMission($equipe)
-                    ]
-                ]
-            ];
-            if(isset($request->Produits)){
-                $resultatEquipe->classementDetail[] = 
-                [
-                    'nom' => 'classementProduitPlusCher',
-                    'classement' => ClassementService::getClassementProduitPlusCher($equipe)
-                ];
-                $resultatEquipe->classementDetail[] = 
-                [
-                    'nom' => 'classementProduitPlusCher',
-                    'classement' => ClassementService::getClassementProduitPlusCher($equipe)
-                ];
-            };
-            $resultat[] = $resultatEquipe;
+            
         }
 
 
+        $success = true;
 
         $response = [
             'success' => $success,
             'resultat' => $resultat,
         ];
+
+        return $response;
         /*
 
         if((isset($request->matriculeA))&&(isset($request->matriculeB))){

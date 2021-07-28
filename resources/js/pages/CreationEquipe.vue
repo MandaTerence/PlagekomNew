@@ -402,6 +402,11 @@ export default {
     },
     methods: {
         removeEquipe(index){
+            if(index==this.selectedEquipe){
+                if(this.selectedEquipe>0){
+                    this.selectedEquipe=index-1;
+                }
+            }
             this.Equipes.splice(index, 1);
         },
         ajouterNouveauEquipe(){
@@ -613,19 +618,20 @@ export default {
             });
             */
             let produits =  this.getCodeProduitFromArray(this.produits);
+            /*
             let matriculeA = this.getMatriculeFromArray(this.EquipeA.commerciaux);
             let matriculeB = this.getMatriculeFromArray(this.EquipeB.commerciaux);
+            */
             this.classements.splice(0,this.classements.length);
-            this.savePersonnelOnlocalStorage();
+            //this.savePersonnelOnlocalStorage();
             axios.get('/api/personnels/getClassement',
                 {
                     params: {
                         equipes: this.getMatriculesEquipes(),
-                        matriculeA: matriculeA,
-                        matriculeB: matriculeB,
                         Produits: produits
                     }
                 }).then(response => {
+                
                 if(response.data.resultatEquipeA!=null){
                     this.ClassementA = response.data.resultatEquipeA.classementReel;
                     this.ClassementDetailA = response.data.resultatEquipeA.classementDetail;

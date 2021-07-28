@@ -170,38 +170,84 @@ class PersonnelService {
         if(isset($resSql)){
             $ville = $resSql->Ville_d_annimation;
         }
-        else{
+        else{/*
             $ville = DB::table("planing")
             ->select("Ville_d_annimation")
             ->where("Id_de_la_mission",$idMission)
             ->orderBy("Date","DESC")
             ->first()->Ville_d_annimation;
+            */
         }
         $equipe = DB::table("equipe_temporaire")
-        ->where("Id_de_la_mission",$idMission)
+        ->where("equipe_temporaire.Id_de_la_mission",$idMission)
+        ->join("mission","mission.Id_de_la_mission","equipe_temporaire.Id_de_la_mission")
+        ->whereRaw("mission.Date_depart >= '".$jour."'")
+        ->whereRaw("mission.Date_de_fin <= '".$jour."'")
         ->get();
-        foreach($equipe as $eq){
-            if($eq->type == "Coach"){
-                $personne = new Personnel();
-                $personne->Matricule = $eq->matricule_personnel;
-                $personne->getDetailSanction($jour);
-                $personne->getDetailControl($jour);
-                $coach[] = $personne;
-            }
-            else if($eq->type == "Commerciaux"){
-                $personne = new Personnel(); 
-                $personne->Matricule = $eq->matricule_personnel;
-                $personne->getDetailSanction($jour);
-                $personne->getDetailControl($jour);
-                $commerciaux[] = $personne;
+
+        /*  
+            select * from mission where mission.Date_depart >= '2021-08-31' AND mission.Date_depart >= '2021-08-31'
+         
+         */
+
+        if(count($equipe)>1){
+            foreach($equipe as $eq){
+                if($eq->type == "Coach"){
+                    $personne = new Personnel();
+                    $personne->Matricule = $eq->matricule_personnel;
+                    $personne->getDetailSanction($jour);
+                    $personne->getDetailControl($jour);
+                    $personne->getNomFromMAtricule();
+                    $coach[] = $personne;
+                }
+                else if($eq->type == "Commerciaux"){
+                    $personne = new Personnel(); 
+                    $personne->Matricule = $eq->matricule_personnel;
+                    $personne->getDetailSanction($jour);
+                    $personne->getDetailControl($jour);
+                    $personne->getNomFromMAtricule();
+                    $commerciaux[] = $personne;
+                }
             }
         }
+
+        else{
+            $matricules = DB::table("detailMission")
+            ->join("mission","mission.Id_de_la_mission","detailMission.Id_de_la_mission")
+            ->select("personnel")
+            ->whereRaw("mission.Date_depart >= '".$jour."'")
+            ->whereRaw("mission.Date_de_fin <= '".$jour."'")
+            ->where("detailMission.Id_de_la_mission",$idMission)
+            ->get();
+
+            foreach($matricules as $matricule){
+                if(str_starts_with($matricule->personnel,'COTN')){
+                    $personne = new Personnel();
+                    $personne->Matricule = $matricule->personnel;
+                    $personne->getDetailSanction($jour);
+                    $personne->getDetailControl($jour);
+                    $coach[] = $personne;
+                }
+                else {
+                    $personne = new Personnel(); 
+                    $personne->Matricule = $matricule->personnel;
+                    $personne->getDetailSanction($jour);
+                    $personne->getDetailControl($jour);
+                    $commerciaux[] = $personne;
+                }
+            }
+            
+        }
+
         return [
             "idMission" => $idMission,
-            "ville" => $ville,
             "Commerciaux" => $commerciaux,
-            "Coach" => $coach
+            "Coach" => $coach,
+            "jour" => $jour,
+            "ville" => $ville
         ];
+        
+
     }
 
     public static function saveEquipeTemp($commerciaux,$coach,$idMission){
