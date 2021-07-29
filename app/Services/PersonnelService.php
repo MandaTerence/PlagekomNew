@@ -150,7 +150,9 @@ class PersonnelService {
     public static function getAllFromMission($jour='%'){
         $result = [];
         $missions = DB::table("mission")
-        ->where("statut","En_cours")
+        //->where("statut","En_cours")
+        ->whereRaw("mission.Date_depart >= '".$jour."'")
+        ->whereRaw("mission.Date_de_fin <= '".$jour."'")
         ->get();
         foreach($missions as $mission){
             $result[] = self::getFromMission($mission->Id_de_la_mission,$jour);
@@ -226,6 +228,7 @@ class PersonnelService {
                     $personne->Matricule = $matricule->personnel;
                     $personne->getDetailSanction($jour);
                     $personne->getDetailControl($jour);
+                    $personne->getNomFromMAtricule();
                     $coach[] = $personne;
                 }
                 else {
@@ -233,6 +236,7 @@ class PersonnelService {
                     $personne->Matricule = $matricule->personnel;
                     $personne->getDetailSanction($jour);
                     $personne->getDetailControl($jour);
+                    $personne->getNomFromMAtricule();
                     $commerciaux[] = $personne;
                 }
             }

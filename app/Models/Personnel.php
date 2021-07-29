@@ -591,15 +591,18 @@ class Personnel extends Model
         ->join("mission","mission.Id_de_la_mission","=","detailmission.Id_de_la_mission")
         ->where("detailmission.personnel","=",$this->Matricule)
         ->orderBy("Date_d_activation","desc")
-        ->first()->Type_de_mission;
-        $this->type = $type;
-        if(isset($type)){
+        ->first();
+        //Type_de_mission
+        if($type!=null){
+            $type = $type->Type_de_mission;
+            $this->type = $type;
             $malus = DB::table("malus_absence")
             ->select("Valeur")
             ->where("Designation",$type)
             ->first()->Valeur;
             $this->malusAbsence = $malus*$this->nbrJourAbsence;
         }
+        
         else{
             $this->malusAbsence = 5000*$this->nbrJourAbsence;
         }

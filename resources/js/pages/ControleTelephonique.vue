@@ -1,239 +1,246 @@
 <template>
-    <div class="page-inner" v-if="!exist">
-    <div v-if="!exist">
-        <div class="card">
-            <div class="card-body ">
-                <div class="form-group">
-                    <label for="matricule">Matricule</label>
-                    <input type="text" class="form-control" id="matricule"  placeholder="Matricule" v-model="nouveauMatricule">
-                </div>
-                <div class="form-group text-center">
-                    <button type="submit" class="btn btn-secondary btn-round col-6" v-on:click="changeCommerciaux">controler</button>
-                </div>
-            </div>
-        </div>
+    <div style="margin-top: 30px" class="row justify-content-center" v-if="isLoadingData">
+        <div class="loader loader-lg"></div>
     </div>
-    </div>
-    <div class="panel-header bg-secondary-gradient" v-if="exist">
-    <div class="page-inner py-4">
-        <div class="text-white pb-2 fw-bold row text-right d-flex justify-content-end" >
-            <a class="text-right" v-on:click="resetCommerciaux" style="margin-right:10px"><div class="icon-preview"><i class="far fa-times-circle" style="font-size:30px;cursor: pointer;"></i></div></a>
-        </div>
-        <h1 class="text-white pb-2 fw-bold" >Controle Telephonique de {{ personnelData.Prenom }}</h1>
-    </div>
-    </div>
-    <div class="page-inner">
-    <div v-if="exist">
-        <h2 class="text-center">
-            <span style="background-color:#f9fbfd">Info Commerciale</span>
-        </h2>
-        <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-        <div class="card" >
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4 d-block d-sm-none" style="margin-bottom: 30px;">
-                        <img src="assets/img/unknow.jpg" class="rounded-circle mx-auto d-block img-fluid d-flex justify-content-center" style="width:200px;height:200px;border: 5px solid #6861ce;">
-                    </div>
-                    <div class="col-md-4">
-                        <table>
-                            <tr>
-                                <td><strong>Nom Commercial:</strong></td>
-                                <td style="text-align:right">{{ personnelData.Nom }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Prenom Commercial:</strong></td>
-                                <td style="text-align:right">{{ personnelData.Prenom }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Contact:</strong></td>
-                                <td style="text-align:right">{{ personnelData.Contact_du_personnel }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Mission Actuel:</strong></td>
-                                <td style="text-align:right">{{ personnelData.Id_de_la_mission }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Coach Commerciale:</strong></td>
-                                <td style="text-align:right">{{ personnelData.Coach }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Contact Coach:</strong></td>
-                                <td style="text-align:right">{{ personnelData.ContactCoach }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-md-4">
-                        <table>
-                            <tr>
-                                <td><strong>Nom Tuteur:</strong></td>
-                                <td style="text-align:right">{{ personnelData.Nom_et_prenom_du_tuteur }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Contact du Tuteur:</strong></td>
-                                <td style="text-align:right">{{ personnelData.Contact_du_tuteur }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-md-4 d-none d-sm-block">
-                        <img src="assets/img/unknow.jpg" class="rounded mx-auto d-block img-fluid d-flex justify-content-center" style="width:160px;height:160px">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <h2 class="text-center"><span style="background-color:#f9fbfd">Info appels telephonique</span></h2>
-        <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-        <div class="card">
-            <div class="card-header">
-                <h2><span>Chronometre d'appel</span></h2>
-            </div>
-            <div class="card-body">
-                <div class="row">
-
-                    <div class="form-group col-4 text-center">
-                        <select class="form-control input-sm" v-model="sim">
-                            <option value="Telma">Telma</option>
-                            <option value="Orange">Orange</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group col-4 text-center" style="font-size:20px">
-                        {{ tempsMinute }}
-                    </div>
-
-                    <div v-if="!timerIsCounting" class="form-group col-4 text-center">
-                        <button type="button" class="btn btn-success btn-round" v-on:click="startTimer">Demarrer</button>
-                    </div>
-                    <div v-if="timerIsCounting" class="form-group col-4 text-center" >
-                        <button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-danger btn-sm" v-on:click="stopTimer">Arreter</button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-        <h2 class="text-center"><span style="background-color:#f9fbfd">Info Sanction</span></h2>
-        <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
-        <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="form-group col-4  text-center">
-                        <select class="form-control" v-model="typePersonnel">
-                            <option value="Commerciaux" selected>Commerciaux</option>
-                            <option value="Coach">Coach</option>
-                        </select>
-                    </div>
-                    <div class="form-group col-4 ">
-                        <input type="text" class="form-control input-sm" v-model="codeSanction" v-on:keyup="autoComplete" v-on:click="autoComplete" placeholder="code sanction">
-                        <div v-if="showAutoComplete" class="panel-footer" style="float:top;position: absolute;z-index: 1;">
-                            <ul class="list-group">
-                                <li class="list-group-item" v-on:click.left="changeSanction(sanction.Id,sanction.code_sanction,sanction.titre)" v-for="sanction in sanctions" v-bind:key="sanction" >
-                                    <div >{{ sanction.titre }}</div>
-                                </li>
-                            </ul>
+    <div v-else>
+        <div class="page-inner" v-if="!exist">
+            <div v-if="!exist">
+                <div class="card">
+                    <div class="card-body ">
+                        <div class="form-group">
+                            <label for="matricule">Matricule</label>
+                            <input type="text" class="form-control" id="matricule"  placeholder="Matricule" v-model="nouveauMatricule">
+                        </div>
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-secondary btn-round col-6" v-on:click="changeCommerciaux">controler</button>
                         </div>
                     </div>
-                    <div class="form-group col-4 text-center">
-                        <button type="button" class="btn btn-secondary btn-round" v-on:click="AddSanction"> Ajouter </button>
-                    </div>
-                </div>
-                <div class="row text-center">
-                    <textarea rows="3" class="form-control" readonly v-model="titreSanction"></textarea>
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header">
-                <h2><span>Tableau Sanction Telephonique Commercial</span></h2>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered">
-                            <thead >
-                                <tr class="bg-secondary" style="color:white">
-                                    <th class="respText" scope="col-2">Date</th>
-                                    <th class="respText" scope="col-2">Code Sanction</th>
-                                    <th class="respText" scope="col-2">Designation</th>
-                                    <th class="respText" scope="col-2">Action</th>
-                                </tr>
-                            </thead> 
-                            <tbody> 
-                                <tr v-for="sanctionP in sanctionsPersonnel" v-bind:key="sanctionP">
-                                    <td class="respText" scope="col-2"> {{ sanctionP.datetime }} </td>
-                                    <td class="respText" scope="col-2"> {{ sanctionP.code_sanction }} </td>
-                                    <td class="respText" scope="col-2"> {{ sanctionP.titre }} </td>
-                                    <td class="respText" scope="col-2"> <button type="button" class="btn btn-danger" v-on:click="removeSanctionPersonnel(sanctionP.id)" >supprimer</button> </td>
-                                </tr>
-                            </tbody> 
-                        </table>
-                    </div>
+        <div class="panel-header bg-secondary-gradient" v-if="exist">
+            <div class="page-inner py-4">
+                <div class="text-white pb-2 fw-bold row text-right d-flex justify-content-end" >
+                    <a class="text-right" v-on:click="resetCommerciaux" style="margin-right:10px"><div class="icon-preview"><i class="far fa-times-circle" style="font-size:30px;cursor: pointer;"></i></div></a>
                 </div>
+                <h1 class="text-white pb-2 fw-bold" >Controle Telephonique de {{ personnelData.Prenom }}</h1>
             </div>
         </div>
-        <!-- Modal -->
-        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel" >Valider Controle</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <table>
-                            <tr>
-                                <td><strong>Commerciaux: </strong></td>
-                                <td>{{ matricule }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>sim: </strong></td>
-                                <td>
-                                    <select class="form-control" v-model="sim">
-                                        <option value="Telma">Telma</option>
-                                        <option value="Orange">Orange</option>
-                                    </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>debut: </strong></td>
-                                <td>{{ tempsDebut }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>fin: </strong></td>
-                                <td>{{ tempsFin }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>durée: </strong></td>
-                                <td>{{ dureeMinute }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#exitModal" v-on:click="validateControle">valider</button>   
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="exitModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel" >Valider Controle</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        insertion reussit
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">ok</button>   
+        <div class="page-inner" >
+            <div v-if="exist">
+                <h2 class="text-center">
+                    <span style="background-color:#f9fbfd">Info Commerciale</span>
+                </h2>
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <div class="card" >
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 d-block d-sm-none" style="margin-bottom: 30px;">
+                                <img src="assets/img/unknow.jpg" class="rounded-circle mx-auto d-block img-fluid d-flex justify-content-center" style="width:200px;height:200px;border: 5px solid #6861ce;">
+                            </div>
+                            <div class="col-md-4">
+                                <table>
+                                    <tr>
+                                        <td><strong>Nom Commercial:</strong></td>
+                                        <td style="text-align:right">{{ personnelData.Nom }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Prenom Commercial:</strong></td>
+                                        <td style="text-align:right">{{ personnelData.Prenom }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Contact:</strong></td>
+                                        <td style="text-align:right">{{ personnelData.Contact_du_personnel }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Mission Actuel:</strong></td>
+                                        <td style="text-align:right">{{ personnelData.Id_de_la_mission }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Coach Commerciale:</strong></td>
+                                        <td style="text-align:right">{{ personnelData.Coach }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Contact Coach:</strong></td>
+                                        <td style="text-align:right">{{ personnelData.ContactCoach }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-4">
+                                <table>
+                                    <tr>
+                                        <td><strong>Nom Tuteur:</strong></td>
+                                        <td style="text-align:right">{{ personnelData.Nom_et_prenom_du_tuteur }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Contact du Tuteur:</strong></td>
+                                        <td style="text-align:right">{{ personnelData.Contact_du_tuteur }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-4 d-none d-sm-block">
+                                <img src="assets/img/unknow.jpg" class="rounded mx-auto d-block img-fluid d-flex justify-content-center" style="width:160px;height:160px">
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <h2 class="text-center"><span style="background-color:#f9fbfd">Info appels telephonique</span></h2>
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><span>Chronometre d'appel</span></h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+
+                            <div class="form-group col-4 text-center">
+                                <select class="form-control input-sm" v-model="sim">
+                                    <option value="Telma">Telma</option>
+                                    <option value="Orange">Orange</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-4 text-center" style="font-size:20px">
+                                {{ tempsMinute }}
+                            </div>
+
+                            <div v-if="!timerIsCounting" class="form-group col-4 text-center">
+                                <button type="button" class="btn btn-success btn-round" v-on:click="startTimer">Demarrer</button>
+                            </div>
+                            <div v-if="timerIsCounting" class="form-group col-4 text-center" >
+                                <button type="button" data-toggle="modal" data-target="#confirmModal" class="btn btn-danger btn-round" v-on:click="stopTimer">Arreter</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <h2 class="text-center"><span style="background-color:#f9fbfd">Info Sanction</span></h2>
+                <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="form-group col-4  text-center">
+                                <select class="form-control" v-model="typePersonnel">
+                                    <option value="Commerciaux" selected>Commerciaux</option>
+                                    <option value="Coach">Coach</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-4 ">
+                                <input type="text" class="form-control input-sm" v-model="codeSanction" v-on:keyup="autoComplete" v-on:click="autoComplete" placeholder="code sanction">
+                                <div v-if="showAutoComplete" class="panel-footer" style="float:top;position: absolute;z-index: 1;">
+                                    <ul class="list-group">
+                                        <li class="list-group-item" v-on:click.left="changeSanction(sanction.Id,sanction.code_sanction,sanction.titre)" v-for="sanction in sanctions" v-bind:key="sanction" >
+                                            <div >{{ sanction.titre }}</div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="form-group col-4 text-center">
+                                <button type="button" class="btn btn-secondary btn-round" v-on:click="AddSanction"> Ajouter </button>
+                            </div>
+                        </div>
+                        <div class="row text-center">
+                            <textarea rows="3" class="form-control" readonly v-model="titreSanction"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2><span>Tableau Sanction Telephonique Commercial</span></h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered">
+                                    <thead >
+                                        <tr class="bg-secondary" style="color:white">
+                                            <th class="respText" scope="col-2">Date</th>
+                                            <th class="respText" scope="col-2">Code Sanction</th>
+                                            <th class="respText" scope="col-2">Designation</th>
+                                            <th class="respText" scope="col-2">Action</th>
+                                        </tr>
+                                    </thead> 
+                                    <tbody> 
+                                        <tr v-for="sanctionP in sanctionsPersonnel" v-bind:key="sanctionP">
+                                            <td class="respText" scope="col-2"> {{ sanctionP.datetime }} </td>
+                                            <td class="respText" scope="col-2"> {{ sanctionP.code_sanction }} </td>
+                                            <td class="respText" scope="col-2"> {{ sanctionP.titre }} </td>
+                                            <td class="respText" scope="col-2"> <button type="button" class="btn btn-danger" v-on:click="removeSanctionPersonnel(sanctionP.id)" >supprimer</button> </td>
+                                        </tr>
+                                    </tbody> 
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal -->
+                <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel" >Valider Controle</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body justify-content-center">
+                                <table>
+                                    <tr>
+                                        <td><strong>Commerciaux: </strong></td>
+                                        <td>{{ matricule }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>sim: </strong></td>
+                                        <td>
+                                            <select class="form-control" v-model="sim">
+                                                <option value="Telma">Telma</option>
+                                                <option value="Orange">Orange</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>debut: </strong></td>
+                                        <td>{{ tempsDebut }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>fin: </strong></td>
+                                        <td>{{ tempsFin }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>durée: </strong></td>
+                                        <td>{{ dureeMinute }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#exitModal" v-on:click="validateControle">valider</button>   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--
+                <div class="modal fade" id="exitModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel" >Valider Controle</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                insertion reussit
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">ok</button>   
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                -->
+                <!-- Modal  end -->
             </div>
         </div>
-        <!-- Modal  end -->
-    </div>
     </div>
 </template>
 
@@ -259,7 +266,8 @@ export default {
             tempsFin: null,
             sanctions: [],
             sanctionsPersonnel: [],
-            isSearchingAutoComplete:false
+            isSearchingAutoComplete:false,
+            isLoadingData: false
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -425,10 +433,12 @@ export default {
         loadURLdata(){
             let urlParams = new URLSearchParams(window.location.search);
             if(urlParams.get('matricule')){
+                this.isLoadingData = true;
                 this.matricule = urlParams.get('matricule');
                 this.getPersonnel();
             }
             else if(localStorage.matricule){
+                this.isLoadingData = true;
                 this.matricule = localStorage.matricule;
                 this.getPersonnel();
             }
@@ -455,6 +465,7 @@ export default {
                 else{
                     alert(this.matricule+" n'existe pas ");
                 }
+                this.isLoadingData = false;
             });
         }
     }

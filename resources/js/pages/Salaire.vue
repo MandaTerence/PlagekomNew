@@ -5,15 +5,6 @@
         </div>
     </div>
     <div class="page-inner">
-
-
-        <div class="small">
-            <line :chart-data="datacollection"></line>
-            <button @click="fillData()">Randomize</button>
-        </div>
-
-
-
         <div class="card">
             <div class="card-header">
                 <div class="row d-flex justify-content-end">
@@ -58,7 +49,7 @@
                                     <td class="respText text-right" >{{ getMoneyFormat(personnel.salaire) }} Ar</td>
                                     <td class="respText text-right" >{{ getMoneyFormat(personnel.malusVente) }} Ar</td>
                                     <td class="respText text-right" >{{ getMoneyFormat(personnel.salaire - personnel.malusVente) }} Ar</td>
-                                    <td class="respText text-right" ><a v-on:click="afficherDetail(personnel)">detail <i class="fas fa-info-circle"></i></a></td>
+                                    <td class="respText text-right" ><a v-on:click="afficherDetail(personnel)">detail <i class="fas fa-info-circle text-primary"></i></a></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -102,14 +93,11 @@
                                             </table>
                                         </div>
                                     </div>
-                                </slot>
-                            </div>
-                            <div class="modal-footer card-footer">
-                                <slot name="footer">
-                                default footer
-                                <button class="modal-default-button" @click="showModal.detailPersonnel = false">
-                                    OK
-                                </button>
+                                    <div class="row justify-content-center" style="margin-top:30px">
+                                        <button class=" col-4 modal-default-button btn btn-primary btn-rounded" @click="showModal.detailPersonnel = false">
+                                            OK
+                                        </button>
+                                    </div>
                                 </slot>
                             </div>
                         </div>
@@ -155,31 +143,6 @@ export default {
         this.reloadPersonnel();
     },
     methods: {
-
-        fillData () {
-        this.datacollection = {
-          labels: [this.getRandomInt(), this.getRandomInt()],
-          datasets: [
-            {
-              label: 'Data One',
-              backgroundColor: '#f87979',
-              data: [this.getRandomInt(), this.getRandomInt()]
-            }, {
-              label: 'Data One',
-              backgroundColor: '#f87979',
-              data: [this.getRandomInt(), this.getRandomInt()]
-            }
-          ]
-        }
-      },
-      getRandomInt () {
-        return Math.floor(Math.random() * (50 - 5 + 1)) + 5
-      },
-
-
-
-
-
         afficherDetail(personnel){
             this.personnelDetail = personnel;
             this.showModal.detailPersonnel = true;

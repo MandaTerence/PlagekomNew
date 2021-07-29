@@ -239,9 +239,6 @@
         </div>
     </div>
 </div>
-<div v-if="(matricule == '')" class="page-inner">
-    test
-</div>
     
 </template>
 <script>

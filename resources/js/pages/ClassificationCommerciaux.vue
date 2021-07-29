@@ -42,7 +42,10 @@
                 <h4>
                     total : {{ classification.length }}
                 </h4>
-                <div class="table-responsive">
+                <div v-if="isLoadingData" class="row col-12 d-flex justify-content-center" >
+                    <div class="loader loader-lg loader-primary"></div>
+                </div>
+                <div class="table-responsive" v-if="!isLoadingData">
                     <table class="table table-hover table-bordered">
                         <thead>
                             <tr class="bg-secondary" style="color:white">
@@ -83,6 +86,7 @@ export default {
             classification: [],
             equipes: [],
             filtre: 'CA',
+            isLoadingData: false
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -172,14 +176,17 @@ export default {
             }
         },
         loadClassificationTout(){
+            this.isLoadingData = true;
             if(this.classificationSave["tout"] === undefined ){
                 axios.get('/api/personnels/getAllWithInfos').then(response => {
                     this.classificationSave["tout"] = response.data.personnels;
                     this.classification = this.classificationSave["tout"];
+                    this.isLoadingData = false;
                 });
             }
             else{
                 this.classification = this.classificationSave["tout"];
+                this.isLoadingData = false;
             }
         },
         replaceClassification(classNouveau){

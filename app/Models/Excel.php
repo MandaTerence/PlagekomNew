@@ -48,6 +48,10 @@ class Excel extends Model
         else if($data->excel=="Planning"){
             self::getPlanning($data);
         }
+        else if($data->excel=="controlMission"){
+            self::getControlMission($data);
+        }
+
 /*
         $excel = "";
         $excel .=  "Code client\tNum Commande\tClient\tDate de Commande\tDate de Livraison\tLien Facebook\tContact\tProduit\tPU\tQTT\tlieu de livraison\tOPL\tQuartier\tVille\tMontant\tLocalisation\tFrais\tRemarque\tStatut\n";
@@ -58,6 +62,22 @@ class Excel extends Model
         print $excel;
         exit;
 */
+    }
+
+    public static function getControlMission($data){
+        $missions = PersonnelService::getAllFromMission($data->jour);
+        $excel = "";
+        foreach($missions as $mission){
+            if($mission->Id_de_la_mission == $data->idMission){
+                $excel .="\n";
+                $excel .= "\t\t Mission: \t ".$idMission."\n\n";
+                $excel .= "nbr de commerciaux\t".count($mission->Commerciaux)."\tVille d animation\t".$mission->ville."\n\n";
+                $excel .= "Matricule\tHeure de controle\tVille d animation\tDuree de controle\tcode de sanction\tCA sanction\tEtat Controle\taction\n";
+                $excel .= "";
+            }
+        }
+        header("Content-disposition: attachment; filename=control.xls");
+        print $excel;
     }
 
     public static function getPlanning($data){

@@ -22,13 +22,13 @@
                                             <tr v-for="sanction in selectedCommercial.sanctions ">
                                                 <td>{{ sanction.code_sanction}}</td>
                                                 <td>{{ sanction.titre }}</td>
-                                                <td>{{ getMoneyFormat(Number(sanction.valeur)) }}</td>
+                                                <td style="white-space: nowrap;overflow: hidden;">{{ getMoneyFormat(Number(sanction.valeur)) }}</td>
                                             </tr>
                                         </tbody>
                                    </table>
                                 </div>
                                 <div style="margin-top:30px" class="row justify-content-center">
-                                    <button class="btn btn-primary" @click="showModal.detailSanction = false">
+                                    <button class="col-4 btn btn-primary btn-rounded" @click="showModal.detailSanction = false">
                                         OK
                                     </button>
                                 </div>
@@ -69,7 +69,7 @@
                                    </table>
                                 </div>
                                 <div style="margin-top:30px" class="row justify-content-center">
-                                    <button class="btn btn-primary" @click="showModal.detailControle = false">
+                                    <button class="col-4 btn btn-primary btn-rounded" @click="showModal.detailControle = false">
                                         OK
                                     </button>
                                 </div>
@@ -81,7 +81,7 @@
         </transition>
     </div>
 
-    <div class="page-inner" v-if="!thereIsPersonnel">
+    <div class="page-inner" v-if="false">
         <div class="row">
             <div class="card col-md-12">
                 <div class="card-body">
@@ -102,24 +102,32 @@
             </div>
         </div>
     </div>
-    <div class="panel-header bg-secondary-gradient" v-if="thereIsPersonnel">
+    <!-- <div class="panel-header bg-secondary-gradient" v-if="thereIsPersonnel">-->
+    <div class="panel-header bg-secondary-gradient">
         <div class="page-inner py-5">
             <h2 class="text-white pb-2 fw-bold">Timeline du {{ dateMission }}</h2>
         </div>
     </div>
-    <div class="page-inner" v-if="thereIsPersonnel">
+    <!-- <div class="page-inner" v-if="thereIsPersonnel"> -->
+    <div class="page-inner">
         <div class="card">
             <div class="card-body">
-                <div class="row" style="margin-bottom:60px;">
-                    <div class="col-2">
-                        <button v-on:click="retour" class="btn btn-secondary btn-round">
-                            <i class="fas fa-angle-left" style="margin-right: 10px;"></i>
-                            <span >retour</span>
-                        </button>
+                <div>
+                    <label for="dateMission">Selectionner la date</label>
+                </div>
+                <div class="row">
+                    <div class="form-group input-group col-12">
+                        <input type="date" class="form-control" id="dateMission" v-model="dateMission">
+                        <div class="input-group-append">
+                            <button class="btn btn-secondary " id="btnCheck" v-on:click="loadMissionDate()">
+                                Controller
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div v-for="mission in missions" v-bind:key="mission">
-                    <div v-if="mission.Commerciaux.length>1" style="margin:20px">
+                    <div v-if="mission.Commerciaux.length>1" style="margin:10px">
+                        <hr>
                         <div class="row"><h3>{{ mission.idMission }}</h3></div>
                         <div class="row">
                             <div class="col-md-3">
@@ -132,30 +140,29 @@
                                 <strong>Durée totale controle :{{ getDureeTotalControle(mission.Commerciaux) }}</strong>
                             </div>
                             <div class="col-md-3">
-                                <strong>CA total Sanction : {{ getMoneyFormat(getCATotalSanction(mission.Commerciaux)) }} Ar</strong>
+                                <strong>CA total Sanction : {{ getMoneyFormat(getCATotalSanction(mission.Commerciaux)) }}</strong>
                             </div>
                         </div>
-                        <hr>
-                        <div class="row"><h3>Commerrciaux :</h3></div>
-                        <div class="row">
-                            <table class="table table-hover table-striped">
+                        <div class="row"><h3>Commerciaux :</h3></div>
+                        <div class="row table-responsive">
+                            <table class="table table-hover table-striped col-12">
                                 <thead>
                                     <tr class="bg-secondary" style="color:white">
-                                        <th scope="col-md-2">Matricule</th>
-                                        <th scope="col-md-2">Heure de controle</th>
-                                        <th scope="col-md-2">Ville d'animation</th>
-                                        <th scope="col-md-2">Duree de controle</th>
-                                        <th scope="col-md-2">code de sanction</th>
-                                        <th scope="col-md-2">CA sanction</th>
-                                        <th scope="col-md-2">Etat Controle</th>
-                                        <th scope="col-md-2">action</th>
+                                        <th class="respText" scope="col-md-2">Matricule</th>
+                                        <th class="respText" scope="col-md-2">Heure de controle</th>
+                                        <th class="respText" scope="col-md-2">Ville d'animation</th>
+                                        <th class="respText" scope="col-md-2">Duree de controle</th>
+                                        <th class="respText" scope="col-md-2">code de sanction</th>
+                                        <th class="respText" scope="col-md-2">CA sanction</th>
+                                        <th class="respText" scope="col-md-2">Etat Controle</th>
+                                        <th class="respText" scope="col-md-2">action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="commercial in mission.Commerciaux" v-bind:key="commercial">
-                                        <td v-on:click="goToPlanning(commercial.Matricule)">
+                                        <td class="respText" v-on:click="goToPlanning(commercial.Matricule)">
                                             {{ commercial.Matricule }}</td>
-                                        <td>
+                                        <td class="respText" >
                                             <div v-if="commercial.controles.length>0" v-on:click="showControle(commercial)">
                                                 <div v-for="controle in commercial.controles" v-bind:key="controle">
                                                     {{ getHeure(controle.debut) }}
@@ -165,10 +172,10 @@
                                                 aucun 
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="respText" >
                                             {{ mission.ville }}
                                         </td>
-                                        <td>
+                                        <td class="respText" >
                                             <div v-if="commercial.controles.length>0">
                                                 {{ getDureeControle(commercial.controles) }}
                                             </div>
@@ -176,7 +183,7 @@
                                                 aucun 
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="respText" >
                                             <div v-if="commercial.sanctions.length>0" v-on:click="showSanction(commercial)">
                                                 <div v-for="sanction in commercial.sanctions" v-bind:key="sanction">
                                                     {{ sanction.code_sanction }}
@@ -186,23 +193,23 @@
                                                 aucun 
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="respText" >
                                             <div v-if="commercial.sanctions.length>0">
-                                                {{ getMoneyFormat(getTotalCASanction(commercial.sanctions)) }} Ar
+                                                {{ getMoneyFormat(getTotalCASanction(commercial.sanctions)) }}
                                             </div>
                                             <div v-else>
                                                 aucun 
                                             </div>
                                         </td>
-                                        <td>
-                                            <div v-if="commercial.controles.length>0">
+                                        <td class="respText" >
+                                            <div class="text-success" v-if="commercial.controles.length>0">
                                                 effectué
                                             </div>
-                                            <div v-else>
+                                            <div class="text-danger" v-else>
                                                 non effectué
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="respText" >
                                             <button v-on:click="goToPlanning(commercial.Matricule)" class="btn btn-primary btn-sm">
                                                 controller
                                             </button>
@@ -213,24 +220,26 @@
                         </div>
                         <hr>
                         <div class="row"><h3>Coach :</h3></div>
-                        <div class="row">
+                        <div class="row table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr class="bg-secondary" style="color:white">
-                                        <th scope="col-md-2">Matricule</th>
-                                        <th scope="col-md-2">Heure de controle</th>
-                                        <th scope="col-md-2">Ville d'animation</th>
-                                        <th scope="col-md-2">Duree de controle</th>
-                                        <th scope="col-md-2">code de sanction</th>
-                                        <th scope="col-md-2">CA sanction</th>
-                                        <th scope="col-md-2">Etat Controle</th>
+                                        <th class="respText" scope="col-md-2">Matricule</th>
+                                        <th class="respText" scope="col-md-2">Heure de controle</th>
+                                        <th class="respText" scope="col-md-2">Ville d'animation</th>
+                                        <th class="respText" scope="col-md-2">Duree de controle</th>
+                                        <th class="respText" scope="col-md-2">code de sanction</th>
+                                        <th class="respText" scope="col-md-2">CA sanction</th>
+                                        <th class="respText" scope="col-md-2">Etat Controle</th>
+                                        <th class="respText" scope="col-md-2">action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="coach in mission.Coach" v-bind:key="coach">
-                                        <td v-on:click="goToPlanning(coach.Matricule)">
-                                            {{ coach.Matricule }}</td>
-                                        <td>
+                                        <td class="respText" v-on:click="goToPlanning(coach.Matricule)">
+                                            {{ coach.Matricule }}
+                                        </td>
+                                        <td class="respText" >
                                             <div v-if="coach.controles.length>0">
                                                 <div v-for="controle in coach.controles" v-bind:key="controle">
                                                     {{ getHeure(controle.debut) }}
@@ -240,10 +249,10 @@
                                                 aucun 
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="respText" >
                                             {{ mission.ville }}
                                         </td>
-                                        <td>
+                                        <td class="respText" >
                                             <div v-if="coach.controles.length>0">
                                                 {{ getDureeControle(coach.controles) }}
                                             </div>
@@ -251,7 +260,7 @@
                                                 aucun 
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="respText" >
                                             <div v-if="coach.sanctions.length>0">
                                                 <div v-for="sanction in coach.sanctions" v-bind:key="sanction">
                                                     {{ sanction.code_sanction }}
@@ -261,7 +270,7 @@
                                                 aucun 
                                             </div>
                                         </td>
-                                        <td>
+                                        <td class="respText" > 
                                             <div v-if="coach.sanctions.length>0">
                                                 {{ getTotalCASanction(coach.sanctions) }}
                                             </div>
@@ -269,18 +278,28 @@
                                                 aucun 
                                             </div>
                                         </td>
-                                        <td>
-                                            <div v-if="coach.controles.length>0">
+                                        <td class="respText" >
+                                            <div class="text-success" v-if="coach.controles.length>0">
                                                 effectué
                                             </div>
-                                            <div v-else>
+                                            <div class="text-danger" v-else>
                                                 non effectué
                                             </div>
+                                        </td>
+                                        <td class="respText" >
+                                            <button v-on:click="goToPlanning(coach.Matricule)" class="btn btn-primary btn-sm">
+                                                controller
+                                            </button>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <button v-on:click="exporterMissionXls(mission.idMission)" v-if="mission.Commerciaux.length>1" class="btn btn-success btn-rounded">
+                            export XLS
+                        </button>
                     </div>
                 </div>
             </div>
@@ -316,9 +335,36 @@ export default {
         }
     },
     methods: {
+        exporterMissionXls(idMission){
+            let data = {
+                "excel":"controlMission",
+                "idMission":idMission,
+                "jour": this.dateMission
+            };
+            data = JSON.stringify(data);
+            data ='/excel'+data
+            axios.get(data,{
+                responseType: 'blob',
+            }).then(response => {
+                this.download(response);
+            });
+        },
+        download(data) {
+            if(!data){
+                return
+            }
+            var blob = new Blob([data.data], {type: 'application/vnd.ms-excel;charset=utf-8'})
+            var url = window.URL.createObjectURL(blob);
+            var aLink = document.createElement("a");
+            aLink.style.display = "none";
+            aLink.href = url;
+            //aLink.setAttribute("Data Template", "Data Template.xls");
+            document.body.appendChild(aLink)
+            aLink.click()
+        },
         getMoneyFormat(monnaie){
             if(monnaie)
-                return monnaie.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); 
+                return monnaie.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$& ')+" Ar"; 
             else
                 return 0;
         },

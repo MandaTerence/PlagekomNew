@@ -603,22 +603,32 @@ class PersonnelController extends Controller
     public function getPersonnelData(Request $request){
         $personnel = Personnel::whereRaw("Matricule like '".$request->matricule."' ")
         ->first();
-        $personnel->getDetailPersonnel();
-        $personnel->getStatutbimestriel();
-        $personnel->getStatutAnnuel();
-        $personnel->getChiffreDAffaire();
-        $personnel->getBonusMensuel();
-        $personnel->getIndemnite();
-        $personnel->getSanction();
-        $personnel->getJourAbsence();
-        $personnel->getMalusVente();
-        if($personnel){
-            $response = [
-                'success' => true,
-                'message' => 'resultat trouvé',
-                'personnel' => $personnel,
-            ];
-            return $response;
+        if($personnel!=null){
+            $personnel->getDetailPersonnel();
+            $personnel->getStatutbimestriel();
+            $personnel->getStatutAnnuel();
+            $personnel->getChiffreDAffaire();
+            $personnel->getBonusMensuel();
+            $personnel->getIndemnite();
+            $personnel->getSanction();
+            $personnel->getJourAbsence();
+            $personnel->getMalusVente();
+            if($personnel){
+                $response = [
+                    'success' => true,
+                    'message' => 'resultat trouvé',
+                    'personnel' => $personnel,
+                ];
+                return $response;
+            }
+            else{
+                $response = [
+                    'success' => false,
+                    'message' => 'aucun resultat trouvé',
+                    'personnel' => null,
+                ];
+                return $response;
+            }
         }
         else{
             $response = [
