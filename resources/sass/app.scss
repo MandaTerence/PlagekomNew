@@ -92,3 +92,16 @@
     transform: scale(1.1);
   }
   
+  .badge_content {
+    background-color: white;
+    box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.75);
+    width: 490px;
+}
+
+.badge_content #ch_img_utilisateur img {
+  height: 150px;
+  width: 150px;
+  position: relative;
+  border-radius: 50%;
+  margin-top: -60px;
+}

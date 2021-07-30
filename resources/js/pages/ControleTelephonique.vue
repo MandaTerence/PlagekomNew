@@ -4,16 +4,14 @@
     </div>
     <div v-else>
         <div class="page-inner" v-if="!exist">
-            <div v-if="!exist">
-                <div class="card">
-                    <div class="card-body ">
-                        <div class="form-group">
-                            <label for="matricule">Matricule</label>
-                            <input type="text" class="form-control" id="matricule"  placeholder="Matricule" v-model="nouveauMatricule">
-                        </div>
-                        <div class="form-group text-center">
-                            <button type="submit" class="btn btn-secondary btn-round col-6" v-on:click="changeCommerciaux">controler</button>
-                        </div>
+            <div class="card">
+                <div class="card-body ">
+                    <div class="form-group">
+                        <label for="matricule">Matricule</label>
+                        <input type="text" class="form-control" id="matricule"  placeholder="Matricule" v-model="nouveauMatricule">
+                    </div>
+                    <div class="form-group text-center">
+                        <button type="submit" class="btn btn-secondary btn-round col-6" v-on:click="changeCommerciaux">controler</button>
                     </div>
                 </div>
             </div>
