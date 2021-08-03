@@ -109,12 +109,14 @@
                                         <EquipeTab  v-model:equipes="equipeChoisit.commerciaux" titre="Commerciaux"/>
                                     </div> 
                                 </div>
-                                <div class="row" >
-                                    <div class="col-12 text-right">
-                                        <button class="btn btn-secondary" v-on:click="getClassement">lancer le classement</button>
-                                    </div>
-                                </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div style="margin-top:30px">
+                            <button class="btn btn-rounded btn-secondary" v-on:click="getClassement">
+                                lancer le classement
+                            </button>
                         </div>
                     </div>
                     <!-- OLD
@@ -173,10 +175,12 @@
         </div>
         <div class="page-inner">
             <div class="row">
-                <div class="col-sm-6">
-                    <div class="card">
-                        <div class="card-header">
-                            Classement Proposé pour l'équipe A du coach {{ EquipeA.coachs[0].Matricule }} 
+                <div v-if="classement.coach.length>0">
+                    <div class="card col-6" v-for="classement in classements">
+                        <div class="card-header row justify-content-center">
+                            <h3>
+                                Classement Proposé pour l'équipe du coach {{ classement.coach[0].Matricule }}
+                            </h3>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -189,16 +193,20 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="equipe in ClassementA" v-bind:key="equipe">
+                                        <tr v-for="equipe in classement.classementReel" v-bind:key="equipe">
                                             <td class="respText" >{{ equipe.Matricule }}</td>
                                             <td class="respText" >{{ equipe.Nom }}</td>
                                             <td class="respText" >
-                                                <input type="number" v-model="equipe.placeTemp" v-on:change="changeClassement(ClassementA,equipe.place,equipe.placeTemp)"/>
+                                                <input type="number" v-model="equipe.placeTemp" v-on:change="changeClassement(classement.classementReel,equipe.place,equipe.placeTemp)"/>
+                                                <!--
+                                                    v-on:change="changeClassement(ClassementA,equipe.place,equipe.placeTemp)"
+                                                -->
                                             </td>
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>        
+                            </div>
+                            <!--  
                             <div class="card">
                                 <div class="card-header">             
                                     <h1><a v-on:click="toogleDetail('A')">Detail</a></h1>
@@ -227,63 +235,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="card" v-if="EquipeB.coachs[0]">
-                        <div class="card-header" >
-                            Classement Proposé pour l'équipe B du coach {{ EquipeB.coachs[0].Matricule }} 
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                    <thead >
-                                        <tr class="bg-secondary" style="color:white">
-                                            <th class="respText" scope="col-md-2">matricule</th>
-                                            <th class="respText" scope="col-md-2 d-none">nom et prenom</th>
-                                            <th class="respText" scope="col-md-1">place</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="equipe in ClassementB" v-bind:key="equipe">
-                                            <td class="respText" scope="col-md-2">{{ equipe.Matricule }}</td>
-                                            <td class="respText" scope="col-md-2">{{ equipe.Nom}}</td>
-                                            <td class="respText" scope="col-md-1">
-                                                <input type="number" v-model="equipe.placeTemp" v-on:change="changeClassement(ClassementB,equipe.place,equipe.placeTemp)"/>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="card">
-                                <div class="card-header">             
-                                    <h1><a v-on:click="toogleDetail('B')">Detail</a></h1>
-                                </div>
-                                <div class="card-body" v-if="showDetailB==true">
-                                    <div v-for="Classement in ClassementDetailB" v-bind:key="Classement">
-                                        <h1>{{ Classement.nom }}</h1>
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
-                                                <thead >
-                                                    <tr class="bg-secondary" style="color:white">
-                                                        <th class="respText" >matricule</th>
-                                                        <th class="respText" >nom et prenom</th>
-                                                        <th class="respText" >CA</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="equipe in Classement.classement" v-bind:key="equipe">
-                                                        <td class="respText" >{{ equipe.Matricule }}</td>
-                                                        <td class="respText" >{{ equipe.Nom }}</td>
-                                                        <td class="respText" >{{ equipe.CA }}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            -->
                         </div>
                     </div>
                 </div>
@@ -362,18 +314,7 @@ export default {
             EquipeB: {
                 coachs : [],
                 commerciaux : []
-            },
-
-            showDetailA: false,
-            showDetailB: false,
-            ClassementA: [],
-            ClassementB: [],
-
-            ClassementDetailA: [],
-            ClassementDetailB: [],
-
-            buttonTeamA: "btn btn-secondary btn-border",
-            buttonTeamB: "btn btn-secondary"
+            }
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -392,7 +333,13 @@ export default {
             }
         },
         equipeChoisit: function (){
-            return this.Equipes[this.selectedEquipe];
+            if(this.Equipes.length>0){
+                return this.Equipes[this.selectedEquipe];
+            }
+            return {
+                coachs : [],
+                commerciaux : []
+            };
         }
     },
     created() {
@@ -453,6 +400,17 @@ export default {
                 commerciaux : []
             };
             alert("Vous avez choisit la mission : "+this.idMission);
+            this.loadEquipeFromMission();
+        },
+        loadEquipeFromMission(){
+            this.$axios.get('/api/missions/getEquipe',{params: {Id_de_la_mission: this.idMission }}) 
+            .then(response => {
+                this.selectedEquipe = 0;
+                this.Equipes = response.data.equipes;
+            })
+            .catch(function (error) {
+
+            });
         },
         toogleAvtiveTeamButton(teamIndex){
             this.selectedEquipe = teamIndex;
@@ -484,6 +442,7 @@ export default {
                 if(response.data.success){
                     this.missions = response.data.missions;
                     this.idMission = this.missions[0].Id_de_la_mission;
+                    this.loadEquipeFromMission();
                 }
                 else{
                     console.log(response.data.message);
@@ -602,48 +561,35 @@ export default {
             return matricules;
         },
         getClassement(){
-            /*
-            let matricules = this.getMatriculeFromArray(this.commerciaux);
             let produits =  this.getCodeProduitFromArray(this.produits);
             this.classements.splice(0,this.classements.length);
-            axios.get('/api/personnels/getClassement',{params: {Matricules: matricules,Produits: produits}}).then(response => { 
-                if(response.data.personnels!=null){
-                    this.classements = response.data.classements;
-                    localStorage.classements = JSON.stringify(this.classements);
-                    this.fillPlaceTemp(response.data.classementsReel);
-                    this.classementReel = response.data.classementsReel;
-                    localStorage.classementReel = JSON.stringify(this.classementReel);
-                    this.toogleClassementsView();
+            let valide = true;
+            for(let i=0;i<this.Equipes.length;i++){
+                if(this.Equipes[i].coachs.length==0){
+                    alert("il manque un coach pour l'equipe "+(i+1));
+                    valide = false;
+                    break;
                 }
-            });
-            */
-            let produits =  this.getCodeProduitFromArray(this.produits);
-            /*
-            let matriculeA = this.getMatriculeFromArray(this.EquipeA.commerciaux);
-            let matriculeB = this.getMatriculeFromArray(this.EquipeB.commerciaux);
-            */
-            this.classements.splice(0,this.classements.length);
-            //this.savePersonnelOnlocalStorage();
-            axios.get('/api/personnels/getClassement',
-                {
-                    params: {
-                        equipes: this.getMatriculesEquipes(),
-                        Produits: produits
+            }
+            if(valide){
+                axios.get('/api/personnels/getClassement',
+                    {
+                        params: {
+                            equipes: this.Equipes,
+                            Produits: produits
+                        }
+                    }).then(response => {
+                        let classements = response.data.resultat;
+                        for(let i=0;i<classements.length;i++){
+                            for(let j= 0;j<classements[i].classementReel.length;j++){
+                                classements[i].classementReel[j].placeTemp = classements[i].classementReel[j].place;
+                            }
+                        }
+                        this.classements = classements;
+                        this.toogleClassementsView();
                     }
-                }).then(response => {
-                
-                if(response.data.resultatEquipeA!=null){
-                    this.ClassementA = response.data.resultatEquipeA.classementReel;
-                    this.ClassementDetailA = response.data.resultatEquipeA.classementDetail;
-                    this.fillPlaceTemp(response.data.resultatEquipeA.classementReel);
-                }
-                if(response.data.resultatEquipeB!=null){
-                    this.ClassementB = response.data.resultatEquipeB.classementReel;
-                    this.ClassementDetailB = response.data.resultatEquipeB.classementDetail;
-                    this.fillPlaceTemp(response.data.resultatEquipeB.classementReel);
-                }
-                this.toogleClassementsView();
-            });
+                );
+            }
         },
         savePersonnelOnlocalStorage(){
             if(this.EquipeA){
@@ -675,7 +621,6 @@ export default {
                 Classement.splice(placeTemp-1, 0, elementTemp);
                 this.recalculPlace(Classement);
             }
-            alert(JSON.stringify(Classement));
         },
         loadFonctions(){
             this.$axios.get('/api/fonctions') 

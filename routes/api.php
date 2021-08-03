@@ -34,6 +34,7 @@ Route::group(['prefix' => 'missions', 'middleware' => 'auth:sanctum'], function 
     Route::get('/', [MissionController::class, 'index']);
     Route::get('/getTaux', [MissionController::class, 'getTaux']);
     Route::get('/getAllTypesMission', [MissionController::class, 'getAllTypesMission']);
+    Route::get('/getEquipe', [MissionController::class, 'getEquipe']);
 });
 
 Route::group(['prefix' => 'personnels', 'middleware' => 'auth:sanctum'], function () {

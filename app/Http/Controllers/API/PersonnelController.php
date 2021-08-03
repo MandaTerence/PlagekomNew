@@ -266,8 +266,6 @@ class PersonnelController extends Controller
     }
 
     public function getClassement(Request $request){
-        $equipeA = [];
-        $equipeB = [];
 
         $interval = getDateInterval(30);
         $equipes = [];
@@ -282,10 +280,11 @@ class PersonnelController extends Controller
 
         $equipes = $request->equipes;
         foreach($equipes as $equipe){
-            if($equipe != "[]"){
+
                 $personnels = [];
                 $listeEquipe = json_decode($equipe);
-                foreach($listeEquipe as $element){
+                $listeCommerciaux = $listeEquipe->commerciaux;
+                foreach($listeCommerciaux as $element){
                     $p = new Personnel;
                     $p->Matricule = $element->Matricule;
                     $p->getNomFromMAtricule();
@@ -303,6 +302,7 @@ class PersonnelController extends Controller
                     }
                 }
                 $resultatEquipe = [
+                    'coach' => $listeEquipe->coachs,
                     'classementReel' => ClassementService::getClassementTotal($equipe,self::DEFAULT_COEF),
                     'classementDetail' =>[
                         [
@@ -334,7 +334,6 @@ class PersonnelController extends Controller
                     ];
                 };
                 $resultat[] = $resultatEquipe;
-            }
             
         }
 

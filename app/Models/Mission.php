@@ -29,6 +29,49 @@ class Mission extends Model
         'Id_type',
     ];
 
+    public static function getEquipe($idMission){   
+        $equipes=[];
+
+        $listeEquipes = DB::table("detailmission")
+        ->select("Equipe")
+        ->distinct()
+        ->where("Id_de_la_mission",$idMission)
+        ->get();
+
+        $personnels = DB::table("detailmission")
+        ->select("personnel","Equipe")
+        ->distinct()
+        ->where("Id_de_la_mission",$idMission)
+        ->get();
+
+        if(($personnels)&&($listeEquipes)){
+            foreach($listeEquipes as $equipe){
+                $coachs=[];
+                $commerciaux=[];
+                foreach($personnels as $personnel){
+                    if($personnel->Equipe == $equipe->Equipe){
+                        $personne = new Personnel;
+                        $personne->Matricule = $personnel->personnel;
+                        $personne->getNomFromMAtricule();
+                        $personne->getCA();
+                        if(str_starts_with($personnel->personnel, 'COTN')){
+                            $coachs[] = $personne;
+                        }
+                        else{
+                            $commerciaux[] =  $personne;
+                        }
+                    }
+                }
+                $equipes[] = [
+                    "coachs" => $coachs,
+                    "commerciaux" => $commerciaux
+                ];
+            }
+            return $equipes;
+        }
+        return [];
+    }
+
     public function selectPersonnelFromMission(){
         return DB::table("detailmission")
         ->select("personnel")

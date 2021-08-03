@@ -71,4 +71,26 @@ class MissionController extends Controller
             return $response;
         }
     }
+
+    public function getEquipe(Request $request){
+        try{
+            $equipes = Mission::getEquipe($request->Id_de_la_mission);
+            $response = 
+            [
+                'success'=> true,
+                'message'=> count($equipes).' results founds',
+                'equipes'=> $equipes,
+            ];
+            return $response;
+        } 
+        catch (\Illuminate\Database\QueryException $exception) {
+            $response = 
+            [
+                'success'=> false,
+                'message'=> $exception->errorInfo
+            ];
+            return $response;
+        }
+    }
+    
 }

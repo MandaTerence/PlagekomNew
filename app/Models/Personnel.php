@@ -977,9 +977,9 @@ class Personnel extends Model
     static function getFirstWithCA($conditions,$interval=""){
         $nbrJour = self::$DAY_INTERVAL;
         $personnel = self::where($conditions)
-        
         ->select('Matricule', 'Nom', 'Prenom','Fonction_actuelle')
         ->first();
+        
         if($personnel){
             if($interval==""){
                 $interval = getDateInterval($nbrJour);
@@ -988,7 +988,7 @@ class Personnel extends Model
             $facture = DB::table('facture')
             ->where('facture.Matricule_personnel',$personnel->Matricule)
             ->whereRaw("facture.Date >= '".$interval->firstDate."'")
-        ->whereRaw("facture.Date <= '".$interval->lastDate."'")
+            ->whereRaw("facture.Date <= '".$interval->lastDate."'")
             ->select(DB::raw('COALESCE(SUM(detailvente.Quantite * prix.Prix_detail),0) as CA'))
             ->join('detailvente', 'detailvente.Facture', '=', 'facture.id')
             ->join('prix', 'detailvente.ID_prix', '=', 'prix.Id')

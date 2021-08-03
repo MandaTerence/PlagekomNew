@@ -26,6 +26,11 @@
         </div>
         <div class="page-inner" >
             <div v-if="exist">
+                <div class="row justify-content-start">
+                    <button v-on:click="goToTimeline()" style="margin-left: 20px" class="btn btn-secondary btn-rounded">
+                        voir Timeline du jour
+                    </button>
+                </div>
                 <h2 class="text-center">
                     <span style="background-color:#f9fbfd">Info Commerciale</span>
                 </h2>
@@ -290,6 +295,9 @@ export default {
         }
     },
     methods: {
+        goToTimeline(){
+            this.$router.push({ path: 'TimeLine'});
+        },
         resetCommerciaux(){
             this.exist = false;
             this.matricule = '';
