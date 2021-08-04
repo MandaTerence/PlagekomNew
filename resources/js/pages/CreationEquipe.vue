@@ -114,7 +114,7 @@
                     </div>
                     <div class="row justify-content-center">
                         <div style="margin-top:30px">
-                            <button class="btn btn-rounded btn-secondary" v-on:click="getClassement">
+                            <button class="btn btn-rounded btn-primary" v-on:click="getClassement">
                                 lancer le classement
                             </button>
                         </div>
@@ -175,14 +175,24 @@
         </div>
         <div class="page-inner">
             <div class="row">
-                <div v-if="classement.coach.length>0">
-                    <div class="card col-6" v-for="classement in classements">
+                <div v-bind:class="classementHtmlClass" v-for="classement in classements">
+                    <div v-if="classement.coach.length>0">
                         <div class="card-header row justify-content-center">
                             <h3>
                                 Classement Proposé pour l'équipe du coach {{ classement.coach[0].Matricule }}
                             </h3>
                         </div>
                         <div class="card-body">
+                            <div class="row d-flex justify-content-center" style="margin-bottom:20px">
+                                <select class="col-12 form-control input-sm" v-model="classement.filtre" v-on:change="filtrer(classement)">
+                                    <option value="mp" selected>meilleur proposition</option>
+                                    <option value="cal">meilleur de chiffre d'affaire</option>
+                                    <option value="cam">meilleur moyenne de chiffre d'affaire moyen</option>
+                                    <option value="cal">meilleur chiffre d'affaire local</option>
+                                    <option value="cami">meilleur chiffre d'affaire mission</option>
+                                    <!-- <option v-if="(missionChoix!='')" value="cat">meilleur chiffre d'affaire {{ missionChoix }}</option> -->
+                                </select>
+                            </div>
                             <div class="table-responsive">
                                 <table class="table table-bordered table-head-bg-secondary table-bordered-bd-secondary">
                                     <thead >
@@ -296,6 +306,8 @@ export default {
 
             selectedEquipe: 0,
 
+            isLoadingData: false,
+
             Equipes: [
                 {
                     coachs : [],
@@ -340,6 +352,12 @@ export default {
                 coachs : [],
                 commerciaux : []
             };
+        },
+        classementHtmlClass: function (){
+            if(this.classements.length<2){
+                return "card col-12";
+            }
+            return "card col-6";
         }
     },
     created() {
@@ -348,6 +366,70 @@ export default {
         this.loadLocalData();
     },
     methods: {
+        filtrer(classement){
+            if(classement.filtre=="ca"){
+                classement.classementReel.sort(function(a, b) {
+                    return b.CAGlobal - a.CAGlobal;
+                });
+            }
+            else if(classement.filtre=="cam"){
+                classement.classementReel.sort(function(a, b) {
+                    return b.CAMoyen - a.CAMoyen;
+                });
+            }
+            else if(classement.filtre=="cami"){
+                classement.classementReel.sort(function(a, b) {
+                    return b.CAMission - a.CAMission;
+                });
+            }
+            else if(classement.filtre=="cal"){
+                classement.classementReel.sort(function(a, b) {
+                    return b.CALocal - a.CALocal;
+                });
+            }
+            else{
+                classement.classementReel.sort(function(a, b) {
+                    return b.CATotal - a.CATotal;
+                });
+            }
+            for(let i= 0;i<classement.classementReel.length;i++){
+                classement.classementReel[i].place = (i+1);
+                classement.classementReel[i].placeTemp = (i+1);
+            }
+        },
+        getClassement(){
+            let produits =  this.getCodeProduitFromArray(this.produits);
+            this.classements.splice(0,this.classements.length);
+            let valide = true;
+            for(let i=0;i<this.Equipes.length;i++){
+                if(this.Equipes[i].coachs.length==0){
+                    alert("il manque un coach pour l'equipe "+(i+1));
+                    valide = false;
+                    break;
+                }
+            }
+            if(valide){
+                this.isLoadingData = true;
+                axios.get('/api/personnels/getClassement',
+                    {
+                        params: {
+                            equipes: this.Equipes,
+                            Produits: produits
+                        }
+                    }).then(response => {
+                        let classements = response.data.resultat;
+                        for(let i=0;i<classements.length;i++){
+                            classements[i].filtre="mp";
+                            for(let j= 0;j<classements[i].classementReel.length;j++){
+                                classements[i].classementReel[j].placeTemp = classements[i].classementReel[j].place;
+                            }
+                        }
+                        this.classements = classements;
+                        this.toogleClassementsView();
+                    }
+                );
+            }
+        },
         removeEquipe(index){
             if(index==this.selectedEquipe){
                 if(this.selectedEquipe>0){
@@ -403,10 +485,12 @@ export default {
             this.loadEquipeFromMission();
         },
         loadEquipeFromMission(){
+            this.isLoadingData = true;
             this.$axios.get('/api/missions/getEquipe',{params: {Id_de_la_mission: this.idMission }}) 
             .then(response => {
                 this.selectedEquipe = 0;
                 this.Equipes = response.data.equipes;
+                this.isLoadingData = false;
             })
             .catch(function (error) {
 
@@ -485,33 +569,29 @@ export default {
                 if(this.idFonction != null ){
                     setTimeout(this.searchAutoComplete, 1000);
                 }
-            }    
+            }
         },
         validateEquipe(coach,equipe){
-            //alert(JSON.stringify(this.getMatriculeAndPlaceFromArray(equipe)));
-            /*
-            if(coach.length<this.maxCoach){
-                alert("il manque "+(this.maxCoach-coach.length)+" coach");
-            }
-            else if(equipe.length<this.maxCommerciaux){
-                alert("il manque "+(this.maxCommerciaux-equipe.length)+" commerciaux");
-            }
-            else{
-            */
-                axios.post('/api/classements/',{matriculeCoach: coach[0].Matricule,matriculeCommerciaux: this.getMatriculeAndPlaceFromArray(equipe),idMission:this.idMission}).then(response => {
-                    if(response.data.success){
-                        this.showModal = false;
-                        //this.$router.push({ name: 'planning', query: { idMission: this.idMission ,coach: this.coach} });
-                    }
-                    else if(!response.data.success){
-                        alert('insertion echoué');
-                    }
-                });
-            //}
+            axios.post('/api/classements/',{
+                matriculeCoach: coach[0].Matricule,
+                matriculeCommerciaux: this.getMatriculeAndPlaceFromArray(equipe),
+                idMission:this.idMission})
+            .then(response => {
+                /*
+                if(response.data.success){
+                    this.showModal = false;
+                    //this.$router.push({ name: 'planning', query: { idMission: this.idMission ,coach: this.coach} });
+                }
+                else if(!response.data.success){
+                    alert('insertion echoué');
+                }*/
+            });
         },
         validateAllEquipe(){
-            this.validateEquipe(this.EquipeA.coachs,this.ClassementA);
-            this.validateEquipe(this.EquipeB.coachs,this.ClassementB);
+            for(let i=0;i<this.classements.length;i++){
+                //alert(JSON.stringify(this.classements[i].classementReel))
+                this.validateEquipe(this.classements[i].coach,this.classements[i].classementReel);
+            }
             /*
             if(this.coachs.length<this.maxCoach){
                 alert("il manque "+(this.maxCoach-this.coachs.length)+" coach");
@@ -559,37 +639,6 @@ export default {
                 matricules.push(this.Equipes[i].commerciaux);
             }
             return matricules;
-        },
-        getClassement(){
-            let produits =  this.getCodeProduitFromArray(this.produits);
-            this.classements.splice(0,this.classements.length);
-            let valide = true;
-            for(let i=0;i<this.Equipes.length;i++){
-                if(this.Equipes[i].coachs.length==0){
-                    alert("il manque un coach pour l'equipe "+(i+1));
-                    valide = false;
-                    break;
-                }
-            }
-            if(valide){
-                axios.get('/api/personnels/getClassement',
-                    {
-                        params: {
-                            equipes: this.Equipes,
-                            Produits: produits
-                        }
-                    }).then(response => {
-                        let classements = response.data.resultat;
-                        for(let i=0;i<classements.length;i++){
-                            for(let j= 0;j<classements[i].classementReel.length;j++){
-                                classements[i].classementReel[j].placeTemp = classements[i].classementReel[j].place;
-                            }
-                        }
-                        this.classements = classements;
-                        this.toogleClassementsView();
-                    }
-                );
-            }
         },
         savePersonnelOnlocalStorage(){
             if(this.EquipeA){

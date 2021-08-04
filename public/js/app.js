@@ -17704,6 +17704,7 @@ __webpack_require__.r(__webpack_exports__);
       classements: [],
       classementReel: [],
       selectedEquipe: 0,
+      isLoadingData: false,
       Equipes: [{
         coachs: [],
         commerciaux: []
@@ -17745,6 +17746,13 @@ __webpack_require__.r(__webpack_exports__);
         coachs: [],
         commerciaux: []
       };
+    },
+    classementHtmlClass: function classementHtmlClass() {
+      if (this.classements.length < 2) {
+        return "card col-12";
+      }
+
+      return "card col-6";
     }
   },
   created: function created() {
@@ -17753,6 +17761,73 @@ __webpack_require__.r(__webpack_exports__);
     this.loadLocalData();
   },
   methods: {
+    filtrer: function filtrer(classement) {
+      if (classement.filtre == "ca") {
+        classement.classementReel.sort(function (a, b) {
+          return b.CAGlobal - a.CAGlobal;
+        });
+      } else if (classement.filtre == "cam") {
+        classement.classementReel.sort(function (a, b) {
+          return b.CAMoyen - a.CAMoyen;
+        });
+      } else if (classement.filtre == "cami") {
+        classement.classementReel.sort(function (a, b) {
+          return b.CAMission - a.CAMission;
+        });
+      } else if (classement.filtre == "cal") {
+        classement.classementReel.sort(function (a, b) {
+          return b.CALocal - a.CALocal;
+        });
+      } else {
+        classement.classementReel.sort(function (a, b) {
+          return b.CATotal - a.CATotal;
+        });
+      }
+
+      for (var i = 0; i < classement.classementReel.length; i++) {
+        classement.classementReel[i].place = i + 1;
+        classement.classementReel[i].placeTemp = i + 1;
+      }
+    },
+    getClassement: function getClassement() {
+      var _this = this;
+
+      var produits = this.getCodeProduitFromArray(this.produits);
+      this.classements.splice(0, this.classements.length);
+      var valide = true;
+
+      for (var i = 0; i < this.Equipes.length; i++) {
+        if (this.Equipes[i].coachs.length == 0) {
+          alert("il manque un coach pour l'equipe " + (i + 1));
+          valide = false;
+          break;
+        }
+      }
+
+      if (valide) {
+        this.isLoadingData = true;
+        axios.get('/api/personnels/getClassement', {
+          params: {
+            equipes: this.Equipes,
+            Produits: produits
+          }
+        }).then(function (response) {
+          var classements = response.data.resultat;
+
+          for (var _i = 0; _i < classements.length; _i++) {
+            classements[_i].filtre = "mp";
+
+            for (var j = 0; j < classements[_i].classementReel.length; j++) {
+              classements[_i].classementReel[j].placeTemp = classements[_i].classementReel[j].place;
+            }
+          }
+
+          _this.classements = classements;
+
+          _this.toogleClassementsView();
+        });
+      }
+    },
     removeEquipe: function removeEquipe(index) {
       if (index == this.selectedEquipe) {
         if (this.selectedEquipe > 0) {
@@ -17804,15 +17879,17 @@ __webpack_require__.r(__webpack_exports__);
       this.loadEquipeFromMission();
     },
     loadEquipeFromMission: function loadEquipeFromMission() {
-      var _this = this;
+      var _this2 = this;
 
+      this.isLoadingData = true;
       this.$axios.get('/api/missions/getEquipe', {
         params: {
           Id_de_la_mission: this.idMission
         }
       }).then(function (response) {
-        _this.selectedEquipe = 0;
-        _this.Equipes = response.data.equipes;
+        _this2.selectedEquipe = 0;
+        _this2.Equipes = response.data.equipes;
+        _this2.isLoadingData = false;
       })["catch"](function (error) {});
     },
     toogleAvtiveTeamButton: function toogleAvtiveTeamButton(teamIndex) {
@@ -17842,7 +17919,7 @@ __webpack_require__.r(__webpack_exports__);
       this.showAdvancedSearch ? this.showAdvancedSearch = false : this.showAdvancedSearch = true;
     },
     loadMissions: function loadMissions() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.$axios.get('/api/missions', {
         params: {
@@ -17852,10 +17929,10 @@ __webpack_require__.r(__webpack_exports__);
         }
       }).then(function (response) {
         if (response.data.success) {
-          _this2.missions = response.data.missions;
-          _this2.idMission = _this2.missions[0].Id_de_la_mission;
+          _this3.missions = response.data.missions;
+          _this3.idMission = _this3.missions[0].Id_de_la_mission;
 
-          _this2.loadEquipeFromMission();
+          _this3.loadEquipeFromMission();
         } else {
           console.log(response.data.message);
         }
@@ -17902,34 +17979,26 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     validateEquipe: function validateEquipe(coach, equipe) {
-      var _this3 = this;
-
-      //alert(JSON.stringify(this.getMatriculeAndPlaceFromArray(equipe)));
-
-      /*
-      if(coach.length<this.maxCoach){
-          alert("il manque "+(this.maxCoach-coach.length)+" coach");
-      }
-      else if(equipe.length<this.maxCommerciaux){
-          alert("il manque "+(this.maxCommerciaux-equipe.length)+" commerciaux");
-      }
-      else{
-      */
       axios.post('/api/classements/', {
         matriculeCoach: coach[0].Matricule,
         matriculeCommerciaux: this.getMatriculeAndPlaceFromArray(equipe),
         idMission: this.idMission
       }).then(function (response) {
-        if (response.data.success) {
-          _this3.showModal = false; //this.$router.push({ name: 'planning', query: { idMission: this.idMission ,coach: this.coach} });
-        } else if (!response.data.success) {
-          alert('insertion echoué');
+        /*
+        if(response.data.success){
+            this.showModal = false;
+            //this.$router.push({ name: 'planning', query: { idMission: this.idMission ,coach: this.coach} });
         }
-      }); //}
+        else if(!response.data.success){
+            alert('insertion echoué');
+        }*/
+      });
     },
     validateAllEquipe: function validateAllEquipe() {
-      this.validateEquipe(this.EquipeA.coachs, this.ClassementA);
-      this.validateEquipe(this.EquipeB.coachs, this.ClassementB);
+      for (var i = 0; i < this.classements.length; i++) {
+        //alert(JSON.stringify(this.classements[i].classementReel))
+        this.validateEquipe(this.classements[i].coach, this.classements[i].classementReel);
+      }
       /*
       if(this.coachs.length<this.maxCoach){
           alert("il manque "+(this.maxCoach-this.coachs.length)+" coach");
@@ -17948,6 +18017,7 @@ __webpack_require__.r(__webpack_exports__);
               }
           });
       }*/
+
     },
     getMatriculeAndPlaceFromArray: function getMatriculeAndPlaceFromArray(personnels) {
       var matricules = [];
@@ -17989,42 +18059,6 @@ __webpack_require__.r(__webpack_exports__);
 
       return matricules;
     },
-    getClassement: function getClassement() {
-      var _this4 = this;
-
-      var produits = this.getCodeProduitFromArray(this.produits);
-      this.classements.splice(0, this.classements.length);
-      var valide = true;
-
-      for (var i = 0; i < this.Equipes.length; i++) {
-        if (this.Equipes[i].coachs.length == 0) {
-          alert("il manque un coach pour l'equipe " + (i + 1));
-          valide = false;
-          break;
-        }
-      }
-
-      if (valide) {
-        axios.get('/api/personnels/getClassement', {
-          params: {
-            equipes: this.Equipes,
-            Produits: produits
-          }
-        }).then(function (response) {
-          var classements = response.data.resultat;
-
-          for (var _i = 0; _i < classements.length; _i++) {
-            for (var j = 0; j < classements[_i].classementReel.length; j++) {
-              classements[_i].classementReel[j].placeTemp = classements[_i].classementReel[j].place;
-            }
-          }
-
-          _this4.classements = classements;
-
-          _this4.toogleClassementsView();
-        });
-      }
-    },
     savePersonnelOnlocalStorage: function savePersonnelOnlocalStorage() {
       if (this.EquipeA) {
         localStorage.EquipeA = JSON.stringify(this.EquipeA);
@@ -18059,13 +18093,13 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     loadFonctions: function loadFonctions() {
-      var _this5 = this;
+      var _this4 = this;
 
       this.$axios.get('/api/fonctions').then(function (response) {
         if (response.data.success) {
-          _this5.fonctions = response.data.fonctions;
-          _this5.idFonction = _this5.fonctions[0].id;
-          _this5.customId = _this5.fonctions[0].customId;
+          _this4.fonctions = response.data.fonctions;
+          _this4.idFonction = _this4.fonctions[0].id;
+          _this4.customId = _this4.fonctions[0].customId;
         } else {
           console.log(response.data.message);
         }
@@ -18074,7 +18108,7 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     searchAutoComplete: function searchAutoComplete() {
-      var _this6 = this;
+      var _this5 = this;
 
       this.resultats = [];
 
@@ -18085,10 +18119,10 @@ __webpack_require__.r(__webpack_exports__);
             search: this.matricule
           }
         }).then(function (response) {
-          _this6.isSearchingAutoComplete = false;
+          _this5.isSearchingAutoComplete = false;
 
           if (response.data.success) {
-            _this6.resultats = response.data.personnels;
+            _this5.resultats = response.data.personnels;
           } else {
             alert(response.data.message);
           }
@@ -18098,11 +18132,11 @@ __webpack_require__.r(__webpack_exports__);
           axios.get('/api/personnels/getMatriculeByFonction', {
             params: {
               fonction: element,
-              search: _this6.matricule
+              search: _this5.matricule
             }
           }).then(function (response) {
             if (response.data.success) {
-              _this6.resultats = _this6.resultats.concat(response.data.personnels);
+              _this5.resultats = _this5.resultats.concat(response.data.personnels);
             } else {
               alert(response.data.message);
             }
@@ -18118,7 +18152,7 @@ __webpack_require__.r(__webpack_exports__);
       this.addPersonnelToTable(this.Equipes[this.selectedEquipe].coachs, personnel);
     },
     addPersonnel: function addPersonnel() {
-      var _this7 = this;
+      var _this6 = this;
 
       if (this.customId == null) {
         if (this.matricule != null && this.idFonction != null) {
@@ -18132,18 +18166,18 @@ __webpack_require__.r(__webpack_exports__);
           }).then(function (response) {
             if (response.data.success) {
               if (response.data.personnel.Fonction_actuelle == 2) {
-                if (_this7.coachs.length > _this7.maxCoach - 1) {
+                if (_this6.coachs.length > _this6.maxCoach - 1) {
                   alert("il existe deja un coach");
                 } else {
-                  _this7.addToCoachEquipe(response.data.personnel);
+                  _this6.addToCoachEquipe(response.data.personnel);
 
-                  _this7.addEquipeFromCoach(response.data.personnel);
+                  _this6.addEquipeFromCoach(response.data.personnel);
                 }
               } else {
-                if (_this7.commerciaux.length > _this7.maxCommerciaux - 1) {
-                  alert("la limite de commerciaux :" + _this7.maxCommerciaux + " est deja atteinte");
+                if (_this6.commerciaux.length > _this6.maxCommerciaux - 1) {
+                  alert("la limite de commerciaux :" + _this6.maxCommerciaux + " est deja atteinte");
                 } else {
-                  _this7.addToEquipe(response.data.personnel);
+                  _this6.addToEquipe(response.data.personnel);
                 }
               }
             } else {
@@ -18157,24 +18191,24 @@ __webpack_require__.r(__webpack_exports__);
             params: {
               criteres: {
                 Fonction_actuelle: element,
-                Matricule: _this7.matricule
+                Matricule: _this6.matricule
               }
             }
           }).then(function (response) {
             if (response.data.success) {
               if (response.data.personnel.Fonction_actuelle == 2) {
-                if (_this7.coachs.length > _this7.maxCoach - 1) {
+                if (_this6.coachs.length > _this6.maxCoach - 1) {
                   alert("il existe deja un coach");
                 } else {
-                  _this7.addToCoachEquipe(response.data.personnel);
+                  _this6.addToCoachEquipe(response.data.personnel);
 
-                  _this7.addEquipeFromCoach(response.data.personnel);
+                  _this6.addEquipeFromCoach(response.data.personnel);
                 }
               } else {
-                if (_this7.commerciaux.length > _this7.maxCommerciaux - 1) {
-                  alert("la limite de commerciaux :" + _this7.maxCommerciaux + " est deja atteinte");
+                if (_this6.commerciaux.length > _this6.maxCommerciaux - 1) {
+                  alert("la limite de commerciaux :" + _this6.maxCommerciaux + " est deja atteinte");
                 } else {
-                  _this7.addToEquipe(response.data.personnel);
+                  _this6.addToEquipe(response.data.personnel);
                 }
               }
             }
@@ -18197,7 +18231,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     },
     addEquipeFromCoach: function addEquipeFromCoach(coach) {
-      var _this8 = this;
+      var _this7 = this;
 
       axios.get('/api/personnels/getPersonnelFromCoach', {
         params: {
@@ -18206,8 +18240,8 @@ __webpack_require__.r(__webpack_exports__);
         }
       }).then(function (response) {
         for (var i = 0; i < response.data.data.length; i++) {
-          if (!(_this8.Equipes[_this8.selectedEquipe].commerciaux.length >= _this8.maxCommerciaux) && response.data.data[i].Matricule != coach.Matricule) {
-            _this8.addToEquipe(response.data.data[i]);
+          if (!(_this7.Equipes[_this7.selectedEquipe].commerciaux.length >= _this7.maxCommerciaux) && response.data.data[i].Matricule != coach.Matricule) {
+            _this7.addToEquipe(response.data.data[i]);
           }
         }
       });
@@ -22430,22 +22464,28 @@ var _hoisted_54 = {
   key: 0
 };
 var _hoisted_55 = {
-  "class": "card col-6"
-};
-var _hoisted_56 = {
   "class": "card-header row justify-content-center"
 };
-var _hoisted_57 = {
+var _hoisted_56 = {
   "class": "card-body"
 };
-var _hoisted_58 = {
+var _hoisted_57 = {
+  "class": "row d-flex justify-content-center",
+  style: {
+    "margin-bottom": "20px"
+  }
+};
+
+var _hoisted_58 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"mp\" selected>meilleur proposition</option><option value=\"cal\">meilleur de chiffre d&#39;affaire</option><option value=\"cam\">meilleur moyenne de chiffre d&#39;affaire moyen</option><option value=\"cal\">meilleur chiffre d&#39;affaire local</option><option value=\"cami\">meilleur chiffre d&#39;affaire mission</option>", 5);
+
+var _hoisted_63 = {
   "class": "table-responsive"
 };
-var _hoisted_59 = {
+var _hoisted_64 = {
   "class": "table table-bordered table-head-bg-secondary table-bordered-bd-secondary"
 };
 
-var _hoisted_60 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
+var _hoisted_65 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("thead", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tr", {
   "class": "bg-secondary",
   style: {
     "color": "white"
@@ -22460,31 +22500,31 @@ var _hoisted_60 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(
 /* HOISTED */
 );
 
-var _hoisted_61 = {
+var _hoisted_66 = {
   "class": "respText"
 };
-var _hoisted_62 = {
+var _hoisted_67 = {
   "class": "respText"
 };
-var _hoisted_63 = {
+var _hoisted_68 = {
   "class": "respText"
 };
-var _hoisted_64 = {
+var _hoisted_69 = {
   "class": "row"
 };
-var _hoisted_65 = {
+var _hoisted_70 = {
   "class": "col-6 d-flex justify-content-start"
 };
 
-var _hoisted_66 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, "retour", -1
+var _hoisted_71 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, "retour", -1
 /* HOISTED */
 );
 
-var _hoisted_67 = {
+var _hoisted_72 = {
   "class": "col-6 d-flex justify-content-end"
 };
 
-var _hoisted_68 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, "valider", -1
+var _hoisted_73 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, "valider", -1
 /* HOISTED */
 );
 
@@ -22641,23 +22681,35 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8
   /* PROPS */
   , ["equipes"])])])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
-    "class": "btn btn-rounded btn-secondary",
+    "class": "btn btn-rounded btn-primary",
     onClick: _cache[15] || (_cache[15] = function () {
       return $options.getClassement && $options.getClassement.apply($options, arguments);
     })
   }, " lancer le classement ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" OLD\n                    <div class=\"row\" v-if=\"buttonTeamA=='btn btn-secondary'\">\n                        <div class=\"table-responsive table-sm\">\n                            <div class=\"card-body\">\n                                <div class=\"row d-flex justify-content-center\" id=\"resultCoach\" >\n                                    <div class=\"table-responsive col-12\" style=\"margin-left:25px\">\n                                        <EquipeTab  v-model:equipes=\"EquipeA.coachs\" titre=\"Coachs\"/>\n                                    </div>\n                                </div>\n                                <div class=\"row d-flex justify-content-center\" id=\"resultCommerciaux\" >\n                                    <div class=\"table-responsive col-12\" style=\"margin-left:25px\">\n                                        <EquipeTab  v-model:equipes=\"EquipeA.commerciaux\" titre=\"Commerciaux\"/>\n                                    </div> \n                                </div>\n                                <div class=\"row\" >\n                                    <div class=\"col-12 text-right\">\n                                        <button class=\"btn btn-secondary\" v-on:click=\"getClassement\">lancer le classement</button>\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"row\" v-else>\n                        <div class=\"table-responsive table-sm\">\n                            <div class=\"card-body\">\n                                <div class=\"row d-flex justify-content-center\" id=\"resultCoach\" >\n                                    <div class=\"table-responsive col-12\" style=\"margin-left:25px\">\n                                        <EquipeTab  v-model:equipes=\"EquipeB.coachs\" titre=\"Coachs\"/>\n                                    </div>\n                                </div>\n                                <div class=\"row d-flex justify-content-center\" id=\"resultCommerciaux\" >\n                                    <div class=\"table-responsive col-12\" style=\"margin-left:25px\">\n                                        <EquipeTab  v-model:equipes=\"EquipeB.commerciaux\" titre=\"Commerciaux\"/>\n                                    </div> \n                                </div>\n                                <div class=\"row\" >\n                                    <div class=\"col-12 text-right\">\n                                        <button class=\"btn btn-secondary\" v-on:click=\"getClassement\">lancer le classement</button>\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    ")])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showClassements ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("h2", _hoisted_51, "Classement pour la mission " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.idMission), 1
   /* TEXT */
-  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_53, [_ctx.classement.coach.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_54, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.classements, function (classement) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("h3", null, " Classement Proposé pour l'équipe du coach " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.coach[0].Matricule), 1
+  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_53, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.classements, function (classement) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
+      "class": $options.classementHtmlClass
+    }, [classement.coach.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("h3", null, " Classement Proposé pour l'équipe du coach " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(classement.coach[0].Matricule), 1
     /* TEXT */
-    )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_58, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_59, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(classement.classementReel, function (equipe) {
+    )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("select", {
+      "class": "col-12 form-control input-sm",
+      "onUpdate:modelValue": function onUpdateModelValue($event) {
+        return classement.filtre = $event;
+      },
+      onChange: function onChange($event) {
+        return $options.filtrer(classement);
+      }
+    }, [_hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <option v-if=\"(missionChoix!='')\" value=\"cat\">meilleur chiffre d'affaire {{ missionChoix }}</option> ")], 40
+    /* PROPS, HYDRATE_EVENTS */
+    , ["onUpdate:modelValue", "onChange"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, classement.filtre]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("table", _hoisted_64, [_hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("tbody", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(classement.classementReel, function (equipe) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("tr", {
         key: equipe
-      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_61, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Matricule), 1
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Matricule), 1
       /* TEXT */
-      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Nom), 1
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_67, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(equipe.Nom), 1
       /* TEXT */
-      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("td", _hoisted_68, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("input", {
         type: "number",
         "onUpdate:modelValue": function onUpdateModelValue($event) {
           return equipe.placeTemp = $event;
@@ -22670,10 +22722,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       , ["onUpdate:modelValue", "onChange"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, equipe.placeTemp]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                                                    v-on:change=\"changeClassement(ClassementA,equipe.place,equipe.placeTemp)\"\n                                                ")])]);
     }), 128
     /* KEYED_FRAGMENT */
-    ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("  \n                            <div class=\"card\">\n                                <div class=\"card-header\">             \n                                    <h1><a v-on:click=\"toogleDetail('A')\">Detail</a></h1>\n                                </div>\n                                <div class=\"card-body\" v-if=\"showDetailA==true\">\n                                    <div v-for=\"Classement in ClassementDetailA\" v-bind:key=\"Classement\">\n                                        <h1>{{ Classement.nom }}</h1>\n                                        <div class=\"table-responsive\">\n                                            <table class=\"table table-bordered table-head-bg-secondary table-bordered-bd-secondary\">\n                                                <thead >\n                                                    <tr class=\"bg-secondary\" style=\"color:white\">\n                                                        <th class=\"respText\" >matricule</th>\n                                                        <th class=\"respText\" >nom et prenom</th>\n                                                        <th class=\"respText\" >CA</th>\n                                                    </tr>\n                                                </thead>\n                                                <tbody>\n                                                    <tr v-for=\"equipe in Classement.classement\" v-bind:key=\"equipe\">\n                                                        <td class=\"respText\" >{{ equipe.Matricule }}</td>\n                                                        <td class=\"respText\" >{{ equipe.Nom }}</td>\n                                                        <td class=\"respText\" >{{ equipe.CA }}</td>\n                                                    </tr>\n                                                </tbody>\n                                            </table>\n                                        </div>\n                                    </div>\n                                </div>\n                            </div>\n                            ")])]);
+    ))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("  \n                            <div class=\"card\">\n                                <div class=\"card-header\">             \n                                    <h1><a v-on:click=\"toogleDetail('A')\">Detail</a></h1>\n                                </div>\n                                <div class=\"card-body\" v-if=\"showDetailA==true\">\n                                    <div v-for=\"Classement in ClassementDetailA\" v-bind:key=\"Classement\">\n                                        <h1>{{ Classement.nom }}</h1>\n                                        <div class=\"table-responsive\">\n                                            <table class=\"table table-bordered table-head-bg-secondary table-bordered-bd-secondary\">\n                                                <thead >\n                                                    <tr class=\"bg-secondary\" style=\"color:white\">\n                                                        <th class=\"respText\" >matricule</th>\n                                                        <th class=\"respText\" >nom et prenom</th>\n                                                        <th class=\"respText\" >CA</th>\n                                                    </tr>\n                                                </thead>\n                                                <tbody>\n                                                    <tr v-for=\"equipe in Classement.classement\" v-bind:key=\"equipe\">\n                                                        <td class=\"respText\" >{{ equipe.Matricule }}</td>\n                                                        <td class=\"respText\" >{{ equipe.Nom }}</td>\n                                                        <td class=\"respText\" >{{ equipe.CA }}</td>\n                                                    </tr>\n                                                </tbody>\n                                            </table>\n                                        </div>\n                                    </div>\n                                </div>\n                            </div>\n                            ")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2
+    /* CLASS */
+    );
   }), 256
   /* UNKEYED_FRAGMENT */
-  ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_69, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_70, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     style: {
       "margin": "20px"
     },
@@ -22681,7 +22735,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[16] || (_cache[16] = function () {
       return $options.retourClassement && $options.retourClassement.apply($options, arguments);
     })
-  }, [_hoisted_66])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+  }, [_hoisted_71])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     style: {
       "margin": "20px"
     },
@@ -22689,7 +22743,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[17] || (_cache[17] = function () {
       return $options.validateAllEquipe && $options.validateAllEquipe.apply($options, arguments);
     })
-  }, [_hoisted_68])])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
+  }, [_hoisted_73])])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64
   /* STABLE_FRAGMENT */
   );
 }

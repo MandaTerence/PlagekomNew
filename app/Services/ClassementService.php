@@ -128,12 +128,8 @@ class ClassementService {
         $personnelsFinal = [];
         for($i=0;$i<count($personnels);$i++){
             $personnels[$i]->place = $i+1;
-            $personnelsFinal[] = [
-                "Matricule"=>$personnels[$i]->Matricule,
-                "Nom"=>$personnels[$i]->Nom."".$personnels[$i]->Prenom,
-                "place"=>$personnels[$i]->place,
-                "CA"=>$personnels[$i]->CATotal
-            ];
+            $personnels[$i]->getCAMoyen();
+            $personnelsFinal[] = $personnels[$i];
         }
         return $personnelsFinal;
     }

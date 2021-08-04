@@ -99,6 +99,13 @@ class PersonnelController extends Controller
         return $personnels;
     }
 
+    public function compareCATotal($pa,$pb){
+        if ($pa->CATotal == $pb->CATotal) { 
+            return 0;
+        }
+        return ($pa->CATotal > $pb->CATotal) ? -1 : 1;
+    }
+
     public function compareCA($pa,$pb){
         if ($pa->CA == $pb->CA) { 
             return 0;
@@ -292,7 +299,7 @@ class PersonnelController extends Controller
                 }
 
                 $equipe = $personnels;
-                
+
                 foreach($equipe as $personnel){
                     if(isset($request->Produits)){
                         $personnel->getAllCA($request->Produits);
@@ -301,6 +308,7 @@ class PersonnelController extends Controller
                         $personnel->getAllCA();
                     }
                 }
+
                 $resultatEquipe = [
                     'coach' => $listeEquipe->coachs,
                     'classementReel' => ClassementService::getClassementTotal($equipe,self::DEFAULT_COEF),

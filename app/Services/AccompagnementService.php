@@ -128,7 +128,8 @@ class AccompagnementService {
     }   
 
     public static function generatePlanning($idMission,$coach,$personnels=null){
-        if($personnels==null){
+        $accArray = [];
+        if($personnels==null){        
             $personnels = DetailMission::getPersonnelFromCoach($coach,$idMission);
         }
         $personnels = self::fillEmptyPersonnel($personnels);
@@ -141,13 +142,37 @@ class AccompagnementService {
                 $matricules[] = $p->Matricule;
             }
         }
-        $classement = Classement::getFromMatricules($idMission,$matricules);
+        //$classement = Classement::getFromMatricules($idMission,$matricules);
         $mission = Mission::getFirst([['Id_de_la_mission',$idMission]]);
         $Date_depart = $mission->Date_depart;
         $Date_de_fin = $mission->Date_de_fin;
         $periods = self::date_range($Date_depart,$Date_de_fin);
-        $accArray = [];
-        for($i=0;$i<count($periods);$i++){
+        
+        for($i=0,$id=0;$i<count($periods);$i++){
+            $p = str_replace('/', '-', $periods[$i]);
+            $dateInserer = date(self::DATE_FORMAT, strtotime($p));
+            $date = date('N', strtotime($p));
+            if($date!=7){
+                $idPersonnelAInserer = (8-($id%8));
+                foreach(self::JOUR_ACCOMPAGNEMENT as $plan){
+                    if(($idPersonnelAInserer) == $plan['place']){
+                        $com = $personnels[$idPersonnelAInserer-1];
+                        $acc = [
+                            'Id_de_la_mission'=>$idMission, 
+                            'Commercial'=>$com["Matricule"],
+                            'Coach'=>$coach,
+                            'Date'=>$dateInserer,
+                            'Heure_debut'=>$plan['Heure_debut'],
+                            'Heure_fin'=>$plan['Heure_fin'],
+                            'Ordre'=>$plan['Ordre']
+                        ];
+                        $accArray[] = $acc;
+                    }
+                }
+                $id++;
+            }
+        }
+        /*for($i=0;$i<count($periods);$i++){
             $p = str_replace('/', '-', $periods[$i]);
             //$jour = date('w', strtotime($p));
             $dateInserer = date(self::DATE_FORMAT, strtotime($p));
@@ -169,7 +194,7 @@ class AccompagnementService {
                     }
                 }
             }
-        }
+        }*/
 
         Accompagnement::insert($accArray);
         return true;
@@ -203,7 +228,7 @@ class AccompagnementService {
                     $com = $classement[$plan['place']-1];
                     $acc = [
                         'Id_de_la_mission'=>$idMission,
-                        'Commercial'=>$com->Commercial,
+                        'Commercial'=>$com->Personnel,
                         'Coach'=>$coach,
                         'Date'=>$dateInserer,
                         'Heure_debut'=>$plan['Heure_debut'],
