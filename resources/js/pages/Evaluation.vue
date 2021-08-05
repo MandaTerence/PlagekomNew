@@ -2,7 +2,24 @@
     <div v-if="!showClassements">
         <div class="panel-header bg-secondary-gradient">
             <div class="page-inner py-4">
-                <h2 class="text-white pb-2 fw-bold">Evaluation du Commerciale</h2>
+                <ul class="breadcrumbs text-white d-none d-sm-block" style="margin-left: -40px">
+                    <li class="nav-item">
+                        <i class="fas fa-users"></i>
+                    </li>
+                    <li class="separator">
+                        <i class="flaticon-right-arrow"></i>
+                    </li>
+                    <li class="nav-item">
+                        <span class="text-white">Planning et Accompagnement</span>
+                    </li>
+                    <li class="separator">
+                        <i class="flaticon-right-arrow"></i>
+                    </li>
+                    <li class="nav-item">
+                        <span class="text-white" >Evaluation des Commerciaux</span>
+                    </li>
+                </ul>
+                <h2 class="text-white pb-2 fw-bold" style="margin-top:40px">Evaluation des Commerciaux</h2>
             </div>
         </div>
         <div v-if="showModal.detailPersonnel" @close="showModal.detailPersonnel = false">

@@ -26,13 +26,20 @@ class SanctionPersonnelController extends Controller
 
     public function getFromMatricule(Request $request){
         if(isset($request->matricule)){
-            $res =SanctionPersonnel::selectRaw("sanction_personnel.id as id,sanction_personnel.date as datetime,DATE(sanction_personnel.date) as date,TIME(sanction_personnel.date) as time,sanction.code_sanction as code_sanction,sanction.titre as titre")
+            $toutesSan = SanctionPersonnel::selectRaw("sanction_personnel.id as id,sanction_personnel.date as datetime,DATE(sanction_personnel.date) as date,TIME(sanction_personnel.date) as time,sanction.code_sanction as code_sanction,sanction.titre as titre,sanction.valeur as valeurs")
             ->where('matricule_personnel',$request->matricule)
+            ->join('sanction', 'sanction.id', '=', 'sanction_personnel.id_sanction')
+            ->get();
+            $sanctionPersonnels = SanctionPersonnel::selectRaw("sanction_personnel.id as id,sanction_personnel.date as datetime,DATE(sanction_personnel.date) as date,TIME(sanction_personnel.date) as time,sanction.code_sanction as code_sanction,sanction.titre as titre,sanction.valeur as valeur")
+            ->where('matricule_personnel',$request->matricule)
+            ->whereRaw('MONTH(date)=MONTH(NOW())')
+            ->whereRaw('YEAR(date)=YEAR(NOW())')
             ->join('sanction', 'sanction.id', '=', 'sanction_personnel.id_sanction')
             ->get();
             return [
                 "success" => true,
-                "sanctionPersonnels" => $res,
+                "sanctionPersonnels" => $sanctionPersonnels,
+                "toutesSan" => $toutesSan
             ];
         }
     }

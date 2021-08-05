@@ -39,7 +39,6 @@
             </div>
         </transition>
     </div>
-
     <div v-if="showModal.detailControle" @close="showModal.detailControle = false">
         <transition name="modal">
             <div class="modal-mask">
@@ -104,8 +103,31 @@
     </div>
     <!-- <div class="panel-header bg-secondary-gradient" v-if="thereIsPersonnel">-->
     <div class="panel-header bg-secondary-gradient">
-        <div class="page-inner py-5">
-            <h2 class="text-white pb-2 fw-bold">Timeline du {{ dateMission }}</h2>
+        <div class="page-inner py-4">
+            <ul class="breadcrumbs text-white d-none d-sm-block" style="margin-left: -40px">
+                <li class="nav-item">
+                    <i class="fas fa-phone-volume"></i>
+                </li>
+                <li class="separator">
+                    <i class="flaticon-right-arrow"></i>
+                </li>
+                <li class="nav-item">
+                    <span class="text-white">Controlle télephonique</span>
+                </li>
+                <li class="separator">
+                    <i class="flaticon-right-arrow"></i>
+                </li>
+                <li class="nav-item">
+                    <span class="text-white" >Etat controlle du mois</span>
+                </li>
+                <li class="separator">
+                    <i class="flaticon-right-arrow"></i>
+                </li>
+                <li class="nav-item">
+                    <span class="text-white">{{ dateMission }}</span>
+                </li>
+            </ul>
+            <h2 class="text-white pb-2 fw-bold" style="margin-top: 40px">Timeline du {{ dateMission }}</h2>
         </div>
     </div>
     <!-- <div class="page-inner" v-if="thereIsPersonnel"> -->
@@ -129,7 +151,7 @@
                     <div v-if="mission.Commerciaux.length>1" style="margin:10px">
                         <hr>
                         <div class="row"><h3>{{ mission.idMission }}</h3></div>
-                        <div class="row">
+                        <div class="row" style="margin-top: 30px">
                             <div class="col-md-3">
                                 <strong>Nombre equipe : {{ getTotalPersonnel(mission) }}</strong>
                             </div>
@@ -143,7 +165,7 @@
                                 <strong>CA total Sanction : {{ getMoneyFormat(getCATotalSanction(mission.Commerciaux)) }}</strong>
                             </div>
                         </div>
-                        <div class="row"><h3>Commerciaux :</h3></div>
+                        <div class="row" style="margin-top: 30px"><h3>Commerciaux :</h3></div>
                         <div class="row table-responsive">
                             <table class="table table-hover table-striped col-12">
                                 <thead>
@@ -219,7 +241,7 @@
                             </table>
                         </div>
                         <hr>
-                        <div class="row"><h3>Coach :</h3></div>
+                        <div class="row" style="margin-top: 30px"><h3>Coach :</h3></div>
                         <div class="row table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -297,8 +319,8 @@
                         </div>
                     </div>
                     <div class="row justify-content-center">
-                        <button v-on:click="exporterMissionXls(mission.idMission)" v-if="mission.Commerciaux.length>1" class="btn btn-success btn-rounded">
-                            export XLS
+                        <button v-on:click="exporterMissionXls(mission.idMission)" v-if="mission.Commerciaux.length>1" class="btn btn-success btn-rounded btn-lg col-4">
+                            export XLS <i class="fas fa-file-excel" style="margin-left:10px;font-size: 15px"></i>
                         </button>
                     </div>
                 </div>
@@ -314,6 +336,7 @@ export default {
         return {
             dateMission: null,
             missions: [],
+            dateActuelle: "",
             thereIsPersonnel: false,
             showModal: {
                 "detailSanction": false,
@@ -329,12 +352,28 @@ export default {
         next();
     },
     mounted() {
-        if (localStorage.dateMission) {
-            this.dateMission = localStorage.dateMission;
-            this.loadMissionDate();
-        }
+        this.dateMission = this.getActualDate();
+        this.dateActuelle = this.getActualDate();
+        this.loadMissionDate();
     },
     methods: {
+        getActualDate(){
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth()+1; 
+            var yyyy = today.getFullYear();
+            if(dd<10) 
+            {
+                dd='0'+dd;
+            } 
+
+            if(mm<10) 
+            {
+                mm='0'+mm;
+            } 
+            today = yyyy+'-'+mm+'-'+dd;
+            return today;
+        },
         exporterMissionXls(idMission){
             let data = {
                 "excel":"controlMission",

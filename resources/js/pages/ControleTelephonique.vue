@@ -4,7 +4,26 @@
     </div>
     <div v-else>
         <div class="page-inner" v-if="!exist">
-            <div class="card">
+            <div class="row">
+                <ul class="breadcrumbs  d-none d-sm-block" style="margin-left: 0px">
+                    <li class="nav-item">
+                        <i class="fas fa-phone-volume"></i>
+                    </li>
+                    <li class="separator">
+                        <i class="flaticon-right-arrow"></i>
+                    </li>
+                    <li class="nav-item">
+                        <span>Controlle télephonique</span>
+                    </li>
+                    <li class="separator">
+                        <i class="flaticon-right-arrow"></i>
+                    </li>
+                    <li class="nav-item">
+                        <a v-on:click="resetCommerciaux">Controlle</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card" style="margin-top:40px">
                 <div class="card-body ">
                     <div class="form-group">
                         <label for="matricule">Matricule</label>
@@ -18,6 +37,29 @@
         </div>
         <div class="panel-header bg-secondary-gradient" v-if="exist">
             <div class="page-inner py-4">
+                <ul class="breadcrumbs text-white d-none d-sm-block" style="margin-left: -40px">
+                    <li class="nav-item">
+                        <i class="fas fa-phone-volume"></i>
+                    </li>
+                    <li class="separator">
+                        <i class="flaticon-right-arrow"></i>
+                    </li>
+                    <li class="nav-item">
+                        <span class="text-white">Controlle télephonique</span>
+                    </li>
+                    <li class="separator">
+                        <i class="flaticon-right-arrow"></i>
+                    </li>
+                    <li class="nav-item">
+                        <a class="text-white" v-on:click="resetCommerciaux">Controlle</a>
+                    </li>
+                    <li class="separator">
+                        <i class="flaticon-right-arrow"></i>
+                    </li>
+                    <li class="nav-item">
+                        <span class="text-white">{{ personnelData.Matricule }}</span>
+                    </li>
+                </ul>
                 <div class="text-white pb-2 fw-bold row text-right d-flex justify-content-end" >
                     <a class="text-right" v-on:click="resetCommerciaux" style="margin-right:10px"><div class="icon-preview"><i class="far fa-times-circle" style="font-size:30px;cursor: pointer;"></i></div></a>
                 </div>
@@ -27,7 +69,7 @@
         <div class="page-inner" >
             <div v-if="exist">
                 <div class="row justify-content-start">
-                    <button v-on:click="goToTimeline()" style="margin-left: 20px" class="btn btn-secondary btn-rounded">
+                    <button v-on:click="goToTimeline()" style="margin-left: 20px" class="btn btn-primary btn-rounded">
                         voir Timeline du jour
                     </button>
                 </div>
@@ -160,6 +202,7 @@
                                             <th class="respText" scope="col-2">Date</th>
                                             <th class="respText" scope="col-2">Code Sanction</th>
                                             <th class="respText" scope="col-2">Designation</th>
+                                            <th class="respText" scope="col-2">Montant</th>
                                             <th class="respText" scope="col-2">Action</th>
                                         </tr>
                                     </thead> 
@@ -168,6 +211,7 @@
                                             <td class="respText" scope="col-2"> {{ sanctionP.datetime }} </td>
                                             <td class="respText" scope="col-2"> {{ sanctionP.code_sanction }} </td>
                                             <td class="respText" scope="col-2"> {{ sanctionP.titre }} </td>
+                                            <td class="respText" scope="col-2"> {{ getMoneyFormat(sanctionP.valeur) }} Ar</td>
                                             <td class="respText" scope="col-2"> <button type="button" class="btn btn-danger" v-on:click="removeSanctionPersonnel(sanctionP.id)" >supprimer</button> </td>
                                         </tr>
                                     </tbody> 
@@ -292,9 +336,22 @@ export default {
         },
         dureeMinute: function(){
             return new Date(this.duree*1000).toISOString().substr(11, 8);
+        },
+        totalValeurSanction: function(){
+            let total = 0;
+            for(let i=0;i<sanctionsPersonnel.length;i++){
+                total+=sanctionsPersonnel[i].valeur;
+            }
+            return total;
         }
     },
     methods: {
+        getMoneyFormat(monnaie){
+            if(monnaie)
+                return monnaie.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$& '); 
+            else
+                return 0;
+        },
         goToTimeline(){
             this.$router.push({ path: 'TimeLine'});
         },

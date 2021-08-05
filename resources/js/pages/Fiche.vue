@@ -2,7 +2,24 @@
 
 <div class="panel-header bg-secondary-gradient" >
     <div class="page-inner py-4">
-        <div class="row text-white pb-2 fw-bold">
+        <ul class="breadcrumbs text-white d-none d-sm-block" style="margin-left: -40px">
+            <li class="nav-item">
+                <i class="fas fa-phone-volume"></i>
+            </li>
+            <li class="separator">
+                <i class="flaticon-right-arrow"></i>
+            </li>
+            <li class="nav-item">
+                <span class="text-white">Controlle télephonique</span>
+            </li>
+            <li class="separator">
+                <i class="flaticon-right-arrow"></i>
+            </li>
+            <li class="nav-item">
+                <span class="text-white" >Fiche Commercial</span>
+            </li>
+        </ul>
+        <div class="row text-white pb-2 fw-bold" style="margin-top:40px">
             <h1>Fiche Commercial</h1>
         </div>
     </div>
@@ -16,12 +33,11 @@
     <div>
         <div class="card">
             <div class="card-body ">
-                <div class="form-group">
-                    <label for="matricule">Matricule</label>
+                <div class="form-group input-group">
                     <input type="text" class="form-control" id="matricule"  placeholder="Matricule" v-model="matricule">
-                </div>
-                <div class="form-group text-center">
-                    <button type="submit" class="btn btn-secondary btn-round col-6" v-on:click="getPersonnel">voir la fiche commerciale</button>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary" v-on:click="getPersonnel">voir la fiche commerciale</button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -21,7 +21,7 @@
     </div>
 
         <div class="d-flex justify-content-center col-12" id="ch_img_utilisateur" style="background: rgb(255, 200, 0)">
-        <img style="border:5px solid rgb(255, 200, 0);" src="http://komone.combo.fun/images/personnel/OTO108.jpg" alt="">
+        <img style="border:5px solid rgb(255, 200, 0);" v-bind:src="imageURL" alt="">
         </div>
 
         <div class="w-100" style="border-top:4px solid rgb(57,57,57,57); height:5px;"></div>
@@ -46,7 +46,7 @@ export default {
     name: "Home",
     data() {
         return {
-            //
+            imageURL:""
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -56,7 +56,12 @@ export default {
         next();
     },
     created() {
+        this.loadProfilePicture();
     },
-    methods: {}
+    methods: {
+        loadProfilePicture(){
+            this.imageURL= "http://komone.combo.fun/images/personnel/"+window.Laravel.user.Matricule+".jpg";
+        }
+    }
 }
 </script>

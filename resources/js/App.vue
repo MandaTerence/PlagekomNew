@@ -108,14 +108,14 @@
                     <li class="nav-item dropdown hidden-caret">
                         <a class="dropdown-toggle profile-pic" data-toggle="dropdown" href="#" aria-expanded="false">
                             <div class="avatar-sm">
-                                <img src="assets/img/profile.jpg" alt="..." class="avatar-img rounded-circle">
+                                <img v-bind:src="profileImageSrc" @error="imageUrlAlt"  alt="..." class="avatar-img rounded-circle">
                             </div>
                         </a>
                         <ul class="dropdown-menu dropdown-user animated fadeIn">
                             <div class="dropdown-user-scroll scrollbar-outer">
                                 <li>
                                     <div class="user-box">
-                                        <div class="avatar-lg"><img src="assets/img/profile.jpg" alt="image profile" class="avatar-img rounded"></div>
+                                        <div class="avatar-lg"><img v-bind:src="profileImageSrc" @error="imageUrlAlt"  alt="image profile" class="avatar-img rounded" style="background-color: white"></div>
                                         <div class="u-text">
                                             <h4>{{ name }}</h4>
                                             <p class="text-muted">hello@example.com</p><a href="profile.html" class="btn btn-xs btn-secondary btn-sm">View Profile</a>
@@ -144,8 +144,8 @@
         <div class="sidebar-wrapper scrollbar scrollbar-inner">
             <div class="sidebar-content">
                 <div class="user">
-                    <div class="avatar-sm float-left mr-2">
-                        <img src="assets/img/profile.jpg" alt="..." class="avatar-img rounded-circle">
+                    <div class="avatar-sm float-left mr-2">imageUrlAlt
+                        <img v-bind:src="profileImageSrc" @error="imageUrlAlt"  alt="..." class="avatar-img rounded-circle" style="background-color: white">
                     </div>
                     <div class="info">
                         <a data-toggle="collapse" href="#collapseExample" aria-expanded="true">
@@ -305,6 +305,7 @@ export default {
             matricule: "",
             isSearchingAutoComplete: false,
             resultats: [],
+            profileImageSrc: "",
 
             dropdownListDisplay: ["none","none","none"],
             displaySideBar: [
@@ -332,9 +333,14 @@ export default {
         }
         if (window.Laravel.user) {
             this.name = window.Laravel.user.Nom;
+            this.profileImageSrc="http://komone.combo.fun/images/personnel/"+window.Laravel.user.Matricule+".jpg";
         }
     },
     methods: {
+        imageUrlAlt(event) {
+            //event.target.src = "alt-image.jpg"
+            this.profileImageSrc="assets/img/profile.jpg";
+        },
         changeMatriculeValue(newMatricule){
             this.resultats = [];
             this.matricule = newMatricule;

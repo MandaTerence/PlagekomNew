@@ -1,7 +1,24 @@
 <template>
     <div class="panel-header bg-secondary-gradient">
         <div class="page-inner py-4">
-            <h2 class="text-white pb-2 fw-bold">Planning d accompagnement</h2>
+            <ul class="breadcrumbs text-white d-none d-sm-block" style="margin-left: -40px">
+                <li class="nav-item">
+                    <i class="fas fa-phone-volume"></i>
+                </li>
+                <li class="separator">
+                    <i class="flaticon-right-arrow"></i>
+                </li>
+                <li class="nav-item">
+                    <span class="text-white">Controlle télephonique</span>
+                </li>
+                <li class="separator">
+                    <i class="flaticon-right-arrow"></i>
+                </li>
+                <li class="nav-item">
+                    <span class="text-white" >Planning d accompagnement</span>
+                </li>
+            </ul>
+            <h2 class="text-white pb-2 fw-bold"  style="margin-top:40px">Planning d accompagnement</h2>
         </div>
     </div>
     <div class="page-inner">
