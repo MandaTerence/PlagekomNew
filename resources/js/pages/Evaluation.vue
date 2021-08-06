@@ -284,8 +284,8 @@
                         </div>
                     </div>
                     
-                    <div class="row justify-content-center" id="barreAction">
-                        <button class="col-4 btn btn-success btn-rounded btn-lg" v-on:click="exportEquipe">
+                    <div class="row justify-content-center" id="barreActionExcel">
+                        <button class="col-4 btn btn-success btn-rounded btn-lg " v-on:click="exportEquipe">
                             exporter XLS
                         </button>
                     </div>
