@@ -172,25 +172,13 @@ class PersonnelService {
         if(isset($resSql)){
             $ville = $resSql->Ville_d_annimation;
         }
-        else{/*
-            $ville = DB::table("planing")
-            ->select("Ville_d_annimation")
-            ->where("Id_de_la_mission",$idMission)
-            ->orderBy("Date","DESC")
-            ->first()->Ville_d_annimation;
-            */
-        }
+        
         $equipe = DB::table("equipe_temporaire")
         ->where("equipe_temporaire.Id_de_la_mission",$idMission)
         ->join("mission","mission.Id_de_la_mission","equipe_temporaire.Id_de_la_mission")
         ->whereRaw("mission.Date_depart >= '".$jour."'")
         ->whereRaw("mission.Date_de_fin <= '".$jour."'")
         ->get();
-
-        /*  
-            select * from mission where mission.Date_depart >= '2021-08-31' AND mission.Date_depart >= '2021-08-31'
-         
-         */
 
         if(count($equipe)>1){
             foreach($equipe as $eq){

@@ -87,13 +87,15 @@
             </transition>
         </div>
         <div class="page-inner">
+            <!--
             <h2 class="text-center">
                 <span style="background-color:#f9fbfd">Recherche</span>
             </h2>
             <hr style="background-color: #47e5ff;height:2px;margin-top: -22px;">
+            -->
             <div class="card">
-                <div class="card-header">
-                    Recherche
+                <div class="card-header bg-secondary text-white  text-center">
+                    <h3>Recherche</h3>
                 </div>
                 <div class="card-body">
                     <div class="row" id="parametreMission">
@@ -194,56 +196,17 @@
                 </div>
                 <div class="card-footer">
                     <div class="row" >
-                        <div class="col-12 text-center">
-                            <button v-on:click="getProposition" class="btn btn-primary btn-rounded">Proposer</button>
+                        <div class="col-12 text-center row justify-content-center">
+                            <button v-on:click="getProposition" class=" col-4 btn btn-primary btn-rounded btn-lg">Proposer</button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card">
-                <div class="card-header">
-                    <h6>
-                        Resultat
-                    </h6>
+                <div class="card-header bg-secondary text-white text-center">
+                    <h3>Resultat</h3>
                 </div>
                 <div class="card-body">
-
-                        <div class="form-group">
-
-                            <label for="RecherchePersonnel">
-                                Recherche de Personnel
-                            </label>
-                            <div class="input-group">
-                                <input type="text" id="RecherchePersonnel" placeholder="Matricule" class="form-control" v-model="matriculeClassement" v-on:keyup="autoComplete('classement',matriculeClassement,resultMatriculeClassement)" v-on:click="autoComplete('classement',matriculeClassement,resultMatriculeClassement)">
-                                <div class="panel-footer" style="float:top;position: absolute;z-index: 1;width: -moz-available;">
-                                    <ul class="list-group">
-                                        <li class="list-group-item" v-for="result in resultMatriculeProposition" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
-                                            <div >{{ result.Matricule }}</div>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="input-group-append">
-                                    <button v-on:click="addPersonnel" class="btn btn-primary" type="button">
-                                        ajouter
-                                    </button>
-                                </div>
-                            </div>
-                            
-                        </div>
-
-                        <div class="form-group">
-                            <label for="rechercheEnGros">
-                                Insertion en gros
-                            </label>
-                            <div class="input-group">
-                                <textarea id="rechercheEnGros" aria-label="With textarea" placeholder="ex: VP00000,VP00001,VP00002... " v-model="listeMatricule" class="col-12 form-control input-sm"></textarea>
-                            </div>
-                        </div>
-                        <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
-                            <button v-on:click="addListePersonnel" class="btn btn-primary btn-rounded" type="button">
-                                ajouter
-                            </button>
-                        </div>
                     <div class="row" id="resultatProposition">
                         <div class="col-md-6 card" style="border-color: blue;">
                             <div class="card-header">
@@ -320,9 +283,51 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="row justify-content-center" id="barreAction">
-                        <button class="btn btn-success btn-rounded" v-on:click="exportEquipe">
+                        <button class="col-4 btn btn-success btn-rounded btn-lg" v-on:click="exportEquipe">
                             exporter XLS
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header bg-secondary text-white text-center">
+                    <h3>insertion spécifique</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="RecherchePersonnel">
+                            Recherche de Personnel
+                        </label>
+                        <div class="input-group">
+                            <input type="text" id="RecherchePersonnel" placeholder="Matricule" class="form-control" v-model="matriculeClassement" v-on:keyup="autoComplete('classement',matriculeClassement,resultMatriculeClassement)" v-on:click="autoComplete('classement',matriculeClassement,resultMatriculeClassement)">
+                            <div class="panel-footer" style="float:top;position: absolute;z-index: 1;width: -moz-available;">
+                                <ul class="list-group">
+                                    <li class="list-group-item" v-for="result in resultMatriculeProposition" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
+                                        <div >{{ result.Matricule }}</div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="input-group-append">
+                                <button v-on:click="addPersonnel" class="btn btn-primary" type="button">
+                                    ajouter
+                                </button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="form-group">
+                        <label for="rechercheEnGros">
+                            Insertion en gros
+                        </label>
+                        <div class="input-group">
+                            <textarea id="rechercheEnGros" aria-label="With textarea" placeholder="ex: VP00000,VP00001,VP00002... " v-model="listeMatricule" class="col-12 form-control input-sm"></textarea>
+                        </div>
+                    </div>
+                    <div class="row input-group d-flex justify-content-center" style="margin-bottom:20px">
+                        <button v-on:click="addListePersonnel" class="btn btn-primary btn-rounded" type="button">
+                            ajouter
                         </button>
                     </div>
                 </div>
@@ -480,11 +485,9 @@ export default {
             this.showModal.detailPersonnel=true;
         },
         autoCompleteProduit(){
-            if((this.produitDesignation.length > 2)&&(!this.isSearchingAutoComplete)){
+            if((this.produitDesignation.length > 2)){
                 this.isSearchingProduit = true;
-                if(this.produitDesignation != null ){
-                    setTimeout(this.searchProduitAutoComplete, 1000);
-                }
+                setTimeout(this.searchProduitAutoComplete, 1000);
             } 
         },
         getProposition(){
@@ -553,17 +556,15 @@ export default {
         },
         searchProduitAutoComplete(){
             this.resultats = [];
-            if(this.customId == null){
-                axios.get('/api/produits/getProduitByDesignation',{params: {Designation: this.produitDesignation}}).then(response => {
-                    this.isSearchingAutoComplete = false;
-                    if(response.data.success){
-                        this.resultats = response.data.produits;
-                    }
-                    else{
-                        alert(response.data.message);
-                    }
-                });
-            }
+            axios.get('/api/produits/getProduitByDesignation',{params: {Designation: this.produitDesignation}}).then(response => {
+                this.isSearchingAutoComplete = false;
+                if(response.data.success){
+                    this.resultats = response.data.produits;
+                }
+                else{
+                    alert(response.data.message);
+                }
+            });
         },
         addProduit(){
             let produitExist = false;

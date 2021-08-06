@@ -208,73 +208,6 @@ class Personnel extends Model
         $classements = ClassementService::getEvaluation($propositions,self::DEFAULT_COEF,$interval,$dateExclus,$taux);
 
         return $classements;
-        /*
-        $ClassementFinal = [];
-
-        $PersonnelSurMissionDansInterval = [];
-        $personnelEnMission = self::getPersonnelEnMission();
-
-        $missionDansInterval =  MISSION::getMissionTypeBetween($idtypeMission,$interval);
-        $jourDeTravail = PersonnelService::getJourTravail($interval,$dateExclus);
-
-        foreach($missionDansInterval as $mission){
-            $personnels = $mission->selectPersonnelFromMission()->get();
-            foreach($personnels as $personnel){
-                $p = new Personnel;
-                $p->Matricule = $personnel->personnel;
-                if((!str_starts_with($personnel->personnel, 'COTN'))&&(!str_starts_with($personnel->personnel, 'cotn'))){
-                    $PersonnelSurMissionDansInterval[] = $p;
-                }
-            }
-        }
-
-        $personnelPrimaire = [];
-
-        foreach($PersonnelSurMissionDansInterval as $personnel){
-            $exist = false;
-            foreach($personnelEnMission as $pm){
-                if($pm->Matricule==$personnel->Matricule){
-                    $personnelPrimaire
-                }
-            }
-            if(){
-
-            }
-        }
-
-        $personnelPrimaire = $PersonnelSurMissionDansInterval;
-        $personnelSecondaire = self::getPersonnelSurInterval($interval,$PersonnelSurMissionDansInterval,$personnelEnMission,$dateExclus);
-
-        foreach($personnelPrimaire as $personnel){
-            $personnel->test="primaire";
-        }
-
-        foreach($personnelSecondaire as $personnel){
-            $personnel->test="secondaire";
-            $personnelPrimaire[] = $personnel;
-        }
-
-        foreach($personnelPrimaire as $personnel){
-            $personnel->getAllCA($interval,$dateExclus,$produits,$idtypeMission);
-            $personnel->getNbrJourObjectifAtteint($interval,$dateExclus);
-        }
-        $classements = ClassementService::getEvaluation($personnelPrimaire,self::DEFAULT_COEF,$interval,$dateExclus,$taux);
-
-        //return $classements;
-
-        return [
-            //"Evaluation" => $classements,
-            "test" => $PersonnelSurMissionDansInterval,
-        ];
-
-        /*
-        $ClassementFinal = self::ajouterDansClassements($interval,$dateExclus,$personnelPrimaire,$ClassementFinal,$taux);
-        $ClassementFinal = self::ajouterDansClassements($interval,$dateExclus,$personnelSecondaire,$ClassementFinal,$taux);
-            return [
-                "Evaluation" => $ClassementFinal,
-                "PersonnelEnMission" => $personnelEnMission,
-            ];
-        */
     }
 
     public function existIn($comparaisons){
@@ -818,7 +751,7 @@ class Personnel extends Model
         $CAProduitPlusCher = 0;
         if(isset($produits)){
             foreach($produits as $produit){
-                $CAProduit = $this->getCAselonProduit($produit,$interval);
+                $CAProduit = $this->getCAselonProduit($interval,$produit);
                 $produitFinaux[] = [
                     "Code_roduit" =>$produit,
                     "CAProduit" => $CAProduit

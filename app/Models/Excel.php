@@ -64,16 +64,91 @@ class Excel extends Model
 */
     }
 
+
+    /*
+    {"idMission":"ROAD_SHOW_FAMILY_2021_05_10","Commerciaux":[{"Matricule":"VP21217","sanctions":[],"controles":[],"Nom":"RAHERIMALALASOA","Prenom":"Sabrinah"},{"Matricule":"VP21209","sanctions":[],"controles":[],"Nom":"RAZAIARISOLO","Prenom":"Andoniaina Jisl\u00e8ne"},{"Matricule":"VP21200","sanctions":[],"controles":[],"Nom":"RASOANIRINA","Prenom":"Harilalaina Christelle"},{"Matricule":"VP12087","sanctions":[],"controles":[],"Nom":"FARAMALALA","Prenom":"HAINGOTIANA"},{"Matricule":"VP21220","sanctions":[],"controles":[],"Nom":"RAKOTOMANANA NIRINA","Prenom":"Daniel"},{"Matricule":"VP21216","sanctions":[],"controles":[],"Nom":"RATONGAVELO","Prenom":"Notiavina Laurah"},{"Matricule":"VP20001","sanctions":[],"controles":[],"Nom":"RAHARINIRIANA","Prenom":"Hobisoa Tahiana"},{"Matricule":"VP21206","sanctions":[],"controles":[],"Nom":"RAKOTONDRAZANANY","Prenom":"Maminirina Mampionona"},{"Matricule":"VP21171","sanctions":[],"controles":[],"Nom":"RAFETIARISOA","Prenom":"Hariniaina Claudia"},{"Matricule":"VP21183","sanctions":[],"controles":[],"Nom":"RAHARINIRINA ","Prenom":"Christine"},{"Matricule":"VP20121","sanctions":[],"controles":[],"Nom":"RAZAIHELIMANANA","Prenom":"Fananiaina Fanja"}],"Coach":[{"Matricule":"COTN102","sanctions":[],"controles":[],"Nom":"RAKOTONIAINA ","Prenom":"Harivelo Zo Patrick"},{"Matricule":"COTN128","sanctions":[],"controles":[],"Nom":"RAZAINDRAZAKA","Prenom":"NJAKATINA RINAH"},{"Matricule":"COTN127","sanctions":[],"controles":[],"Nom":"RAMANANTENASOA","Prenom":"Ny Ambina Lalaina"},{"Matricule":"COTN131","sanctions":[],"controles":[],"Nom":"RAKOTONIRINA","Prenom":"MAMINIAINA"}],"jour":"2021-05-10","ville":"ANTANANARIVO"} */
+/*
+    {"idMission":"ROAD_SHOW_2021_07_01","Commerciaux":[{"Matricule":"VP21300 ","sanctions":[{"code_sanction":"C-ABS-01-TER","titre":"ABSENCE DU COACH AVEC LE GROUPE SUR LE TERRAINABSE","valeur":2500,"unite":"APP\/HR"},{"code_sanction":"C-APM-11-MIS","titre":"ABSENCE APRES-MISSION - COACH","valeur":10000,"unite":"JOUR"}],"controles":[{"sim":"Telma","debut":"2021-07-01 15:35:35","fin":"2021-07-01 16:35:35","duree":"01:00:00"}],"Nom":"RAFARASOAVONJENA","Prenom":"Zanamino Lina"},{"Matricule":"VP21321 ","sanctions":[],"controles":[],"Nom":"RANDRIAMIRADO","Prenom":"Toky Nandrianina"},{"Matricule":"VP21326 ","sanctions":[],"controles":[],"Nom":"RANDRIAMIHAINGO","Prenom":"V\u00e9ronique"}],"Coach":[{"Matricule":"COTN134","sanctions":[],"controles":[],"Nom":"RANDRIAMIZAHA","Prenom":"Njaraniaina"},{"Matricule":"COTN137","sanctions":[],"controles":[],"Nom":"HEVIDRAZANA","Prenom":"Natoto Rhandy"},{"Matricule":"COTN128","sanctions":[],"controles":[],"Nom":"RAZAINDRAZAKA","Prenom":"NJAKATINA RINAH"},{"Matricule":"COTN127","sanctions":[],"controles":[],"Nom":"RAMANANTENASOA","Prenom":"Ny Ambina Lalaina"}],"jour":"2021-07-01","ville":"ANTANANARIVO"}
+*/
     public static function getControlMission($data){
         $missions = PersonnelService::getAllFromMission($data->jour);
+        //return $missions;
         $excel = "";
         foreach($missions as $mission){
-            if($mission->Id_de_la_mission == $data->idMission){
+            if($mission["idMission"] == $data->idMission){
                 $excel .="\n";
-                $excel .= "\t\t Mission: \t ".$idMission."\n\n";
-                $excel .= "nbr de commerciaux\t".count($mission->Commerciaux)."\tVille d animation\t".$mission->ville."\n\n";
-                $excel .= "Matricule\tHeure de controle\tVille d animation\tDuree de controle\tcode de sanction\tCA sanction\tEtat Controle\taction\n";
-                $excel .= "";
+                $excel .= "\t\t Mission: \t ".$data->idMission."\n\n";
+                $excel .= "nbr de commerciaux\t".count($mission["Commerciaux"])."\tVille d animation\t".$mission["ville"]."\n\n";
+                $excel .= "Matricule\tHeure de controle\tVille d animation\tcode de sanction\tEtat Controle\tMontant sanction\n";
+
+                $excel .= "\nCommerciaux\n";
+
+                foreach($mission["Commerciaux"] as $commerciaux){
+                    $excel .= $commerciaux["Matricule"]."\t";
+                    if(count($commerciaux["controles"])>0){
+                        foreach($commerciaux["controles"] as $controle){
+                            $excel .= $controle["debut"]." a ".$controle["fin"].",";
+                        }
+                    }
+                    else{
+                        $excel .= "aucun";
+                    }
+                    $excel .="\t";
+                    $excel .=$mission["ville"]."\t";
+                    $totalSanction = 0;
+                    if(count($commerciaux["sanctions"])>0){
+                        foreach($commerciaux["sanctions"] as $sanction){
+                            $excel .= $sanction["code_sanction"].",";
+                            $totalSanction += (int)$sanction["valeur"];
+                        }
+                    }
+                    else{
+                        $excel .= "aucun";
+                    }
+                    $excel .= "\t";
+                    if(count($commerciaux["controles"])>0){
+                        $excel .= "effectue\t";
+                    }else{
+                        $excel .= "non effectue\t";
+                    }
+                    $excel .= $totalSanction."\t";
+                    $excel .= "\n";
+                }
+
+                $excel .= "\nCoachs\n";
+
+                foreach($mission["Coach"] as $commerciaux){
+                    $excel .= $commerciaux["Matricule"]."\t";
+                    if(count($commerciaux["controles"])>0){
+                        foreach($commerciaux["controles"] as $controle){
+                            $excel .= $controle["debut"]." a ".$controle["fin"].",";
+                        }
+                    }
+                    else{
+                        $excel .= "aucun";
+                    }
+                    $excel .="\t";
+                    $excel .=$mission["ville"]."\t";
+                    $totalSanction = 0;
+                    if(count($commerciaux["sanctions"])>0){
+                        foreach($commerciaux["sanctions"] as $sanction){
+                            $excel .= $sanction["code_sanction"].",";
+                            $totalSanction += (int)$sanction["valeur"];
+                        }
+                    }
+                    else{
+                        $excel .= "aucun";
+                    }
+                    $excel .= "\t";
+                    if(count($commerciaux["controles"])>0){
+                        $excel .= "effectue\t";
+                    }else{
+                        $excel .= "non effectue\t";
+                    }
+                    $excel .= $totalSanction."\t";
+                    $excel .= "\n";
+                }
+
             }
         }
         header("Content-disposition: attachment; filename=control.xls");

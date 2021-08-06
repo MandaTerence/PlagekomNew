@@ -147,6 +147,9 @@
                         </div>
                     </div>
                 </div>
+                <div style="margin-top: 30px" class="row justify-content-center" v-if="isLoadingData">
+                    <div class="loader loader-lg"></div>
+                </div>
                 <div v-for="mission in missions" v-bind:key="mission">
                     <div v-if="mission.Commerciaux.length>1" style="margin:10px">
                         <hr>
@@ -342,7 +345,8 @@ export default {
                 "detailSanction": false,
                 "detailControle": false
             },
-            selectedCommercial: ''
+            selectedCommercial: '',
+            isLoadingData: false
         }
     },
     beforeRouteEnter(to, from, next) {
@@ -488,12 +492,14 @@ export default {
         loadMissionDate(){
             if(this.dateMission!=null){
                 localStorage.dateMission = this.dateMission;
+                this.isLoadingData = true;
                 axios.get('/api/personnels/getAllFromMission',{params: {jour: this.dateMission}}).then(response => {
                    this.missions = response.data.missions;
                    this.thereIsPersonnel = this.checkMission();
                    if(!this.thereIsPersonnel){
                        alert("aucune mission trouvé");
                    }
+                   this.isLoadingData = false;
                 });
             }
         },

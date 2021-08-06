@@ -86,6 +86,10 @@
                             <div class="col-md-4">
                                 <table>
                                     <tr>
+                                        <td><strong>Matricule:</strong></td>
+                                        <td style="text-align:right">{{ personnelData.Matricule }}</td>
+                                    </tr>
+                                    <tr>
                                         <td><strong>Nom Commercial:</strong></td>
                                         <td style="text-align:right">{{ personnelData.Nom }}</td>
                                     </tr>
