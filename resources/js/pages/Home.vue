@@ -60,12 +60,11 @@ export default {
         next();
     },
     created() {
-        //<h4>{{ nom }}       <br>{{ prenom }}         <br>{{ cin }}<br>{{ matricule }}        </h4>
         this.loadProfilePicture();
         this.nom = window.Laravel.user.Nom;
         this.prenom = window.Laravel.user.Prenom;
         this.matricule = window.Laravel.user.Matricule;
-        this.cin = window.Laravel.user.Cin_personnel.match(/.{1,3}/g).join('-');
+        this.cin = String(window.Laravel.user.Cin_personnel).match(/.{1,3}/g).join('-');
     },
     methods: {
         loadProfilePicture(){
