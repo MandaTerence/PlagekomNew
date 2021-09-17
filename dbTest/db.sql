@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Structure de la table `fonction`
+-- Structure de la table `fonction` adsasdas
 --
 
 CREATE TABLE `fonction` (
