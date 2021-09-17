@@ -6,11 +6,12 @@ use App\Models\DetailMission;
 use App\Models\Classement;
 use App\Models\Mission;
 use App\Models\Accompagnement;
+use Illuminate\Support\Facades\DB;
 
 
 class AccompagnementService {
 
-    CONST DATE_FORMAT = 'yy-m-d';
+    CONST DATE_FORMAT = 'Y-m-d';
 
     CONST JOUR_ACCOMPAGNEMENT = [
         //lundi
@@ -60,7 +61,7 @@ class AccompagnementService {
         return "ok test";
     }
 
-    public static function generatePlanning($idMission,$coach,$personnels=null){
+    public static function generatePlanningNew($idMission,$coach,$personnels=null){
         if($personnels==null){
             $personnels = DetailMission::getPersonnelFromCoach($coach,$idMission);
         }
@@ -103,6 +104,102 @@ class AccompagnementService {
         return true;
     }
 
+    public static function fillEmptyPersonnel($personnels){
+        if(count($personnels)>0){
+            $tableauFinal = [];
+            $personnelsInverse = array_reverse($personnels);
+            $indexFinal = 0;
+            
+            $taillePerso = count($personnels);
+            while($indexFinal<8){
+                $indexPerso = $indexFinal%$taillePerso;
+                $tableauFinal[] = $personnelsInverse[$indexPerso];
+                $indexFinal++;
+            }
+            $tableauFinal = array_reverse($tableauFinal);
+            $personnels = $tableauFinal;
+            $test = "";
+            for($i=0;$i<count($tableauFinal);$i++){
+                $test .= " |".$i."p".$tableauFinal[$i]["Matricule"];
+            }
+            DB::insert('insert into test (data) values (?)', [$test]);
+            return $tableauFinal;
+        }
+    }   
+
+    public static function generatePlanning($idMission,$coach,$personnels=null){
+        $accArray = [];
+        if($personnels==null){        
+            $personnels = DetailMission::getPersonnelFromCoach($coach,$idMission);
+        }
+        $personnels = self::fillEmptyPersonnel($personnels);
+        $matricules = [];
+        foreach($personnels as $p){
+            if(isset($p['Matricule'])){
+                $matricules[] = $p['Matricule'];
+            }
+            else{
+                $matricules[] = $p->Matricule;
+            }
+        }
+        //$classement = Classement::getFromMatricules($idMission,$matricules);
+        $mission = Mission::getFirst([['Id_de_la_mission',$idMission]]);
+        $Date_depart = $mission->Date_depart;
+        $Date_de_fin = $mission->Date_de_fin;
+        $periods = self::date_range($Date_depart,$Date_de_fin);
+        
+        for($i=0,$id=0;$i<count($periods);$i++){
+            $p = str_replace('/', '-', $periods[$i]);
+            $dateInserer = date(self::DATE_FORMAT, strtotime($p));
+            $date = date('N', strtotime($p));
+            if($date!=7){
+                $idPersonnelAInserer = (8-($id%8));
+                foreach(self::JOUR_ACCOMPAGNEMENT as $plan){
+                    if(($idPersonnelAInserer) == $plan['place']){
+                        $com = $personnels[$idPersonnelAInserer-1];
+                        $acc = [
+                            'Id_de_la_mission'=>$idMission, 
+                            'Commercial'=>$com["Matricule"],
+                            'Coach'=>$coach,
+                            'Date'=>$dateInserer,
+                            'Heure_debut'=>$plan['Heure_debut'],
+                            'Heure_fin'=>$plan['Heure_fin'],
+                            'Ordre'=>$plan['Ordre']
+                        ];
+                        $accArray[] = $acc;
+                    }
+                }
+                $id++;
+            }
+        }
+        /*for($i=0;$i<count($periods);$i++){
+            $p = str_replace('/', '-', $periods[$i]);
+            //$jour = date('w', strtotime($p));
+            $dateInserer = date(self::DATE_FORMAT, strtotime($p));
+            $date = date('N', strtotime($p));
+            if($date!=7){
+                foreach(self::JOUR_ACCOMPAGNEMENT as $plan){
+                    if((($i%6)+1) == $plan['Date']){
+                        $com = $classement[$plan['place']-1];
+                        $acc = [
+                            'Id_de_la_mission'=>$idMission, 
+                            'Commercial'=>$com->Commercial,
+                            'Coach'=>$coach,
+                            'Date'=>$dateInserer,
+                            'Heure_debut'=>$plan['Heure_debut'],
+                            'Heure_fin'=>$plan['Heure_fin'],
+                            'Ordre'=>$plan['Ordre']
+                        ];
+                        $accArray[] = $acc;
+                    }
+                }
+            }
+        }*/
+
+        Accompagnement::insert($accArray);
+        return true;
+    }
+
     public static function generatePlanningOld($idMission,$coach,$personnels=null){
         if($personnels==null){
             $personnels = DetailMission::getPersonnelFromCoach($coach,$idMission);
@@ -127,11 +224,11 @@ class AccompagnementService {
             $jour = date('w', strtotime($p));
             $dateInserer = date(self::DATE_FORMAT, strtotime($p));
             foreach(self::JOUR_ACCOMPAGNEMENT as $plan){
-                if($jour == $plan['Date']){
+                if(($jour == $plan['Date'])){
                     $com = $classement[$plan['place']-1];
                     $acc = [
                         'Id_de_la_mission'=>$idMission,
-                        'Commercial'=>$com->Commercial,
+                        'Commercial'=>$com->Personnel,
                         'Coach'=>$coach,
                         'Date'=>$dateInserer,
                         'Heure_debut'=>$plan['Heure_debut'],
@@ -192,6 +289,45 @@ class AccompagnementService {
             $jours[] =$jour;
         }
         return $jours;
+    }
+
+    public static function completeSunday($accompagnements){
+        $final = [];
+        foreach ($accompagnements as $accs) {
+            $final[] = $accs;
+            if(date('w', strtotime($accs["jour"]))==6){
+                $dimanche = [
+                    'Coach'=>$accs["Coach"],
+                    'jour'=>date('Y-m-d', strtotime("+1 day", strtotime($accs["jour"]))),
+                    'matin'=>[
+                        [
+                            'Commercial'=>"-",
+                            'Heure_debut'=>$accs["matin"][0]["Heure_debut"],
+                            'Heure_fin'=>$accs["matin"][0]["Heure_fin"]
+                        ],
+                        [
+                            'Commercial'=>"-",
+                            'Heure_debut'=>$accs["matin"][1]["Heure_debut"],
+                            'Heure_fin'=>$accs["matin"][1]["Heure_fin"]
+                        ]    
+                    ],
+                    'apresMidi'=>[
+                        [
+                            'Commercial'=>"-",
+                            'Heure_debut'=>$accs["apresMidi"][0]["Heure_debut"],
+                            'Heure_fin'=>$accs["apresMidi"][0]["Heure_fin"]
+                        ],
+                        [
+                            'Commercial'=>"-",
+                            'Heure_debut'=>$accs["apresMidi"][1]["Heure_debut"],
+                            'Heure_fin'=>$accs["apresMidi"][1]["Heure_fin"]
+                        ]
+                    ]
+                ];
+                $final[] = $dimanche;
+            }
+        }
+        return $final;
     }
 
     public static function toFormatParJourAcc($acc){

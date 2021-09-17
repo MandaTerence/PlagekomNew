@@ -8,6 +8,7 @@ use App\Models\Accompagnement;
 use App\Models\DetailMission;
 use Illuminate\Http\Request;
 use App\Services\AccompagnementService;
+use App\Services\PersonnelService;
 
 class ClassementController extends Controller
 {
@@ -15,7 +16,10 @@ class ClassementController extends Controller
         $coach = $request->input('matriculeCoach');
         $commerciaux = $request->input('matriculeCommerciaux');
         $idMission = $request->input('idMission');
+        
         $success = Classement::saveFromCommerciaux($idMission,$commerciaux); 
+        PersonnelService::saveEquipeTemp($commerciaux,$coach,$idMission);
+
         if($success){
             $test = AccompagnementService::generatePlanning($idMission,$coach,$commerciaux);
         }
@@ -24,6 +28,7 @@ class ClassementController extends Controller
             'test' => $test
         ];
         return $response;
+        
     }
 
     public function getPlanning(Request $request){
@@ -34,9 +39,11 @@ class ClassementController extends Controller
             if(isset($coachs)){
                 foreach($coachs as $coach){
                     $acc = Accompagnement::getFromMissionAndCoach($idMission,$coach->Coach);
+                    $acc = AccompagnementService::toFormatParJour($acc);
+                    $acc = AccompagnementService::completeSunday($acc);
                     $accParJour[] = [
                         "coach"=>$coach,
-                        "accompagnement"=>AccompagnementService::toFormatParJour($acc),
+                        "accompagnement"=>$acc,
                         "Commerciaux"=>Accompagnement::getCommerciaux($idMission,$coach->Coach)
                     ];
                 }

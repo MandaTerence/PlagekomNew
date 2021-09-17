@@ -24,8 +24,13 @@
         "vue-loader": "^16.1.2"
     },
     "dependencies": {
+        "@fullcalendar/core": "^5.9.0",
+        "@fullcalendar/vue": "^5.9.0",
+        "chart.js": "^2.9.4",
         "node-gyp": "^7.1.2",
         "vue": "^3.0.5",
+        "vue-chartjs": "^3.5.1",
+        "vue-month-picker": "^1.5.0",
         "vue-router": "^4.0.4",
         "vuesax": "^4.0.1-alpha.25"
     }

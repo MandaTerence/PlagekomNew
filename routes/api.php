@@ -9,7 +9,8 @@ use App\Http\Controllers\API\PersonnelController;
 use App\Http\Controllers\API\ClassementController;
 use App\Http\Controllers\API\ProduitController;
 use App\Http\Controllers\API\ControleController;
-
+use App\Http\Controllers\API\SanctionController;
+use App\Http\Controllers\API\SanctionPersonnelController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -31,17 +32,28 @@ Route::group(['prefix' => 'fonctions', 'middleware' => 'auth:sanctum'], function
 
 Route::group(['prefix' => 'missions', 'middleware' => 'auth:sanctum'], function () {
     Route::get('/', [MissionController::class, 'index']);
+    Route::get('/getTaux', [MissionController::class, 'getTaux']);
+    Route::get('/getAllTypesMission', [MissionController::class, 'getAllTypesMission']);
+    Route::get('/getEquipe', [MissionController::class, 'getEquipe']);
 });
-
 
 Route::group(['prefix' => 'personnels', 'middleware' => 'auth:sanctum'], function () {
     Route::get('/', [PersonnelController::class, 'index']);
     Route::get('/getFirstWhere', [PersonnelController::class, 'getFirstWhere']);
+    Route::get('/getFirstForEvaluation', [PersonnelController::class, 'getFirstForEvaluation']);
     Route::get('/getPersonnelData', [PersonnelController::class, 'getPersonnelData']);
     Route::get('/getMatriculeByFonction', [PersonnelController::class, 'getMatriculeByFonction']);
+    Route::get('/getEvaluation', [PersonnelController::class, 'getEvaluation']);
     Route::get('/getClassement', [PersonnelController::class, 'getClassement']);
     Route::get('/searchByFonction', [PersonnelController::class, 'searchByFonction']);
     Route::get('/getPersonnelFromCoach', [PersonnelController::class, 'getPersonnelFromCoach']);
+    Route::get('/getAllFromMission', [PersonnelController::class, 'getAllFromMission']);
+    Route::get('/getAllWithInfos', [PersonnelController::class, 'getAllWithInfos']);
+    Route::get('/getPersonnelEnMission', [PersonnelController::class, 'getPersonnelEnMission']);
+    Route::get('/getPersonnelLocaux', [PersonnelController::class, 'getPersonnelLocaux']);
+    Route::get('/getAllSalaire', [PersonnelController::class, 'getAllSalaire']);
+    Route::get('/getProposition', [PersonnelController::class, 'getProposition']);
+    Route::get('/getMatricule', [PersonnelController::class, 'getMatricule']);
 });
 
 Route::group(['prefix' => 'equipe', 'middleware' => 'auth:sanctum'], function () {
@@ -61,4 +73,15 @@ Route::group(['prefix' => 'produits', 'middleware' => 'auth:sanctum'], function 
     Route::get('/', [ProduitController::class, 'index']);
     Route::get('/getProduitByDesignation', [ProduitController::class, 'getProduitByDesignation']);
     Route::get('/getFirst', [ProduitController::class, 'getFirst']);
+});
+
+Route::group(['prefix' => 'sanction', 'middleware' => 'auth:sanctum'], function () {
+    Route::get('/', [SanctionController::class, 'getAll']);
+});
+
+Route::group(['prefix' => 'sanctionPersonnel', 'middleware' => 'auth:sanctum'], function () {
+    Route::post('/', [SanctionPersonnelController::class, 'create']);
+    Route::get('/getFromMatricule', [SanctionPersonnelController::class, 'getFromMatricule']);
+    Route::delete('/delete', [SanctionPersonnelController::class, 'delete']);
+    
 });

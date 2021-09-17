@@ -1,6 +1,5 @@
 <template>
     <div class="form-row">
-        
         <div class="form-group col-md-4">
             <label for="inputFonction">Fonction</label>
             <select class="form-control" id="inputFonction" v-model="idFonction" v-on:change="changeCustomId">
@@ -10,7 +9,7 @@
         <div class="form-group col-md-4">
             <label for="inputMatricule">Matricule</label>
             <input type="text" placeholder="what are you looking for?" v-model="matricule" class="form-control" v-on:keyup="autoComplete" v-on:click="autoComplete">
-            <div class="panel-footer" style="float:top">
+            <div class="panel-footer" style="float:top;position: absolute;z-index: 1;" >
                 <ul class="list-group">
                     <li class="list-group-item" v-for="result in resultats" v-bind:key="result" v-on:click.left="changeMatriculeValue(result.Matricule)" >
                         <div >{{ result.Matricule }}</div>

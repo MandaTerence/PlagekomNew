@@ -24,11 +24,86 @@ class PersonnelController extends Controller
         'produit' => []
     ];
 
+    public function getAllSalaire(Request $request){
+        $annee = '';
+        $mois = '';
+
+        if($request->annee){
+            $annee = $request->annee;
+        }
+        else{
+            $annee = date("y");
+        }
+        if($request->mois){
+            $mois = $request->mois;
+        }
+        else{
+            $mois = date("m");
+        }
+        $personnels = PersonnelService::getAllSalaire($mois,$annee);
+        $response = [
+            'success' => true,
+            'personnels' => $personnels,
+            'test' => $request->annee.' '.$request->mois
+        ];
+        return $response;
+    }
+
+    public function getPersonnelEnMission(Request $request){
+        $personnels = PersonnelService::getPersonnelsMission("MISSION");
+        $response = [
+            'success' => true,
+            'personnels' => $personnels,
+        ];
+        return $response;
+    }
+
+    public function getPersonnelLocaux(Request $request){
+        $personnels = PersonnelService::getPersonnelsMission("LOCAL");
+        $response = [
+            'success' => true,
+            'personnels' => $personnels,
+        ];
+        return $response;
+    }
+
+    public function getAllWithInfos(Request $request){
+        $interval = getDateInterval(Personnel::$DAY_INTERVAL);
+        $personnels = Personnel::selectRaw('personnel.Matricule,personnel.Nom,personnel.Prenom,Sum(detailvente.Quantite * prix.Prix_detail) as CA,Sum(detailvente.Quantite) as nbrProduit,count( DISTINCT facture.Id_de_la_mission ) as nbrMission')
+        ->join('facture','facture.Matricule_personnel','like','personnel.Matricule')
+        ->join('detailvente','detailvente.Facture','=','facture.id')
+        ->join('prix','detailvente.ID_prix','=','prix.Id')
+        ->whereBetween('facture.Date', [$interval->firstDate,$interval->lastDate])
+        ->where('personnel.Fonction_actuelle','like','1')
+        ->orWhere('personnel.Fonction_actuelle','like','6')
+        ->groupBy('Matricule','Nom','Prenom')
+        ->orderBy('CA','DESC')
+        ->get();
+        for($i=0;$i<count($personnels);$i++){
+            $personnels[$i]->Place = $i+1;
+            $personnels[$i]->CA = (int)$personnels[$i]->CA;
+            $personnels[$i]->nbrProduit = (int)$personnels[$i]->nbrProduit;
+            $personnels[$i]->getAssuidite();
+        }
+        $response = [
+            'success' => true,
+            'personnels' => $personnels,
+        ];
+        return $response;
+    }
+
     public function index(Request $request){
         $personnels = Personnel::where(ControllerHelper::getConditions($request))
             ->take(self::DEFAULT_MAX_RESULT)
             ->get();
-        return $personnels; 
+        return $personnels;
+    }
+
+    public function compareCATotal($pa,$pb){
+        if ($pa->CATotal == $pb->CATotal) { 
+            return 0;
+        }
+        return ($pa->CATotal > $pb->CATotal) ? -1 : 1;
     }
 
     public function compareCA($pa,$pb){
@@ -38,7 +113,7 @@ class PersonnelController extends Controller
         return ($pa->CA > $pb->CA) ? -1 : 1;
     }
 
-    public function getClassement(Request $request){
+    public function getClassementOld(Request $request){
         $personnels = [];
         if(isset($request->Matricules)){
             $personnels = PersonnelService::getPersonnelFromMatricule($request->Matricules);
@@ -80,40 +155,302 @@ class PersonnelController extends Controller
         return $response;
     }
 
-    public function getClassementOld(Request $request){
-        $classementGlobal = [];
-        $classementLocal = [];
-        $classementMission = [];
-        $classementProduits = [];
-        if(isset($request->Matricules)){
-            $classementGlobal = ClassementService::getClassementGlobal($request->Matricules);
-            $classementLocal = ClassementService::getClassementLocal($request->Matricules);
-            $classementMission = ClassementService::getClassementMission($request->Matricules);
+    public function getProposition(Request $request){
+        $interval = getDateInterval(30);
+        $idType = $request->idType;
+        $produits = $request->produits;
+        $pourcentage = $request->pourcentage;
+        $dateExclus = [];
+        if($request->listeDateExclu){
+            $dateExclus = $request->listeDateExclu;
+        }
+        if((isset($request->dateDebut))&&(isset($request->dateFin))){
+            $interval = (object) [
+                "lastDate" => $request->dateFin,
+                "firstDate" => $request->dateDebut
+            ];
+        }
+        $jourTravail = PersonnelService::getJourTravail($interval,$dateExclus);
+        return [
+            "propositions" => Personnel::getProposition($idType,$interval,$pourcentage,$dateExclus,$produits),
+            "interval" => $interval,
+            "idType" => $idType,
+            "dateExclu" => $dateExclus,
+            "jourTravail" => $jourTravail
+        ];
+    }
+
+    public function getFirstForEvaluation(Request $request){
+        $matricule = $request->matricule;
+        $interval = getDateInterval(30);
+        $idType = $request->idType;
+        $produits = $request->produits;
+        $pourcentage = $request->pourcentage;
+        $dateExclus = [];
+        if($request->listeDateExclu){
+            $dateExclus = $request->listeDateExclu;
+        }
+        if((isset($request->dateDebut))&&(isset($request->dateFin))){
+            $interval = (object) [
+                "lastDate" => $request->dateFin,
+                "firstDate" => $request->dateDebut
+            ];
+        }
+        $jourTravail = PersonnelService::getJourTravail($interval,$dateExclus);
+
+        $personnel = new Personnel();
+        $personnel->Matricule = $matricule;
+        $personnel->getNomFromMAtricule();
+
+        if(isset($personnel->Nom)){
+            $personnel->getAllCA($interval,$dateExclus,$produits,$idType);
+            return [
+                'success' => true,
+                'personnel' => $personnel
+            ];
         }
 
-        if(isset($request->Produits)){
-            foreach($request->Produits as $produit){
-                $classementProduits[] =
-                [
-                    "produit" => $produit,
-                    "classement" => ClassementService::getClassementProduit($request->Matricules,$produit)
+        else{
+            return [
+                'success' => false,
+            ];
+        }
+    }
+
+    public function getEvaluation(Request $request){
+        
+        $equipeA = [];
+        $interval = getDateInterval(30);
+        $dateXclu = $request->listeDateExclu;
+        $pourcentage = $request->pourcentage;
+        $minimumVente = $request->minimumVente;
+        
+        if(!isset($pourcentage)){
+            $pourcentage = 0;
+        }
+        if(!isset($minimumVente)){
+            $minimumVente = 0;
+        }
+        if(!isset($dateXclu)){
+            $dateXclu = [];
+        }
+        if((isset($request->Matricules))){
+            $equipeA = PersonnelService::getPersonnelFromMatricule($request->Matricules);
+        }
+        if((isset($request->dateDebut))&&(isset($request->dateFin))){
+            $interval = (object) [
+                "lastDate" => $request->dateFin,
+                "firstDate" => $request->dateDebut
+            ];
+        }
+
+        $jourDeTravail = PersonnelService::getJourTravail($interval,$dateXclu);
+        //$equipe = [];
+
+        foreach($equipeA as $personnel){
+            $personnel->getAllCA($interval,$dateXclu);
+            $personnel->getNbrJourObjectifAtteint($interval,$dateXclu);
+            $personnel->getPourcentageObjectif($jourDeTravail);
+            $personnel->getNbrProduit($interval);
+            $personnel->getStatutbimestriel();
+            $personnel->getAssuidite();
+            $personne = new Personnel();
+            $personne->Matricule = $personnel->Matricule;
+            //$equipe[] = $personne;
+        }
+        
+        $classement = ClassementService::getEvaluation($equipeA,self::DEFAULT_COEF,$interval,$dateXclu,$pourcentage);
+
+        $success = true;
+        $message = 'resultat trouvé';
+        $response = [
+            'success' => $success,
+            'nbrJourDeTravail' => $jourDeTravail,
+            'classements' => $classement
+        ];
+        //
+        return $response;
+    }
+
+    public function getClassement(Request $request){
+
+        $interval = getDateInterval(30);
+        $equipes = [];
+        $resultat = [];
+
+        if((isset($request->dateDebut))&&(isset($request->dateFin))){
+            $interval = [
+                "lastDate" => $request->dateDebut,
+                "firstDate" => $request->dateFin
+            ];
+        }
+
+        $equipes = $request->equipes;
+        foreach($equipes as $equipe){
+
+                $personnels = [];
+                $listeEquipe = json_decode($equipe);
+                $listeCommerciaux = $listeEquipe->commerciaux;
+                foreach($listeCommerciaux as $element){
+                    $p = new Personnel;
+                    $p->Matricule = $element->Matricule;
+                    $p->getNomFromMAtricule();
+                    $personnels[] = $p;
+                }
+
+                $equipe = $personnels;
+
+                foreach($equipe as $personnel){
+                    if(isset($request->Produits)){
+                        $personnel->getAllCA($request->Produits);
+                    }
+                    else{
+                        $personnel->getAllCA();
+                    }
+                }
+
+                $resultatEquipe = [
+                    'coach' => $listeEquipe->coachs,
+                    'classementReel' => ClassementService::getClassementTotal($equipe,self::DEFAULT_COEF),
+                    'classementDetail' =>[
+                        [
+                            'nom' =>'classementGlobal',
+                            'classement' => ClassementService::getClassementGlobal($equipe)
+                        ]
+                        ,
+                        [
+                            'nom' => 'classementLocal',
+                            'classement' => ClassementService::getClassementLocal($equipe)
+                        ]
+                        ,
+                        [
+                            'nom' =>'classementMission',
+                            'classement' => ClassementService::getClassementMission($equipe)
+                        ]
+                    ]
                 ];
+                if(isset($request->Produits)){
+                    $resultatEquipe->classementDetail[] = 
+                    [
+                        'nom' => 'classementProduitPlusCher',
+                        'classement' => ClassementService::getClassementProduitPlusCher($equipe)
+                    ];
+                    $resultatEquipe->classementDetail[] = 
+                    [
+                        'nom' => 'classementProduitPlusCher',
+                        'classement' => ClassementService::getClassementProduitPlusCher($equipe)
+                    ];
+                };
+                $resultat[] = $resultatEquipe;
+            
+        }
+
+
+        $success = true;
+
+        $response = [
+            'success' => $success,
+            'resultat' => $resultat,
+        ];
+
+        return $response;
+        /*
+
+        if((isset($request->matriculeA))&&(isset($request->matriculeB))){
+            $equipeA = PersonnelService::getPersonnelFromMatricule($request->matriculeA);
+            $equipeB = PersonnelService::getPersonnelFromMatricule($request->matriculeB);
+        }
+        
+        foreach($equipeA as $personnel){
+            if(isset($request->Produits)){
+                $personnel->getAllCA($request->Produits);
+            }
+            else{
+                $personnel->getAllCA();
             }
         }
+        foreach($equipeB as $personnel){
+            if(isset($request->Produits)){
+                $personnel->getAllCA($request->Produits);
+            }
+            else{
+                $personnel->getAllCA();
+            }
+        }
+        $resultatEquipeA = [
+            'classementReel' => ClassementService::getClassementTotal($equipeA,self::DEFAULT_COEF),
+            'classementDetail' =>[
+                [
+                    'nom' =>'classementGlobal',
+                    'classement' => ClassementService::getClassementGlobal($equipeA)
+                ]
+                ,
+                [
+                    'nom' => 'classementLocal',
+                    'classement' => ClassementService::getClassementLocal($equipeA)
+                ]
+                ,
+                [
+                    'nom' =>'classementMission',
+                    'classement' => ClassementService::getClassementMission($equipeA)
+                ]
+            ]
+        ];
+        if(isset($request->Produits)){
+            $resultatEquipeA->classementDetail[] = 
+            [
+                'nom' => 'classementProduitPlusCher',
+                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
+            ];
+            $resultatEquipeA->classementDetail[] = 
+            [
+                'nom' => 'classementProduitPlusCher',
+                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
+            ];
+        };
+        $resultatEquipeB = [
+            'classementReel' => ClassementService::getClassementTotal($equipeB,self::DEFAULT_COEF),
+            'classementDetail' =>[
+                [
+                    'nom' =>'classementGlobal',
+                    'classement' => ClassementService::getClassementGlobal($equipeB)
+                ]
+                ,
+                [
+                    'nom' => 'classementLocal',
+                    'classement' => ClassementService::getClassementLocal($equipeB)
+                ]
+                ,
+                [
+                    'nom' =>'classementMission',
+                    'classement' => ClassementService::getClassementMission($equipeB)
+                ]
+            ]
+        ];
+        if(isset($request->Produits)){
+            $resultatEquipeA->classementDetail[] = 
+            [
+                'nom' => 'classementProduitPlusCher',
+                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
+            ];
+            $resultatEquipeA->classementDetail[] = 
+            [
+                'nom' => 'classementProduitPlusCher',
+                'classement' => ClassementService::getClassementProduitPlusCher($equipeA)
+            ];
+        };
 
         $success = true;
         $message = 'resultat trouvé';
 
         $response = [
             'success' => $success,
-            'message' => $message,
-            'classementGlobal' =>$classementGlobal,
-            'classementLocal' =>$classementLocal,
-            'classementMission' =>$classementMission,
-            'classementProduit' =>$classementProduits
+            'resultatEquipeA' => $resultatEquipeA,
+            'resultatEquipeB' => $resultatEquipeB,
         ];
         
         return $response;
+        */
     }
 
     public function getClassementsss(Request $request){
@@ -162,20 +499,10 @@ class PersonnelController extends Controller
             }
         }
         $personnel = Personnel::getFirstWithCA($conditions);
-        $testCA = 0;
-        $testCAB = 0;
-        if(isset($personnel)){
-            $testCA = $personnel->getCAselonProduit('SYSTEMA TOOTHPASTE CHARCOAL');
-            $testCAB = $personnel->getCAMission();
-            $testCAC = $personnel->getCALocal();
-        }
         if($personnel){
             $response = [
                 'success' => true,
                 'message' => 'resultat trouvé',
-                'CA produit' => $testCA,
-                'CA Mission' => $testCAB,
-                'CA local' => $testCAC,
                 'personnel' => $personnel,
             ];
             return response()->json($response);
@@ -236,6 +563,20 @@ class PersonnelController extends Controller
         }
     }
 
+    public function getMatricule(Request $request){
+        $conditions = [];
+        if(isset($request->search)){
+            $conditions[] = ['Matricule','like','%'.$request->search.'%'];
+        }
+        $personnels = Personnel::getMatricules($conditions);
+        $response = [
+            'success' => true,
+            'message' => count($personnels).' results founds',
+            'personnels' => $personnels,
+        ];
+        return $response;
+    }
+
     public function searchByFonction(Request $request){
         if(isset($request->fonction)){
             $conditions = [];
@@ -269,13 +610,32 @@ class PersonnelController extends Controller
     public function getPersonnelData(Request $request){
         $personnel = Personnel::whereRaw("Matricule like '".$request->matricule."' ")
         ->first();
-        if($personnel){
-            $response = [
-                'success' => true,
-                'message' => 'resultat trouvé',
-                'personnel' => $personnel,
-            ];
-            return $response;
+        if($personnel!=null){
+            $personnel->getDetailPersonnel();
+            $personnel->getStatutbimestriel();
+            $personnel->getStatutAnnuel();
+            $personnel->getChiffreDAffaire();
+            $personnel->getBonusMensuel();
+            $personnel->getIndemnite();
+            $personnel->getSanction();
+            $personnel->getJourAbsence();
+            $personnel->getMalusVente();
+            if($personnel){
+                $response = [
+                    'success' => true,
+                    'message' => 'resultat trouvé',
+                    'personnel' => $personnel,
+                ];
+                return $response;
+            }
+            else{
+                $response = [
+                    'success' => false,
+                    'message' => 'aucun resultat trouvé',
+                    'personnel' => null,
+                ];
+                return $response;
+            }
         }
         else{
             $response = [
@@ -287,5 +647,14 @@ class PersonnelController extends Controller
         }
     }
 
-}
+    public function getAllFromMission(Request $request){
+        $jour = $request->jour;
+        $missions = PersonnelService::getAllFromMission($jour);
+        $response = [
+            'success' => true,
+            'missions' =>$missions
+        ];
+        return $response;
+    }
 
+}

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Produit;
 use App\Helpers\ControllerHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProduitController extends Controller
 {
