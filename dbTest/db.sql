@@ -87,7 +87,7 @@ CREATE TABLE `personnel` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Déchargement des données de la table `personnel`
+-- Déchargement des données de la table `personnel`asdasd
 --
 
 INSERT INTO `personnel` (`Matricule`, `Date_d_embauche`, `Nom`, `Prenom`, `Date_de_naissance`, `Lieu_de_naissance`, `Sexe`, `Situation_Matrimoniale`, `Nombre_d_enfant`, `Cin_personnel`, `Date_cin_personnel`, `Lieu_delivrance_du_cin_personnel`, `Date_duplicata_cin_personnel`, `Lieu_de_dupliacata_cin_personnel`, `Adresse_du_personnel`, `Contact_du_personnel`, `Nom_et_prenom_du_tuteur`, `Lien_de_parente`, `Cin_du_tuteur`, `Date_de_delivrance_cin_tuteur`, `Adresse_du_tuteur`, `Contact_du_tuteur`, `Fonction_a_l_embauche`, `Fonction_actuelle`, `Mode_de_pass_login`, `statut`) VALUES
